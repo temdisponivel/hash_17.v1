@@ -29,6 +29,8 @@ namespace Hash17.Programs.Implementation
             {
                 Terminal.Instance.ClearAll();
             }
+
+            yield return null;
         }
     }
 }
