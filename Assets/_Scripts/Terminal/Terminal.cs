@@ -72,7 +72,7 @@ namespace Hash17.Terminal_
 
         public string CurrentLocationAndUserName
         {
-            get { return string.Format("{0}:{1}>", CurrentUserName, CurrentLocation); }
+            get { return string.Format("{0}:{1}", CurrentUserName, CurrentLocation); }
         }
 
         public event Action<IProgram> OnProgramExecuted;
@@ -91,6 +91,8 @@ namespace Hash17.Terminal_
         {
             base.Awake();
             ClearInput();
+            CurrentUserName = "#17";
+            CurrentLocation = "/~";
         }
 
         #endregion

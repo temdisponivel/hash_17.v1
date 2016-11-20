@@ -21,21 +21,21 @@ namespace Hash17.Programs
 
         protected Coroutine ExecCoroutine { get; set; }
 
-        public ProgramScriptableObject Definition { get; private set; }
-
-        #endregion
-
-        #region Unity events
-
-        protected virtual void Awake()
+        private ProgramScriptableObject _definition;
+        public ProgramScriptableObject Definition
         {
-            ProgramScriptableObject def;
-            Blackboard.Instance.ProgramDefinitionById.TryGetValue(Id, out def);
-            Definition = def;
+            get
+            {
+                if (_definition == null)
+                    _definition = Blackboard.Instance.ProgramDefinitionById[Id];
+
+                return _definition;
+
+            }
         }
 
         #endregion
-
+        
         #region IProgram
 
         public void Execute(string parameters)

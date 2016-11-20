@@ -6,6 +6,7 @@ namespace Hash17.Programs
     {
         void Execute(string parameters);
         string GetDescription();
+        string GetUsage();
         void Stop();
         event Action<IProgram> OnStart;
         event Action<IProgram> OnFinish;

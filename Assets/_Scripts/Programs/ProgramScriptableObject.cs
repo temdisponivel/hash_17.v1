@@ -10,8 +10,10 @@ namespace Hash17.Programs
     public class ProgramScriptableObject : ScriptableObject
     {
         public int Id;
+        public string Command;
         public string Description;
         public string Usage;
+        public string PrefabPath;
         public string[] KnownParametersAndOptions;
     }
 }
