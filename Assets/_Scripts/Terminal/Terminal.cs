@@ -40,8 +40,13 @@ namespace Hash17.Terminal_
                 Input.enabled = !_blockInput;
             }
         }
-        
-        public bool TreatInput { get; set; }
+
+        private bool _treatInput = true;
+        public bool TreatInput
+        {
+            get { return _treatInput; }
+            set { _treatInput = value; }
+        }
 
         private string _currentLocation;
         public string CurrentLocation
@@ -70,13 +75,27 @@ namespace Hash17.Terminal_
             get { return string.Format("{0}:{1}>", CurrentUserName, CurrentLocation); }
         }
 
-        public event Action<IProgram> OnRunProgram;
+        public event Action<IProgram> OnProgramExecuted;
+        public event Action<IProgram> OnProgramFinished;
         public event Action<string> OnInputSubmited;
         public event Action OnInputValueChange;
 
+        public readonly List<string> AllCommandsTyped = new List<string>();
+        private int _currentNavigationCommandIndex = -1;
+
         #endregion
 
-        #region Input
+        #region Unity events
+
+        protected override void Awake()
+        {
+            base.Awake();
+            ClearInput();
+        }
+
+        #endregion
+
+        #region Programs
 
         public void InputValueChange()
         {
@@ -86,21 +105,26 @@ namespace Hash17.Terminal_
 
         public void OnInputSubmit()
         {
-            string value = Input.value;
+            string value = Input.value.Trim();
             if (TreatInput)
             {
                 TreatInputText(Input.value);
-                Input.value = string.Empty;
+                
+                ClearInput();
 
                 if (OnInputSubmited != null)
                     OnInputSubmited(value);
+
+                value = value.Replace("\n", string.Empty);
+                if (!string.IsNullOrEmpty(value))
+                    AllCommandsTyped.Insert(0, value);
             }
         }
 
         private void TreatInputText(string text)
         {
             text = text.Replace("\n", string.Empty);
-            AddText(text);
+            ShowText(text);
 
             string programName, programParams;
             if (Interpreter.GetProgram(text, out programName, out programParams))
@@ -112,10 +136,19 @@ namespace Hash17.Terminal_
                     RunningPrograms.Add(programInstance);
                     programInstance.Execute(programParams);
 
-                    if (OnRunProgram != null)
-                        OnRunProgram(programInstance);
+                    if (OnProgramExecuted != null)
+                        OnProgramExecuted(programInstance);
+
+                    programInstance.OnFinish += ProgramFinished;
                 }
             }
+        }
+
+        private void ClearInput()
+        {
+            Input.value = string.Empty;
+            _currentNavigationCommandIndex = -1;
+            Input.isSelected = true;
         }
 
         private void UpdateUserNameLocation()
@@ -123,11 +156,44 @@ namespace Hash17.Terminal_
             LabelUserNameLocation.text = CurrentLocationAndUserName;
         }
 
+        public void OnUpPressed()
+        {
+            _currentNavigationCommandIndex = Math.Min(AllCommandsTyped.Count - 1, _currentNavigationCommandIndex + 1);
+            UpdateCommandLineToCommandIndex();
+        }
+
+        public void OnDownPressed()
+        {
+            _currentNavigationCommandIndex = Math.Max(0, _currentNavigationCommandIndex - 1);
+            UpdateCommandLineToCommandIndex();
+        }
+
+        public void OnEscPressed()
+        {
+            ClearInput();
+        }
+
+        public void UpdateCommandLineToCommandIndex()
+        {
+            if (AllCommandsTyped.Count != 0)
+                Input.value = AllCommandsTyped[_currentNavigationCommandIndex];
+        }
+
+        private void ProgramFinished(IProgram program)
+        {
+            RunningPrograms.Remove(program);
+
+            program.OnFinish -= ProgramFinished;
+
+            if (OnProgramFinished != null)
+                OnProgramFinished(program);
+        }
+
         #endregion
 
         #region Interface
 
-        public void AddText(string text)
+        public void ShowText(string text)
         {
             var newText = NGUITools.AddChild(TextTable.gameObject, TextEntryPrefab);
             newText.transform.SetAsFirstSibling();
@@ -142,10 +208,15 @@ namespace Hash17.Terminal_
 
         public void Clear(int quantity)
         {
-            for (int i = TextTable.children.Count - 1; i >= 0 && quantity > 0; i--)
+            if (quantity == 0)
+                return;
+
+            for (int i = TextTable.children.Count - 1; quantity > 0 && i >= 0 && i < TextTable.children.Count; i--)
             {
                 quantity--;
-                Destroy(TextTable.children[i].gameObject);
+
+                if (TextTable.children[i])
+                    Destroy(TextTable.children[i].gameObject);
             }
 
             TextTable.Reposition();

@@ -13,8 +13,6 @@ namespace Hash17.Programs.Implementation
     {
         protected override IEnumerator InnerExecute(string parameters)
         {
-            yield return null;
-
             string value = string.Empty;
             bool clearQuant = false;
             int quant = 0;
@@ -22,9 +20,7 @@ namespace Hash17.Programs.Implementation
             {
                 clearQuant = int.TryParse(value, out quant) && quant > 0;
             }
-
-            yield return 0;
-
+            
             if (clearQuant)
             {
                 Terminal.Instance.Clear(quant);

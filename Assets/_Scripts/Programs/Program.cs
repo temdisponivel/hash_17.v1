@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Hash17.Terminal_;
+using Hash17.Utils;
 using UnityEngine;
 
 namespace Hash17.Programs
@@ -24,8 +25,7 @@ namespace Hash17.Programs
         public void Execute(string parameters)
         {
             Parameters = parameters;
-
-            BlockInput();
+            
             Running = true;
             ExecCoroutine = StartCoroutine(InnerExecute(parameters));
             StartCoroutine(WaitToFinish());
@@ -66,7 +66,8 @@ namespace Hash17.Programs
         protected void FinishExecution()
         {
             Running = false;
-            UnblockInput();
+
+            Terminal.Instance.ShowText(TextBuilder.ErrorText("FINISHING TERMINAL"));
 
             if (OnFinish != null)
                 OnFinish(this);
