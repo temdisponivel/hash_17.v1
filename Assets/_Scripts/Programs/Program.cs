@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using Hash17.Blackboard_;
 using Hash17.Terminal_;
 using Hash17.Utils;
 using UnityEngine;
@@ -10,13 +12,27 @@ namespace Hash17.Programs
     {
         #region Properties
 
+        public int Id;
         public event Action<IProgram> OnStart;
         public event Action<IProgram> OnFinish;
-        public string Parameters { get; set; }
+        public ProgramParameter Parameters { get; set; }
 
         public bool Running { get; private set; }
 
         protected Coroutine ExecCoroutine { get; set; }
+
+        public ProgramScriptableObject Definition { get; private set; }
+
+        #endregion
+
+        #region Unity events
+
+        protected virtual void Awake()
+        {
+            ProgramScriptableObject def;
+            Blackboard.Instance.ProgramDefinitionById.TryGetValue(Id, out def);
+            Definition = def;
+        }
 
         #endregion
 
@@ -24,10 +40,10 @@ namespace Hash17.Programs
 
         public void Execute(string parameters)
         {
-            Parameters = parameters;
+            Parameters = new ProgramParameter(parameters);
             
             Running = true;
-            ExecCoroutine = StartCoroutine(InnerExecute(parameters));
+            ExecCoroutine = StartCoroutine(InnerExecute());
             StartCoroutine(WaitToFinish());
 
             if (OnStart != null)
@@ -46,12 +62,56 @@ namespace Hash17.Programs
         {
             return Instantiate(this).GetComponent<IProgram>();
         }
-        
+
+        public virtual string GetDescription()
+        {
+            if (Definition != null)
+                return Definition.Description;
+
+            return string.Empty;
+        }
+
+        public virtual string GetUsage()
+        {
+            if (Definition != null)
+                return Definition.Usage;
+
+            return string.Empty;
+        }
+
+        protected bool AskedForHelp(bool showHelpIftrue)
+        {
+            bool result = Parameters.ContainParam("h");
+            if (showHelpIftrue && result)
+            {
+                Terminal.Instance.ShowText(GetDescription());
+                Terminal.Instance.ShowText(GetUsage());
+            }
+
+            return result;
+        }
+
+        protected bool ValidateUnknowParameters(bool shouldShowUsage)
+        {
+            List<ProgramParameter.Param> unknownParams;
+            bool result = Parameters.HasParamOtherThan(out unknownParams, Definition.KnownParametersAndOptions);
+            if (result)
+            {
+                for (int i = 0; i < unknownParams.Count; i++)
+                {
+                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Unknow {0} {1}.", unknownParams[i].IsOption ? "option" : "parameter", unknownParams[i].Name)));
+                }
+                Terminal.Instance.ShowText(GetUsage());
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region Helpers
 
-        protected abstract IEnumerator InnerExecute(string parameters);
+        protected abstract IEnumerator InnerExecute();
 
         protected void BlockInput()
         {
@@ -67,8 +127,6 @@ namespace Hash17.Programs
         {
             Running = false;
 
-            Terminal.Instance.ShowText(TextBuilder.ErrorText("FINISHING TERMINAL"));
-
             if (OnFinish != null)
                 OnFinish(this);
 
@@ -81,6 +139,11 @@ namespace Hash17.Programs
 
             if (Running)
                 FinishExecution();
+        }
+
+        protected void LoadUsageFromAsset()
+        {
+            
         }
 
         #endregion

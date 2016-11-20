@@ -11,26 +11,37 @@ namespace Hash17.Programs.Implementation
 {
     public class Clear : Program
     {
-        protected override IEnumerator InnerExecute(string parameters)
+        protected override IEnumerator InnerExecute()
         {
-            string value = string.Empty;
-            bool clearQuant = false;
-            int quant = 0;
-            if (Interpreter.ContainsParameter(parameters, false, "C", out value))
+            if (AskedForHelp(true))
             {
-                clearQuant = int.TryParse(value, out quant) && quant > 0;
+                yield break;
             }
-            
-            if (clearQuant)
+
+            if (ValidateUnknowParameters(true))
             {
-                Terminal.Instance.Clear(quant);
+                yield break;
+            }
+
+            ProgramParameter.Param param;
+            if (Parameters.TryGetParam("C", out param))
+            {
+                int quant = 0;
+                if (!param.IsOption && int.TryParse(param.Value, out quant) && quant > 0)
+                {
+                    Terminal.Instance.Clear(quant);
+                }
+                else
+                {
+                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Invalid value for parameter -C.\n{0}", GetUsage())));
+                }
             }
             else
             {
                 Terminal.Instance.ClearAll();
             }
 
-            yield return null;
+            yield break;
         }
     }
 }

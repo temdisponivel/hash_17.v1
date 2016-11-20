@@ -211,7 +211,7 @@ namespace Hash17.Terminal_
             if (quantity == 0)
                 return;
 
-            for (int i = TextTable.children.Count - 1; quantity > 0 && i >= 0 && i < TextTable.children.Count; i--)
+            for (int i = 0; quantity > 0 && i < TextTable.children.Count; i++)
             {
                 quantity--;
 
