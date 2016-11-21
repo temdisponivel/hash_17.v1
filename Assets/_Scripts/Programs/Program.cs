@@ -12,7 +12,7 @@ namespace Hash17.Programs
     {
         #region Properties
 
-        public int Id;
+        public ProgramId Id;
         public event Action<IProgram> OnStart;
         public event Action<IProgram> OnFinish;
         public ProgramParameter Parameters { get; set; }
@@ -99,12 +99,27 @@ namespace Hash17.Programs
             {
                 for (int i = 0; i < unknownParams.Count; i++)
                 {
-                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Unknow {0} {1}.", unknownParams[i].IsOption ? "option" : "parameter", unknownParams[i].Name)));
+                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Unknow parameter {0}.", unknownParams[i].Name)));
                 }
                 Terminal.Instance.ShowText(GetUsage());
             }
 
             return result;
+        }
+
+        public bool HelpOrUnknownParameters(bool shouldShowUsage)
+        {
+            if (AskedForHelp(shouldShowUsage))
+            {
+                return true;
+            }
+
+            if (ValidateUnknowParameters(shouldShowUsage))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         #endregion

@@ -13,21 +13,16 @@ namespace Hash17.Programs.Implementation
     {
         protected override IEnumerator InnerExecute()
         {
-            if (AskedForHelp(true))
+            if (HelpOrUnknownParameters(true))
             {
                 yield break;
             }
-
-            if (ValidateUnknowParameters(true))
-            {
-                yield break;
-            }
-
+            
             ProgramParameter.Param param;
             if (Parameters.TryGetParam("C", out param))
             {
                 int quant = 0;
-                if (!param.IsOption && int.TryParse(param.Value, out quant) && quant > 0)
+                if (int.TryParse(param.Value, out quant) && quant > 0)
                 {
                     Terminal.Instance.Clear(quant);
                 }

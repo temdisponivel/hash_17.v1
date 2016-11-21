@@ -18,7 +18,7 @@ namespace Hash17.Terminal_
         public UIInput Input;
         public UILabel LabelUserNameLocation;
 
-        private readonly  List<IProgram> _runningPrograms = new List<IProgram>();
+        private readonly List<IProgram> _runningPrograms = new List<IProgram>();
         public List<IProgram> RunningPrograms
         {
             get
@@ -48,31 +48,20 @@ namespace Hash17.Terminal_
             set { _treatInput = value; }
         }
 
-        private string _currentLocation;
-        public string CurrentLocation
-        {
-            get { return _currentLocation; }
-            set
-            {
-                _currentLocation = value;
-                UpdateUserNameLocation();
-            }
-        }
-
         private string _currentUserName;
         public string CurrentUserName
         {
             get { return _currentUserName; }
             set
             {
-                _currentUserName = value; 
+                _currentUserName = value;
                 UpdateUserNameLocation();
             }
         }
 
         public string CurrentLocationAndUserName
         {
-            get { return string.Format("{0}:{1}", CurrentUserName, CurrentLocation); }
+            get { return string.Format("{0}:{1}", CurrentUserName, ""); }
         }
 
         public event Action<IProgram> OnProgramExecuted;
@@ -92,7 +81,6 @@ namespace Hash17.Terminal_
             base.Awake();
             ClearInput();
             CurrentUserName = "#17";
-            CurrentLocation = "/~";
         }
 
         #endregion
@@ -108,19 +96,20 @@ namespace Hash17.Terminal_
         public void OnInputSubmit()
         {
             string value = Input.value.Trim();
+
             if (TreatInput)
             {
                 TreatInputText(Input.value);
-                
-                ClearInput();
 
-                if (OnInputSubmited != null)
-                    OnInputSubmited(value);
+                ClearInput();
 
                 value = value.Replace("\n", string.Empty);
                 if (!string.IsNullOrEmpty(value))
                     AllCommandsTyped.Insert(0, value);
             }
+
+            if (OnInputSubmited != null)
+                OnInputSubmited(value);
         }
 
         private void TreatInputText(string text)
@@ -129,20 +118,22 @@ namespace Hash17.Terminal_
             ShowText(text);
 
             string programName, programParams;
-            if (Interpreter.GetProgram(text, out programName, out programParams))
+            Interpreter.GetProgram(text, out programName, out programParams);
+            IProgram program;
+            if (Blackboard.Instance.Programs.TryGetValue(programName, out program))
             {
-                IProgram program;
-                if (Blackboard.Instance.Programs.TryGetValue(programName, out program))
-                {
-                    var programInstance = program.Clone();
-                    RunningPrograms.Add(programInstance);
-                    programInstance.Execute(programParams);
+                var programInstance = program.Clone();
+                RunningPrograms.Add(programInstance);
+                programInstance.Execute(programParams);
 
-                    if (OnProgramExecuted != null)
-                        OnProgramExecuted(programInstance);
+                if (OnProgramExecuted != null)
+                    OnProgramExecuted(programInstance);
 
-                    programInstance.OnFinish += ProgramFinished;
-                }
+                programInstance.OnFinish += ProgramFinished;
+            }
+            else
+            {
+                ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
             }
         }
 

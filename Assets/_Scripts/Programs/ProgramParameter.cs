@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
+using Debug = UnityEngine.Debug;
 
 namespace Hash17.Programs
 {
@@ -13,7 +16,6 @@ namespace Hash17.Programs
         {
             public string Name;
             public string Value;
-            public bool IsOption;
         }
 
         #endregion
@@ -35,16 +37,16 @@ namespace Hash17.Programs
             string paramName = string.Empty;
             string paramValue = string.Empty;
 
-            int state = 0;
             const int lookForPrefix = 0;
             const int readParameter = 1;
             const int readParameterValue = 2;
+            int state = lookForPrefix;
 
             for (int i = 0; i < RawData.Length; i++)
             {
                 if (state == lookForPrefix)
                 {
-                    if (RawData[i] == '/' || RawData[i] == '-')
+                    if (RawData[i] == '-')
                     {
                         paramPrefix = RawData[i];
                         state = readParameter;
@@ -59,35 +61,56 @@ namespace Hash17.Programs
 
                     paramName = paramNameBuilder.ToString();
 
-                    // if it's a option, doesn't look for value
-                    if (paramPrefix == '-')
-                    {
-                        AddParam(ref paramName, ref paramValue, ref paramPrefix);
-                        state = lookForPrefix;
-                        continue;
-                    }
-
                     state = readParameterValue;
                 }
                 else if (state == readParameterValue)
                 {
-                    if (RawData[i] == '/' || RawData[i] == '-')
+                    StringBuilder parameterValueBuilder = new StringBuilder();
+                    bool parameterAdded = false;
+                    bool ignoreSpecialCharacter = false;
+                    bool onQuots = false;
+                    
+                    while (i < RawData.Length)
                     {
-                        AddParam(ref paramName, ref paramValue, ref paramPrefix);
-                        paramPrefix = RawData[i];
-                        state = readParameter;
-                        continue;
+                        // if we should ignore special character
+                        if (!ignoreSpecialCharacter && RawData[i] == '\\')
+                        {
+                            ignoreSpecialCharacter = true;
+                            i++;
+                            continue;
+                        }
+
+                        if (!ignoreSpecialCharacter && RawData[i] == '\'')
+                        {
+                            onQuots = !onQuots;
+                            i++;
+                            continue;
+                        }
+
+                        if (RawData[i] == '-')
+                        {
+                            // if we should NOT ignore special character
+                            if (!ignoreSpecialCharacter && !onQuots)
+                            {
+                                paramValue = parameterValueBuilder.ToString();
+                                AddParam(ref paramName, ref paramValue, ref paramPrefix);
+                                paramPrefix = RawData[i];
+                                state = readParameter;
+                                parameterAdded = true;
+                                break;
+                            }
+                        }
+
+                        ignoreSpecialCharacter = false;
+                        parameterValueBuilder = parameterValueBuilder.Append(RawData[i++]);
                     }
 
-                    StringBuilder parameterValueBuilder = new StringBuilder();
-
-                    while (i < RawData.Length && RawData[i] != ' ')
-                        parameterValueBuilder = parameterValueBuilder.Append(RawData[i++]);
-
-                    paramValue = parameterValueBuilder.ToString();
-
-                    AddParam(ref paramName, ref paramValue, ref paramPrefix);
-                    state = lookForPrefix;
+                    if (!parameterAdded)
+                    {
+                        paramValue = parameterValueBuilder.ToString();
+                        AddParam(ref paramName, ref paramValue, ref paramPrefix);
+                        state = lookForPrefix;
+                    }
                 }
             }
 
@@ -108,7 +131,6 @@ namespace Hash17.Programs
             {
                 Name = name,
                 Value = value,
-                IsOption = prefix == '-',
             });
         }
 

@@ -652,7 +652,7 @@ public class UIInput : MonoBehaviour
 
 		bool shift = ((ev.modifiers & EventModifiers.Shift) != 0);
 
-		switch (ev.keyCode)
+        switch (ev.keyCode)
 		{
 			case KeyCode.Backspace:
 			{
@@ -692,7 +692,9 @@ public class UIInput : MonoBehaviour
 
 				if (!string.IsNullOrEmpty(mValue))
 				{
-					mSelectionEnd = Mathf.Max(mSelectionEnd - 1, 0);
+				    int n = 1;
+				    if (ctrl) n = 4;
+					mSelectionEnd = Mathf.Max(mSelectionEnd - n, 0);
 					if (!shift) mSelectionStart = mSelectionEnd;
 					UpdateLabel();
 				}
@@ -705,7 +707,9 @@ public class UIInput : MonoBehaviour
 
 				if (!string.IsNullOrEmpty(mValue))
 				{
-					mSelectionEnd = Mathf.Min(mSelectionEnd + 1, mValue.Length);
+                    int n = 1;
+                    if (ctrl) n = 4;
+                    mSelectionEnd = Mathf.Min(mSelectionEnd + n, mValue.Length);
 					if (!shift) mSelectionStart = mSelectionEnd;
 					UpdateLabel();
 				}

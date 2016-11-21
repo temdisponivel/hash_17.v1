@@ -1,0 +1,358 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Policy;
+using UnityEngine.VR;
+
+namespace Hash17.Files
+{
+    public class FileSystem : Directory
+    {
+        #region Inner types
+
+        public enum OperationResult
+        {
+            Ok,
+            DuplicatedName,
+            InvalidValue,
+            NotFound,
+        }
+
+        #endregion
+
+        #region Properties
+
+        private Directory _currentDirectory;
+
+        public Directory CurrentDirectory
+        {
+            get
+            {
+                if (_currentDirectory == null)
+                    return this;
+                return _currentDirectory;
+            }
+            private set { _currentDirectory = value; }
+        }
+
+        public char DirectorySeparator
+        {
+            get { return '/'; }
+        }
+
+        public override string Name
+        {
+            get { return "/"; }
+            internal set { }
+        }
+
+        #endregion
+
+        #region Files
+
+        #region Get
+
+        public List<File> GetFiles()
+        {
+            if (CurrentDirectory == null)
+                CurrentDirectory = this;
+
+            return GetFilesInDirectory(CurrentDirectory);
+        }
+
+        public List<File> GetFilesInDirectory(Directory dir)
+        {
+            return new List<File>(dir.Files);
+        }
+
+        #endregion
+
+        #region Create
+
+        public OperationResult CreateFile(string name, out File file)
+        {
+            return CreateFile(this, name, out file);
+        }
+
+        public OperationResult CreateFile(Directory parent, string name, out File file)
+        {
+            if (parent == null)
+            {
+                file = null;
+                return OperationResult.NotFound;
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                file = null;
+                return OperationResult.InvalidValue;
+            }
+
+            if (parent.FindFileByName(name) != null)
+            {
+                file = null;
+                return OperationResult.DuplicatedName;
+            }
+
+            parent.Files.Add(file = new File()
+            {
+                Directory = parent,
+                Name = name,
+                Content = string.Empty,
+            });
+
+            return OperationResult.Ok;
+        }
+
+        #endregion
+
+        #region Edit
+
+        #region Delete
+
+        public OperationResult DeleteFile(string name)
+        {
+            return DeleteFile(this, name);
+        }
+
+        public OperationResult DeleteFile(Directory parent, string name)
+        {
+            File file = parent.FindFileByName(name);
+            if (file == null)
+                return OperationResult.NotFound;
+
+            parent.Files.Remove(file);
+            return OperationResult.Ok;
+        }
+
+        #endregion
+
+        #region Update
+
+        #region Content
+
+        public OperationResult UpdateFileContent(string filePathAndName, string newContent)
+        {
+            var parts = filePathAndName.Split('/');
+            var fileName = parts[Math.Max(0, parts.Length - 1)];
+            var filePath = filePathAndName.Substring(0, filePathAndName.Length - fileName.Length);
+
+            return UpdateFileContent(filePath, fileName, newContent);
+        }
+
+        public OperationResult UpdateFileContent(string filePath, string fileName, string newContent)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return OperationResult.NotFound;
+
+            if (string.IsNullOrEmpty(fileName))
+                return OperationResult.NotFound;
+
+            if (string.IsNullOrEmpty(newContent))
+                return OperationResult.InvalidValue;
+
+            var dir = FindDirectory(filePath);
+            if (dir == null)
+                return OperationResult.NotFound;
+
+            var file = dir.FindFileByName(fileName);
+
+            if (file == null)
+                return OperationResult.NotFound;
+
+            file.Content = newContent;
+
+            return OperationResult.Ok;
+        }
+
+        #endregion content
+
+        #region Name
+
+        public OperationResult UpdateFileName(string filePathAndName, string newName)
+        {
+            var parts = filePathAndName.Split('/');
+            var fileName = parts[Math.Max(0, parts.Length - 1)];
+            var filePath = filePathAndName.Substring(0, filePathAndName.Length - fileName.Length);
+
+            return UpdateFileName(filePath, fileName, newName);
+        }
+
+        public OperationResult UpdateFileName(string filePath, string fileName, string newName)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return OperationResult.NotFound;
+
+            if (string.IsNullOrEmpty(fileName))
+                return OperationResult.NotFound;
+
+            if (string.IsNullOrEmpty(newName))
+                return OperationResult.InvalidValue;
+
+            var dir = FindDirectory(filePath);
+            if (dir == null)
+                return OperationResult.NotFound;
+
+            var file = dir.FindFileByName(fileName);
+
+            if (file == null)
+                return OperationResult.NotFound;
+
+            file.Name = newName;
+
+            return OperationResult.Ok;
+        }
+
+        #endregion name
+
+        #region Directory
+
+        public OperationResult UpdateFileDirectory(string filePathAndName, string newDirectory)
+        {
+            var parts = filePathAndName.Split('/');
+            var fileName = parts[Math.Max(0, parts.Length - 1)];
+            var filePath = filePathAndName.Substring(0, filePathAndName.Length - fileName.Length);
+
+            return UpdateFileDirectory(filePath, fileName, newDirectory);
+        }
+
+        public OperationResult UpdateFileDirectory(string filePath, string fileName, string newDirectory)
+        {
+            if (string.IsNullOrEmpty(newDirectory))
+                return OperationResult.InvalidValue;
+
+            var dir = FindDirectory(filePath);
+            if (dir == null)
+                return OperationResult.NotFound;
+
+            var file = dir.FindFileByName(fileName);
+
+            if (file == null)
+                return OperationResult.NotFound;
+
+            var newDir = FindDirectory(newDirectory);
+            if (newDir == null)
+                return OperationResult.NotFound;
+            
+            newDir.Files.Add(file);
+            dir.Files.Remove(file);
+
+            file.Directory = newDir;
+
+            return OperationResult.Ok;
+        }
+
+        #endregion Directory
+
+        #endregion update
+
+        #endregion edit
+
+        #endregion files
+
+        #region Directories
+
+        #region Get
+
+        public List<Directory> GetDirectories()
+        {
+            if (CurrentDirectory == null)
+                CurrentDirectory = this;
+
+            return GetDirectoriesIn(CurrentDirectory);
+        }
+
+        public List<Directory> GetDirectoriesIn(Directory directory)
+        {
+            if (directory == null)
+                return null;
+
+            return new List<Directory>(directory.Childs);
+        }
+
+        public Directory FindDirectory(string path, bool navigateToResult = false)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            var parts = path.Split(DirectorySeparator);
+
+            Directory root = CurrentDirectory;
+            int increment = 0;
+            if (path.StartsWith(Name)) // if the path starts asking for system file
+            {
+                root = this;
+                increment = 1;
+            }
+
+            for (int i = 0 + increment; i < parts.Length; i++)
+            {
+                if (parts[i] == "..")
+                {
+                    root = root.Parent;
+                    continue;
+                }
+
+                root = root.FindDirectoryByName(parts[i]);
+
+                if (root == null)
+                    break;
+            }
+
+            if (navigateToResult && root != null)
+                CurrentDirectory = root;
+
+            return root;
+        }
+
+        #endregion
+
+        #region Create
+        
+        public OperationResult CreateDiretory(string path, out Directory dir)
+        {
+            if (path.ToLower().StartsWith(Name))
+            {
+                var parts = path.Split('/');
+                var fileName = parts[Math.Max(0, parts.Length - 1)];
+                var filePath = path.Substring(0, path.Length - fileName.Length);
+                return CreateDiretory(FindDirectory(filePath), fileName, out dir);
+            }
+            return CreateDiretory(this, path, out dir);
+        }
+
+        public OperationResult CreateDiretory(Directory parent, string name, out Directory dir)
+        {
+            if (parent == null)
+            {
+                dir = null;
+                return OperationResult.NotFound;
+            }
+            
+            if (string.IsNullOrEmpty(name))
+            {
+                dir = null;
+                return OperationResult.InvalidValue;
+            }
+
+            if (parent.FindDirectoryByName(name) != null)
+            {
+                dir = null;
+                return OperationResult.DuplicatedName;
+            }
+
+            parent.Childs.Add(dir = new Directory()
+            {
+                Name = name,
+                Files = new List<File>(),
+                Parent = parent,
+            });
+
+            return OperationResult.Ok;
+        }
+
+        #endregion
+
+        #endregion
+    }
+}

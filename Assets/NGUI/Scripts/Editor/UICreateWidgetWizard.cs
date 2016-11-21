@@ -1,4 +1,4 @@
-//----------------------------------------------
+﻿//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
@@ -87,7 +87,7 @@ public class UICreateWidgetWizard : EditorWindow
 		EditorPrefs.SetInt("NGUI Widget Type", (int)mWidgetType);
 		EditorPrefs.SetInt("NGUI Color", NGUIMath.ColorToInt(mColor));
 		EditorPrefs.SetBool("NGUI ScrollCL", mScrollCL);
-		EditorPrefs.SetInt("NGUI Fill Dir", (int)mFillDir);
+		EditorPrefs.SetInt("NGUI Fill FileSystemDir", (int)mFillDir);
 
 		SaveString("NGUI Button", mButton);
 		SaveString("NGUI Image 0", mImage0);
@@ -115,7 +115,7 @@ public class UICreateWidgetWizard : EditorWindow
 	static void Load ()
 	{
 		mWidgetType = (WidgetType)EditorPrefs.GetInt("NGUI Widget Type", 0);
-		mFillDir = (UIScrollBar.FillDirection)EditorPrefs.GetInt("NGUI Fill Dir", 0);
+		mFillDir = (UIScrollBar.FillDirection)EditorPrefs.GetInt("NGUI Fill FileSystemDir", 0);
 
 		int color = EditorPrefs.GetInt("NGUI Color", -1);
 		if (color != -1) mColor = NGUIMath.IntToColor(color);

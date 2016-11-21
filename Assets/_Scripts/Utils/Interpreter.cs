@@ -7,12 +7,11 @@ namespace Hash17.Utils
 {
     public static class Interpreter
     {
-        public static bool GetProgram(string input, out string program, out string parameters)
+        public static void GetProgram(string input, out string program, out string parameters)
         {
             var parts = input.Split(' ');
             program = parts[0];
             parameters = input.Substring(program.Length).Trim();
-            return true;
         }
     }
 }

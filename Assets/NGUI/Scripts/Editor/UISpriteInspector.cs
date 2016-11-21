@@ -1,4 +1,4 @@
-//----------------------------------------------
+﻿//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
@@ -104,7 +104,7 @@ public class UISpriteInspector : UIWidgetInspector
 			else if (type == UISprite.Type.Filled)
 			{
 				NGUIEditorTools.DrawProperty("Flip", serializedObject, "mFlip");
-				NGUIEditorTools.DrawProperty("Fill Dir", serializedObject, "mFillDirection", GUILayout.MinWidth(20f));
+				NGUIEditorTools.DrawProperty("Fill FileSystemDir", serializedObject, "mFillDirection", GUILayout.MinWidth(20f));
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(4f);
 				NGUIEditorTools.DrawProperty("Fill Amount", serializedObject, "mFillAmount", GUILayout.MinWidth(20f));
