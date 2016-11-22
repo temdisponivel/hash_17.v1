@@ -23,6 +23,7 @@ namespace Hash17.Programs
 
         public string RawData;
         public List<Param> Params = new List<Param>();
+        public static List<char> Prefixes = new List<char>() { '-', '/' };
 
         public ProgramParameter(string parameters)
         {
@@ -31,94 +32,7 @@ namespace Hash17.Programs
         }
 
         #region Interprete
-
-        //public void InterpreteParameters()
-        //{
-        //    char paramPrefix = '\0';
-        //    string paramName = string.Empty;
-        //    string paramValue = string.Empty;
-
-        //    const int lookForPrefix = 0;
-        //    const int readParameter = 1;
-        //    const int readParameterValue = 2;
-        //    int state = readParameterValue;
-
-        //    for (int i = 0; i < RawData.Length; i++)
-        //    {
-        //        if (state == lookForPrefix)
-        //        {
-        //            if (RawData[i] == '-')
-        //            {
-        //                paramPrefix = RawData[i];
-        //                state = readParameter;
-        //            }
-        //        }
-        //        else if (state == readParameter)
-        //        {
-        //            StringBuilder paramNameBuilder = new StringBuilder();
-
-        //            for (; i < RawData.Length && RawData[i] != ' ';)
-        //                paramNameBuilder = paramNameBuilder.Append(RawData[i++]);
-
-        //            paramName = paramNameBuilder.ToString();
-
-        //            state = readParameterValue;
-        //        }
-        //        else if (state == readParameterValue)
-        //        {
-        //            StringBuilder parameterValueBuilder = new StringBuilder();
-        //            bool parameterAdded = false;
-        //            bool ignoreSpecialCharacter = false;
-        //            bool onQuots = false;
-
-        //            while (i < RawData.Length)
-        //            {
-        //                // if we should ignore special character
-        //                if (!ignoreSpecialCharacter && RawData[i] == '\\')
-        //                {
-        //                    ignoreSpecialCharacter = true;
-        //                    i++;
-        //                    continue;
-        //                }
-
-        //                if (!ignoreSpecialCharacter && RawData[i] == '\'')
-        //                {
-        //                    onQuots = !onQuots;
-        //                    i++;
-        //                    continue;
-        //                }
-
-        //                if (RawData[i] == '-')
-        //                {
-        //                    // if we should NOT ignore special character
-        //                    if (!ignoreSpecialCharacter && !onQuots)
-        //                    {
-        //                        paramValue = parameterValueBuilder.ToString();
-        //                        AddParam(ref paramName, ref paramValue, ref paramPrefix);
-        //                        paramPrefix = RawData[i];
-        //                        state = readParameter;
-        //                        parameterAdded = true;
-        //                        break;
-        //                    }
-        //                }
-
-        //                ignoreSpecialCharacter = false;
-        //                parameterValueBuilder = parameterValueBuilder.Append(RawData[i++]);
-        //            }
-
-        //            if (!parameterAdded)
-        //            {
-        //                paramValue = parameterValueBuilder.ToString();
-        //                AddParam(ref paramName, ref paramValue, ref paramPrefix);
-        //                state = lookForPrefix;
-        //            }
-        //        }
-        //    }
-
-        //    if (!string.IsNullOrEmpty(paramName))
-        //        AddParam(paramName, paramValue, paramPrefix);
-        //}
-
+        
         private void InterpreteParameters()
         {
             string paramName = string.Empty;
@@ -127,17 +41,15 @@ namespace Hash17.Programs
 
             List<Param> paramsFound = new List<Param>();
 
-            List<char> prefixes = new List<char>() { '-', '/' };
-
             const int readParameterName = 0;
             const int readParameterValue = 1;
             const int lookForParam = 2;
 
             int state = readParameterValue;
 
-            for (int i = 0; i < prefixes.Count; i++)
+            for (int i = 0; i < Prefixes.Count; i++)
             {
-                if (RawData.StartsWith(prefixes[i].ToString()))
+                if (RawData.StartsWith(Prefixes[i].ToString()))
                 {
                     state = lookForParam;
                     break;
@@ -151,11 +63,11 @@ namespace Hash17.Programs
             for (int i = 0; i < RawData.Length; i++)
             {
                 var currentChar = RawData[i];
-                bool isParamPrefix = prefixes.Contains(currentChar);
+                bool isParamPrefix = Prefixes.Contains(currentChar);
 
-                if (currentChar == '\\')
+                if (!treatSpecialCharAsString && currentChar == '\\')
                 {
-                    treatSpecialCharAsString = !treatSpecialCharAsString;
+                    treatSpecialCharAsString = true;
                     continue;
                 }
 
@@ -234,14 +146,7 @@ namespace Hash17.Programs
 
             Params = new List<Param>(paramsFound);
         }
-
-        private void AddParam(ref string name, ref string value, ref char prefix)
-        {
-            AddParam(name, value, prefix);
-            name = value = string.Empty;
-            prefix = '\0';
-        }
-
+        
         public void AddParam(string name, string value, char prefix)
         {
             Params.Add(new Param()
