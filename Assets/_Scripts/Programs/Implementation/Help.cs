@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Hash17.Blackboard_;
 using Hash17.Terminal_;
+using Hash17.Utils;
 
 namespace Hash17.Programs.Implementation
 {
@@ -14,15 +15,15 @@ namespace Hash17.Programs.Implementation
         {
             BlockInput();
 
-            Terminal.Instance.ShowText("-----------");
+            Terminal.Instance.ShowText("PARAMETERS: ");
 
-            foreach (var program in Blackboard.Instance.Programs)
+            for (int i = 0; i < Parameters.Params.Count; i++)
             {
-                Terminal.Instance.ShowText(program.Value.GetDescription());
-                Terminal.Instance.ShowText(program.Value.GetUsage());
-                Terminal.Instance.ShowText("\n");
+                var current = Parameters.Params[i];
+                Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("NAME: {0} - VALUE: {1} - PREFIX: {2}", current.Name, current.Value, current.Prefix)));
                 yield return null;
             }
+            
 
             UnblockInput();
         }

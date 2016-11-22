@@ -16,6 +16,7 @@ namespace Hash17.Programs
         {
             public string Name;
             public string Value;
+            public char Prefix;
         }
 
         #endregion
@@ -25,97 +26,213 @@ namespace Hash17.Programs
 
         public ProgramParameter(string parameters)
         {
-            RawData = parameters;
+            RawData = parameters.Trim();
             InterpreteParameters();
         }
 
         #region Interprete
 
-        public void InterpreteParameters()
+        //public void InterpreteParameters()
+        //{
+        //    char paramPrefix = '\0';
+        //    string paramName = string.Empty;
+        //    string paramValue = string.Empty;
+
+        //    const int lookForPrefix = 0;
+        //    const int readParameter = 1;
+        //    const int readParameterValue = 2;
+        //    int state = readParameterValue;
+
+        //    for (int i = 0; i < RawData.Length; i++)
+        //    {
+        //        if (state == lookForPrefix)
+        //        {
+        //            if (RawData[i] == '-')
+        //            {
+        //                paramPrefix = RawData[i];
+        //                state = readParameter;
+        //            }
+        //        }
+        //        else if (state == readParameter)
+        //        {
+        //            StringBuilder paramNameBuilder = new StringBuilder();
+
+        //            for (; i < RawData.Length && RawData[i] != ' ';)
+        //                paramNameBuilder = paramNameBuilder.Append(RawData[i++]);
+
+        //            paramName = paramNameBuilder.ToString();
+
+        //            state = readParameterValue;
+        //        }
+        //        else if (state == readParameterValue)
+        //        {
+        //            StringBuilder parameterValueBuilder = new StringBuilder();
+        //            bool parameterAdded = false;
+        //            bool ignoreSpecialCharacter = false;
+        //            bool onQuots = false;
+
+        //            while (i < RawData.Length)
+        //            {
+        //                // if we should ignore special character
+        //                if (!ignoreSpecialCharacter && RawData[i] == '\\')
+        //                {
+        //                    ignoreSpecialCharacter = true;
+        //                    i++;
+        //                    continue;
+        //                }
+
+        //                if (!ignoreSpecialCharacter && RawData[i] == '\'')
+        //                {
+        //                    onQuots = !onQuots;
+        //                    i++;
+        //                    continue;
+        //                }
+
+        //                if (RawData[i] == '-')
+        //                {
+        //                    // if we should NOT ignore special character
+        //                    if (!ignoreSpecialCharacter && !onQuots)
+        //                    {
+        //                        paramValue = parameterValueBuilder.ToString();
+        //                        AddParam(ref paramName, ref paramValue, ref paramPrefix);
+        //                        paramPrefix = RawData[i];
+        //                        state = readParameter;
+        //                        parameterAdded = true;
+        //                        break;
+        //                    }
+        //                }
+
+        //                ignoreSpecialCharacter = false;
+        //                parameterValueBuilder = parameterValueBuilder.Append(RawData[i++]);
+        //            }
+
+        //            if (!parameterAdded)
+        //            {
+        //                paramValue = parameterValueBuilder.ToString();
+        //                AddParam(ref paramName, ref paramValue, ref paramPrefix);
+        //                state = lookForPrefix;
+        //            }
+        //        }
+        //    }
+
+        //    if (!string.IsNullOrEmpty(paramName))
+        //        AddParam(paramName, paramValue, paramPrefix);
+        //}
+
+        private void InterpreteParameters()
         {
-            char paramPrefix = '\0';
             string paramName = string.Empty;
             string paramValue = string.Empty;
+            char paramPrefix = '\0';
 
-            const int lookForPrefix = 0;
-            const int readParameter = 1;
-            const int readParameterValue = 2;
-            int state = lookForPrefix;
+            List<Param> paramsFound = new List<Param>();
 
-            for (int i = 0; i < RawData.Length; i++)
+            List<char> prefixes = new List<char>() { '-', '/' };
+
+            const int readParameterName = 0;
+            const int readParameterValue = 1;
+            const int lookForParam = 2;
+
+            int state = readParameterValue;
+
+            for (int i = 0; i < prefixes.Count; i++)
             {
-                if (state == lookForPrefix)
+                if (RawData.StartsWith(prefixes[i].ToString()))
                 {
-                    if (RawData[i] == '-')
-                    {
-                        paramPrefix = RawData[i];
-                        state = readParameter;
-                    }
-                }
-                else if (state == readParameter)
-                {
-                    StringBuilder paramNameBuilder = new StringBuilder();
-
-                    for (; i < RawData.Length && RawData[i] != ' ';)
-                        paramNameBuilder = paramNameBuilder.Append(RawData[i++]);
-
-                    paramName = paramNameBuilder.ToString();
-
-                    state = readParameterValue;
-                }
-                else if (state == readParameterValue)
-                {
-                    StringBuilder parameterValueBuilder = new StringBuilder();
-                    bool parameterAdded = false;
-                    bool ignoreSpecialCharacter = false;
-                    bool onQuots = false;
-                    
-                    while (i < RawData.Length)
-                    {
-                        // if we should ignore special character
-                        if (!ignoreSpecialCharacter && RawData[i] == '\\')
-                        {
-                            ignoreSpecialCharacter = true;
-                            i++;
-                            continue;
-                        }
-
-                        if (!ignoreSpecialCharacter && RawData[i] == '\'')
-                        {
-                            onQuots = !onQuots;
-                            i++;
-                            continue;
-                        }
-
-                        if (RawData[i] == '-')
-                        {
-                            // if we should NOT ignore special character
-                            if (!ignoreSpecialCharacter && !onQuots)
-                            {
-                                paramValue = parameterValueBuilder.ToString();
-                                AddParam(ref paramName, ref paramValue, ref paramPrefix);
-                                paramPrefix = RawData[i];
-                                state = readParameter;
-                                parameterAdded = true;
-                                break;
-                            }
-                        }
-
-                        ignoreSpecialCharacter = false;
-                        parameterValueBuilder = parameterValueBuilder.Append(RawData[i++]);
-                    }
-
-                    if (!parameterAdded)
-                    {
-                        paramValue = parameterValueBuilder.ToString();
-                        AddParam(ref paramName, ref paramValue, ref paramPrefix);
-                        state = lookForPrefix;
-                    }
+                    state = lookForParam;
+                    break;
                 }
             }
 
-            if (!string.IsNullOrEmpty(paramName))
-                AddParam(paramName, paramValue, paramPrefix);
+            StringBuilder paramNameBuilder = new StringBuilder();
+            StringBuilder paramValueBuilder = new StringBuilder();
+            bool onQuot = false;
+            bool treatSpecialCharAsString = false;
+            for (int i = 0; i < RawData.Length; i++)
+            {
+                var currentChar = RawData[i];
+                bool isParamPrefix = prefixes.Contains(currentChar);
+
+                if (currentChar == '\\')
+                {
+                    treatSpecialCharAsString = !treatSpecialCharAsString;
+                    continue;
+                }
+
+                if (currentChar == '"')
+                {
+                    if (!treatSpecialCharAsString)
+                    {
+                        onQuot = !onQuot;
+                        continue;
+                    }
+                }
+
+                if (onQuot)
+                    treatSpecialCharAsString = true;
+                
+                if (state == lookForParam)
+                {
+                    if (isParamPrefix && !treatSpecialCharAsString)
+                    {
+                        paramPrefix = currentChar;
+                        state = readParameterName;
+                    }
+                }
+                else if (state == readParameterName)
+                {
+                    if (!treatSpecialCharAsString && currentChar == ' ')
+                    {
+                        paramName = paramNameBuilder.ToString().Trim();
+                        state = readParameterValue;
+                    }
+                    else
+                    {
+                        paramNameBuilder = paramNameBuilder.Append(currentChar);
+                    }
+                }
+                else if (state == readParameterValue)
+                {
+                    if (!treatSpecialCharAsString && isParamPrefix)
+                    {
+                        paramValue = paramValueBuilder.ToString().Trim();
+
+                        paramValueBuilder = new StringBuilder();
+                        paramNameBuilder = new StringBuilder();
+
+                        paramsFound.Add(new Param()
+                        {
+                            Name = paramName,
+                            Value = paramValue,
+                            Prefix = paramPrefix,
+                        });
+
+                        state = readParameterName;
+                        paramPrefix = currentChar;
+                    }
+                    else
+                    {
+                        paramValueBuilder = paramValueBuilder.Append(currentChar);
+                    }
+                }
+
+                treatSpecialCharAsString = false;
+            }
+
+            paramValue = paramValueBuilder.ToString().Trim();
+            paramName = paramNameBuilder.ToString().Trim();
+
+            if (!string.IsNullOrEmpty(paramValue) || !string.IsNullOrEmpty(paramName))
+            {
+                paramsFound.Add(new Param()
+                {
+                    Name = paramName,
+                    Value = paramValue,
+                    Prefix = paramPrefix,
+                });
+            }
+
+            Params = new List<Param>(paramsFound);
         }
 
         private void AddParam(ref string name, ref string value, ref char prefix)
@@ -174,3 +291,4 @@ namespace Hash17.Programs
         #endregion
     }
 }
+
