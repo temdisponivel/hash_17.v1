@@ -37,19 +37,6 @@ namespace Hash17.Blackboard_
 
         void LoadFileSystem()
         {
-            Directory dir = FileSystem;
-            for (int i = 0; i < 5; i++)
-            {
-                FileSystem.CreateDiretory(FileSystem, "teste " + i, out dir);
-            }
-
-            for (int i = 0; i < FileSystem.Childs.Count; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                    FileSystem.CreateDiretory(FileSystem.Childs[i], "teste " + j, out dir);
-            }
-
-            Debug.Log(FileSystem.FindDirectory("c:/Teste 0/Teste 1/../../Teste 0", true));
         }
 
         #endregion

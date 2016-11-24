@@ -61,7 +61,7 @@ namespace Hash17.Terminal_
 
         public string CurrentLocationAndUserName
         {
-            get { return string.Format("{0}:{1}", CurrentUserName, ""); }
+            get { return string.Format("{0}:{1}", Blackboard.Instance.FileSystem.CurrentDirectory.Path, CurrentUserName); }
         }
 
         public event Action<IProgram> OnProgramExecuted;
@@ -81,6 +81,11 @@ namespace Hash17.Terminal_
             base.Awake();
             ClearInput();
             CurrentUserName = "#17";
+        }
+
+        protected void Start()
+        {
+            Blackboard.Instance.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
         }
 
         #endregion
@@ -172,16 +177,6 @@ namespace Hash17.Terminal_
                 Input.value = AllCommandsTyped[_currentNavigationCommandIndex];
         }
 
-        private void ProgramFinished(IProgram program)
-        {
-            RunningPrograms.Remove(program);
-
-            program.OnFinish -= ProgramFinished;
-
-            if (OnProgramFinished != null)
-                OnProgramFinished(program);
-        }
-
         #endregion
 
         #region Interface
@@ -213,6 +208,25 @@ namespace Hash17.Terminal_
             }
 
             TextTable.Reposition();
+        }
+
+        #endregion
+
+        #region Callbacks
+
+        private void ProgramFinished(IProgram program)
+        {
+            RunningPrograms.Remove(program);
+
+            program.OnFinish -= ProgramFinished;
+
+            if (OnProgramFinished != null)
+                OnProgramFinished(program);
+        }
+
+        private void OnCurrentDirChanged()
+        {
+            UpdateUserNameLocation();
         }
 
         #endregion

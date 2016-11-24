@@ -22,6 +22,8 @@ namespace Hash17.Files
 
         #region Properties
 
+        public event Action OnChangeCurrentDirectory;
+
         private Directory _currentDirectory;
 
         public Directory CurrentDirectory
@@ -32,7 +34,13 @@ namespace Hash17.Files
                     return this;
                 return _currentDirectory;
             }
-            private set { _currentDirectory = value; }
+            private set
+            {
+                _currentDirectory = value;
+
+                if (OnChangeCurrentDirectory != null)
+                    OnChangeCurrentDirectory();
+            }
         }
 
         public char DirectorySeparator
@@ -233,7 +241,7 @@ namespace Hash17.Files
             var newDir = FindDirectory(newDirectory);
             if (newDir == null)
                 return OperationResult.NotFound;
-            
+
             newDir.Files.Add(file);
             dir.Files.Remove(file);
 
@@ -308,17 +316,40 @@ namespace Hash17.Files
         #endregion
 
         #region Create
-        
+
         public OperationResult CreateDiretory(string path, out Directory dir)
         {
-            if (path.ToLower().StartsWith(Name))
+            dir = null;
+
+            if (string.IsNullOrEmpty(path))
+                return OperationResult.InvalidValue;
+
+            Directory parent = CurrentDirectory;
+
+            if (path.StartsWith(Name))
+                parent = this;
+
+            var parts = path.Split('/');
+            for (int i = 0; i < parts.Length; i++)
             {
-                var parts = path.Split('/');
-                var fileName = parts[Math.Max(0, parts.Length - 1)];
-                var filePath = path.Substring(0, path.Length - fileName.Length);
-                return CreateDiretory(FindDirectory(filePath), fileName, out dir);
+                var current = parts[i];
+
+                var currentDir = parent.FindDirectoryByName(current);
+                if (currentDir != null)
+                {
+                    parent = currentDir;
+                    continue;
+                }
+                
+                var result = CreateDiretory(parent, current, out dir);
+
+                parent = dir;
+
+                if (result != OperationResult.Ok)
+                    return result;
             }
-            return CreateDiretory(this, path, out dir);
+
+            return OperationResult.Ok;
         }
 
         public OperationResult CreateDiretory(Directory parent, string name, out Directory dir)
@@ -328,7 +359,7 @@ namespace Hash17.Files
                 dir = null;
                 return OperationResult.NotFound;
             }
-            
+
             if (string.IsNullOrEmpty(name))
             {
                 dir = null;

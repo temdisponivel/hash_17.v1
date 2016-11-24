@@ -20,7 +20,7 @@ namespace Hash17.Files
                 Directory parent = this;
                 while (parent != null)
                 {
-                    builder = builder.Insert(0, string.Format("{0}/", parent.Name.Remove('/')));
+                    builder = builder.Insert(0, string.Format("{0}/", parent.Name.Replace("/", "")));
                     parent = parent.Parent;
                 }
                 builder.Remove(builder.Length - 1, 1);
