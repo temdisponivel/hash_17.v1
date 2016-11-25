@@ -3,7 +3,7 @@
     public enum ProgramId
     {
         Clear,
-        Help,
-        Dir,
+        Cd,
+        Read,
     }
 }

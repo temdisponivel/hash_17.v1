@@ -9,7 +9,7 @@ using Hash17.Terminal_;
 
 namespace Hash17.Programs.Implementation
 {
-    public class Dir : Program
+    public class Cd : Program
     {
         protected override IEnumerator InnerExecute()
         {

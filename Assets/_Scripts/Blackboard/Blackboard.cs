@@ -37,6 +37,12 @@ namespace Hash17.Blackboard_
 
         void LoadFileSystem()
         {
+            Directory dir;
+            FileSystem.CreateDiretory("teste", out dir);
+
+            File file;
+            FileSystem.CreateFile(dir, "teste", out file);
+            FileSystem.UpdateFileContent(string.Format("{0}{1}{2}", dir.Path, FileSystem.DirectorySeparator, file.Name), "ALO ALO");
         }
 
         #endregion

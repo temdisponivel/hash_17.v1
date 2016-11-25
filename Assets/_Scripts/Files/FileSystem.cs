@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Policy;
+using System.Text;
 using UnityEngine.VR;
 
 namespace Hash17.Files
@@ -57,6 +58,13 @@ namespace Hash17.Files
         #endregion
 
         #region Files
+        
+        private void GetFileNameAndPath(string pathWithName, out string fileName, out string path)
+        {
+            var parts = pathWithName.Split('/');
+            fileName = parts[Math.Max(0, parts.Length - 1)];
+            path = pathWithName.Substring(0, pathWithName.Length - fileName.Length);
+        }
 
         #region Get
 
@@ -71,6 +79,24 @@ namespace Hash17.Files
         public List<File> GetFilesInDirectory(Directory dir)
         {
             return new List<File>(dir.Files);
+        }
+
+        public OperationResult FindFileByPath(string pfilePathAndNameath, out File fileFound)
+        {
+            string fileName, filePath;
+            GetFileNameAndPath(pfilePathAndNameath, out fileName, out filePath);
+
+            Directory dir = CurrentDirectory;
+            fileFound = null;
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                dir = FindDirectory(filePath);
+                if (dir == null)
+                    return OperationResult.NotFound;
+            }
+
+            fileFound = dir.FindFileByName(fileName);
+            return OperationResult.Ok;
         }
 
         #endregion
@@ -141,10 +167,8 @@ namespace Hash17.Files
 
         public OperationResult UpdateFileContent(string filePathAndName, string newContent)
         {
-            var parts = filePathAndName.Split('/');
-            var fileName = parts[Math.Max(0, parts.Length - 1)];
-            var filePath = filePathAndName.Substring(0, filePathAndName.Length - fileName.Length);
-
+            string fileName, filePath;
+            GetFileNameAndPath(filePathAndName, out fileName, out filePath);
             return UpdateFileContent(filePath, fileName, newContent);
         }
 
@@ -179,10 +203,8 @@ namespace Hash17.Files
 
         public OperationResult UpdateFileName(string filePathAndName, string newName)
         {
-            var parts = filePathAndName.Split('/');
-            var fileName = parts[Math.Max(0, parts.Length - 1)];
-            var filePath = filePathAndName.Substring(0, filePathAndName.Length - fileName.Length);
-
+            string fileName, filePath;
+            GetFileNameAndPath(filePathAndName, out fileName, out filePath);
             return UpdateFileName(filePath, fileName, newName);
         }
 
@@ -283,8 +305,6 @@ namespace Hash17.Files
             if (string.IsNullOrEmpty(path))
                 return null;
 
-            var parts = path.Split(DirectorySeparator);
-
             Directory root = CurrentDirectory;
             int increment = 0;
             if (path.StartsWith(Name)) // if the path starts asking for system file
@@ -292,6 +312,11 @@ namespace Hash17.Files
                 root = this;
                 increment = 1;
             }
+
+            if (path.EndsWith("/"))
+                path = path.Substring(0, path.Length - 1);
+
+            var parts = path.Split(DirectorySeparator);
 
             for (int i = 0 + increment; i < parts.Length; i++)
             {

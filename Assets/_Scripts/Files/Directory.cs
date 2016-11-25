@@ -28,12 +28,12 @@ namespace Hash17.Files
             }
         }
 
-        public Directory FindDirectoryByName(string name)
+        public virtual Directory FindDirectoryByName(string name)
         {
             return Childs.Find(d => String.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public File FindFileByName(string name)
+        public virtual File FindFileByName(string name)
         {
             return Files.Find(d => String.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase));
         }
