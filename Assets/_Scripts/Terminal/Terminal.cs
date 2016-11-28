@@ -88,8 +88,7 @@ namespace Hash17.Terminal_
         protected void Start()
         {
             Blackboard.Instance.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
-
-            new GameObject().AddComponent<Init>().Execute("");
+            RunProgram(Blackboard.Instance.SpecialPrograms[ProgramId.Init], string.Empty);
         }
 
         #endregion
@@ -131,9 +130,7 @@ namespace Hash17.Terminal_
             IProgram program;
             if (Blackboard.Instance.Programs.TryGetValue(programName, out program))
             {
-                var programInstance = program.Clone();
-                RunningPrograms.Add(programInstance);
-                programInstance.Execute(programParams);
+                var programInstance = RunProgram(program, programParams);
 
                 if (OnProgramExecuted != null)
                     OnProgramExecuted(programInstance);
@@ -145,6 +142,14 @@ namespace Hash17.Terminal_
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
             }
+        }
+
+        private IProgram RunProgram(IProgram program, string param)
+        {
+            var programInstance = program.Clone();
+            RunningPrograms.Add(programInstance);
+            programInstance.Execute(param);
+            return programInstance;
         }
 
         private void ClearInput()

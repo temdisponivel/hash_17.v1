@@ -15,6 +15,17 @@ namespace Hash17.Programs
         public ProgramId Id;
         public event Action<IProgram> OnStart;
         public event Action<IProgram> OnFinish;
+
+        public string Usage
+        {
+            get { return Definition.Usage; }
+        }
+
+        public string Description
+        {
+            get { return Definition.Description; }
+        }
+        
         public ProgramParameter Parameters { get; set; }
 
         public bool Running { get; private set; }
@@ -62,23 +73,7 @@ namespace Hash17.Programs
         {
             return Instantiate(this).GetComponent<IProgram>();
         }
-
-        public virtual string GetDescription()
-        {
-            if (Definition != null)
-                return Definition.Description;
-
-            return string.Empty;
-        }
-
-        public virtual string GetUsage()
-        {
-            if (Definition != null)
-                return Definition.Usage;
-
-            return string.Empty;
-        }
-
+        
         protected bool AskedForHelp(bool showHelpIftrue)
         {
             bool result = Parameters.ContainParam("h");
@@ -92,8 +87,8 @@ namespace Hash17.Programs
 
         public void ShowHelp()
         {
-            Terminal.Instance.ShowText(GetDescription());
-            Terminal.Instance.ShowText(GetUsage());
+            Terminal.Instance.ShowText(Description);
+            Terminal.Instance.ShowText(Usage);
         }
 
         protected bool ValidateUnknowParameters(bool shouldShowUsage)
@@ -106,7 +101,7 @@ namespace Hash17.Programs
                 {
                     Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Unknow parameter {0}.", unknownParams[i].Name)));
                 }
-                Terminal.Instance.ShowText(GetUsage());
+                Terminal.Instance.ShowText(Usage);
             }
 
             return result;

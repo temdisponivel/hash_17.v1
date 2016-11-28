@@ -12,8 +12,15 @@ namespace Hash17.Blackboard_
         #region Properties
 
         public readonly Dictionary<string, IProgram> Programs = new Dictionary<string, IProgram>();
+        public readonly Dictionary<ProgramId, IProgram> SpecialPrograms = new Dictionary<ProgramId, IProgram>();
         public readonly Dictionary<ProgramId, ProgramScriptableObject> ProgramDefinitionById = new Dictionary<ProgramId, ProgramScriptableObject>();
         public FileSystem FileSystem = new FileSystem();
+
+        [SerializeField]
+        public ProgramScriptableObject[] ProgramsScriptableObjects;
+
+        [SerializeField]
+        public FileSystemScriptableObject FileSystemScriptableObject;
 
         #endregion
 
@@ -28,25 +35,22 @@ namespace Hash17.Blackboard_
 
         void LoadProgramsDefinitions()
         {
-            var programs = Resources.LoadAll<ProgramScriptableObject>("");
+            var programs = ProgramsScriptableObjects;
             for (int i = 0; i < programs.Length; i++)
             {
-                ProgramDefinitionById.Add(programs[i].Id, programs[i]);
+                var program = programs[i];
+                ProgramDefinitionById.Add(program.Id, program);
 
-                string path = programs[i].PrefabPath;
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = string.Format("Programs/{0}/{0}", programs[i].Id);
-                }
-
-                Programs.Add(programs[i].Command, Resources.Load<GameObject>(path).GetComponent<IProgram>());
+                if (program.AvailableInGamePlay)
+                    SpecialPrograms.Add(programs[i].Id, program.ProgramPrefab.GetComponent<IProgram>());
+                else
+                    Programs.Add(programs[i].Command, program.ProgramPrefab.GetComponent<IProgram>());
             }
         }
 
         protected void LoadFileSystem()
         {
-            var fileSystem = Resources.LoadAll<FileSystemScriptableObject>("")[0];
-            FileSystem = fileSystem.ToFileSystem();
+            FileSystem = FileSystemScriptableObject.ToFileSystem();
         }
 
         #endregion

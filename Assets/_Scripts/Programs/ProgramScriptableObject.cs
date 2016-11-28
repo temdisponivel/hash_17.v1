@@ -13,7 +13,8 @@ namespace Hash17.Programs
         public string Command;
         public string Description;
         public string Usage;
-        public string PrefabPath;
         public string[] KnownParametersAndOptions;
+        public GameObject ProgramPrefab;
+        public bool AvailableInGamePlay = true;
     }
 }

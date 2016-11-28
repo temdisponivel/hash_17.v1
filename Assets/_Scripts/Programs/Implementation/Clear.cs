@@ -28,7 +28,7 @@ namespace Hash17.Programs.Implementation
                 }
                 else
                 {
-                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Invalid value for parameter -C.\n{0}", GetUsage())));
+                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Invalid value for parameter -C.\n{0}", Usage)));
                 }
             }
             else

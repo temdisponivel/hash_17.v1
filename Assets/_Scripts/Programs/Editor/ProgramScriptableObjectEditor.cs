@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using UnityEditor;
+using UnityEngine;
 
 namespace Hash17.Programs.Editor
 {
@@ -14,15 +15,12 @@ namespace Hash17.Programs.Editor
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Id"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Command"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("PrefabPath"));
-
             EditorGUILayout.LabelField("Description");
             program.Description = EditorGUILayout.TextArea(program.Description);
             EditorGUILayout.LabelField("Usage");
             program.Usage = EditorGUILayout.TextArea(program.Usage);
-
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("ProgramPrefab"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("KnownParametersAndOptions"), true);
-
             serializedObject.ApplyModifiedProperties();
         }
     }

@@ -1,5 +1,0 @@
-This is the text that will be showed when the game initializes
-
-this is another
-
-     Yet another one

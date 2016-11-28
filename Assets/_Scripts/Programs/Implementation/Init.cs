@@ -10,15 +10,12 @@ namespace Hash17.Programs.Implementation
 {
     public class Init : Program
     {
+        public TextAsset InitText;
+
         protected override IEnumerator InnerExecute()
         {
             BlockInput();
-
-            var text = Resources.Load<TextAsset>("Programs/Init/InitText").text;
-
-            yield return Terminal.Instance.ShowTextWithInterval(text, callback: UnblockInput);
-
-            Terminal.Instance.ShowText("FINISH");
+            yield return Terminal.Instance.ShowTextWithInterval(InitText.text, callback: UnblockInput);
         }
     }
 }

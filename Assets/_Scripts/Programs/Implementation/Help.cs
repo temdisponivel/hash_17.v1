@@ -20,7 +20,7 @@ namespace Hash17.Programs.Implementation
             foreach (var program in programs)
             {
                 Terminal.Showtext(program.Key);
-                Terminal.Showtext("       " + program.Value.GetDescription());
+                Terminal.Showtext("       " + program.Value.Description);
                 yield return null;
             }
             
