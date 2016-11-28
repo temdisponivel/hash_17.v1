@@ -5,5 +5,6 @@
         Clear,
         Cd,
         Read,
+        Search,
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Hash17.Files;
+using Hash17.Files.SO;
 using Hash17.Programs;
 using Hash17.Utils;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace Hash17.Blackboard_
 
         public readonly Dictionary<string, IProgram> Programs = new Dictionary<string, IProgram>();
         public readonly Dictionary<ProgramId, ProgramScriptableObject> ProgramDefinitionById = new Dictionary<ProgramId, ProgramScriptableObject>();
-        public readonly FileSystem FileSystem = new FileSystem();
+        public FileSystem FileSystem = new FileSystem();
 
         #endregion
 
@@ -31,18 +32,21 @@ namespace Hash17.Blackboard_
             for (int i = 0; i < programs.Length; i++)
             {
                 ProgramDefinitionById.Add(programs[i].Id, programs[i]);
-                Programs.Add(programs[i].Command, Resources.Load<GameObject>(programs[i].PrefabPath).GetComponent<IProgram>());
+
+                string path = programs[i].PrefabPath;
+                if (string.IsNullOrEmpty(path))
+                {
+                    path = string.Format("Programs/{0}/{0}", programs[i].Id);
+                }
+
+                Programs.Add(programs[i].Command, Resources.Load<GameObject>(path).GetComponent<IProgram>());
             }
         }
 
-        void LoadFileSystem()
+        protected void LoadFileSystem()
         {
-            Directory dir;
-            FileSystem.CreateDiretory("teste", out dir);
-
-            File file;
-            FileSystem.CreateFile(dir, "teste", out file);
-            FileSystem.UpdateFileContent(string.Format("{0}{1}{2}", dir.Path, FileSystem.DirectorySeparator, file.Name), "ALO ALO");
+            var fileSystem = Resources.LoadAll<FileSystemScriptableObject>("")[0];
+            FileSystem = fileSystem.ToFileSystem();
         }
 
         #endregion

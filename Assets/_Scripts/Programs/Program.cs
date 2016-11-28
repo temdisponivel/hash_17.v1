@@ -84,11 +84,16 @@ namespace Hash17.Programs
             bool result = Parameters.ContainParam("h");
             if (showHelpIftrue && result)
             {
-                Terminal.Instance.ShowText(GetDescription());
-                Terminal.Instance.ShowText(GetUsage());
+                ShowHelp();
             }
 
             return result;
+        }
+
+        public void ShowHelp()
+        {
+            Terminal.Instance.ShowText(GetDescription());
+            Terminal.Instance.ShowText(GetUsage());
         }
 
         protected bool ValidateUnknowParameters(bool shouldShowUsage)

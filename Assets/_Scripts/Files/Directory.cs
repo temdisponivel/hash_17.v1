@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Hash17.Files
 {
+    [Serializable]
     public class Directory
     {
         public virtual string Name { get; internal set; }

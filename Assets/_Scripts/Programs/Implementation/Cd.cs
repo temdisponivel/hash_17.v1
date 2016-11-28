@@ -6,6 +6,8 @@ using System.Text;
 using Hash17.Blackboard_;
 using Hash17.Files;
 using Hash17.Terminal_;
+using Hash17.Utils;
+using UnityEngine;
 
 namespace Hash17.Programs.Implementation
 {
@@ -36,6 +38,19 @@ namespace Hash17.Programs.Implementation
             else if (Parameters.TryGetParam("", out param))
             {
                 fileSystem.FindDirectory(param.Value, true);
+            }
+            else if (param == null)
+            {
+                var dir = fileSystem.CurrentDirectory;
+                for (int i = 0; i < dir.Childs.Count; i++)
+                {
+                    Terminal.Instance.ShowText(TextBuilder.BuildText(dir.Childs[i].Name, Color.blue));
+                }
+
+                for (int i = 0; i < dir.Files.Count; i++)
+                {
+                    Terminal.Instance.ShowText(TextBuilder.BuildText(dir.Files[i].Name, Color.blue));
+                }
             }
         }
     }

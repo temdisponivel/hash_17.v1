@@ -21,7 +21,7 @@ namespace Hash17.Utils
             return BuildText(text, ErrorColor);
         }
 
-        private static string BuildText(string text, Color color)
+        public static string BuildText(string text, Color color)
         {
             return string.Format("[{1}]{0}[-]", text, color.ToRGBHex());
         }
