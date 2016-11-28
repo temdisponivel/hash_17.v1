@@ -15,16 +15,15 @@ namespace Hash17.Programs.Implementation
         {
             BlockInput();
 
-            Terminal.Instance.ShowText("PARAMETERS: ");
+            var programs = Blackboard.Instance.Programs;
 
-            for (int i = 0; i < Parameters.Params.Count; i++)
+            foreach (var program in programs)
             {
-                var current = Parameters.Params[i];
-                Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("NAME: {0} - VALUE: {1} - PREFIX: {2}", current.Name, current.Value, current.Prefix)));
+                Terminal.Showtext(program.Key);
+                Terminal.Showtext("       " + program.Value.GetDescription());
                 yield return null;
             }
             
-
             UnblockInput();
         }
     }

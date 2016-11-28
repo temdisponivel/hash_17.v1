@@ -2,8 +2,10 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Hash17.Blackboard_;
 using Hash17.Programs;
+using Hash17.Programs.Implementation;
 using Hash17.Utils;
 using UnityEditor;
 
@@ -86,6 +88,8 @@ namespace Hash17.Terminal_
         protected void Start()
         {
             Blackboard.Instance.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
+
+            new GameObject().AddComponent<Init>().Execute("");
         }
 
         #endregion
@@ -139,6 +143,7 @@ namespace Hash17.Terminal_
             else
             {
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
+                ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
             }
         }
 
@@ -181,12 +186,43 @@ namespace Hash17.Terminal_
 
         #region Interface
 
-        public void ShowText(string text)
+        public void ShowText(string text, bool asNewLine = true)
         {
-            var newText = NGUITools.AddChild(TextTable.gameObject, TextEntryPrefab);
-            newText.transform.SetAsFirstSibling();
-            newText.GetComponent<TextEntry>().Setup(CurrentLocationAndUserName, text);
+            TextEntry entry;
+            if (asNewLine)
+            {
+                var newText = NGUITools.AddChild(TextTable.gameObject, TextEntryPrefab);
+                newText.transform.SetAsFirstSibling();
+                entry = newText.GetComponent<TextEntry>();
+            }
+            else
+            {
+                if (TextTable.transform.childCount == 0)
+                {
+                    ShowText(text);
+                    return;
+                }
+
+                entry = TextTable.transform.GetChild(0).GetComponent<TextEntry>();
+            }
+
+            entry.Setup(CurrentLocationAndUserName, text);
             TextTable.Reposition();
+        }
+
+        public static void Showtext(string text)
+        {
+            Instance.ShowText(text);
+        }
+
+        public Coroutine ShowTextWithInterval(string text, float intervalBetweenChars = .02f, Action callback = null)
+        {
+            StringBuilder textBuilder = new StringBuilder();
+            return CoroutineHelper.Instance.WaitAndCallTimes((index) =>
+            {
+                textBuilder = textBuilder.Append(text[index]);
+                ShowText(textBuilder.ToString(), false);
+            }, text.Length, intervalBetweenChars, callback);
         }
 
         public void ClearAll()

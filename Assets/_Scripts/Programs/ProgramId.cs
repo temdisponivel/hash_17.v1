@@ -6,5 +6,7 @@
         Cd,
         Read,
         Search,
+        Help,
+        Init,
     }
 }
