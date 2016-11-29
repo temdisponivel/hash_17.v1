@@ -21,6 +21,7 @@ namespace Hash17.Programs.Editor
             program.Usage = EditorGUILayout.TextArea(program.Usage);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("ProgramPrefab"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("KnownParametersAndOptions"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("AvailableInGamePlay"), true);
             serializedObject.ApplyModifiedProperties();
         }
     }

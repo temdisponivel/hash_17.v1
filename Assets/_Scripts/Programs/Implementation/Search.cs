@@ -15,8 +15,20 @@ namespace Hash17.Programs.Implementation
         protected override IEnumerator InnerExecute()
         {
             ProgramParameter.Param param;
-            bool all = false;
-            if (!(Parameters.TryGetParam("", out param) || (all = Parameters.TryGetParam("all", out param))) || string.IsNullOrEmpty(param.Value))
+            
+            bool all = Parameters.TryGetParam("all", out param);
+            bool only = Parameters.TryGetParam("only", out param);
+
+            if (!(all || only || Parameters.TryGetParam("", out param)))
+            {
+                ShowHelp();
+                yield break;
+            }
+
+
+            param = Parameters.GetFirstParamWithValue();
+
+            if (param == null)
             {
                 ShowHelp();
                 yield break;
@@ -27,19 +39,7 @@ namespace Hash17.Programs.Implementation
             List<File> files;
             if (all)
             {
-                files = new List<File>(FileSystem.Instance.Files);
-                Directory root = FileSystem.Instance;
-                var toSee = new List<Directory>();
-                toSee.Add(root);
-                for (int j = 0; j < toSee.Count; j++)
-                {
-                    root = toSee[j];
-                    files.AddRange(root.Files);
-                    for (int i = 0; i < root.Childs.Count; i++)
-                    {
-                        toSee.Add(root.Childs[i]);
-                    }
-                }
+                files = Blackboard.Instance.AllFiles;
             }
             else
             {
@@ -54,8 +54,15 @@ namespace Hash17.Programs.Implementation
 
                 var content = currentFile.Content.ToLower();
 
-                if (!terms.Any(t => content.Contains(t)))
+                if (only)
+                {
+                    if (!terms.All(t => content.Contains(t)))
+                        continue;
+                }
+                else if (!terms.Any(t => content.Contains(t)))
+                {
                     continue;
+                }
 
                 content = currentFile.Content;
 

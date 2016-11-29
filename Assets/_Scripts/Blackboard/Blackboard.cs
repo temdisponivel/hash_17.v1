@@ -22,6 +22,9 @@ namespace Hash17.Blackboard_
         [SerializeField]
         public FileSystemScriptableObject FileSystemScriptableObject;
 
+        public List<File> AllFiles { get; protected set; }
+        public List<Directory> AllDirectories { get; protected set; }
+
         #endregion
 
         #region setup 
@@ -42,15 +45,46 @@ namespace Hash17.Blackboard_
                 ProgramDefinitionById.Add(program.Id, program);
 
                 if (program.AvailableInGamePlay)
-                    SpecialPrograms.Add(programs[i].Id, program.ProgramPrefab.GetComponent<IProgram>());
-                else
                     Programs.Add(programs[i].Command, program.ProgramPrefab.GetComponent<IProgram>());
+                else
+                    SpecialPrograms.Add(programs[i].Id, program.ProgramPrefab.GetComponent<IProgram>()); 
             }
         }
 
         protected void LoadFileSystem()
         {
             FileSystem = FileSystemScriptableObject.ToFileSystem();
+            UpdateAllDirectories();
+            UpdateAllFiles();
+        }
+
+        public void UpdateAllFiles()
+        {
+            var files = new List<File>(FileSystem.Files);
+            for (int i = 0; i < AllDirectories.Count; i++)
+            {
+                var currentdir = AllDirectories[i];
+                files.AddRange(currentdir.Files);
+            }
+
+            AllFiles = files;
+        }
+
+        public void UpdateAllDirectories()
+        {
+            var root = FileSystem as Directory;
+            var toSee = new List<Directory>();
+            toSee.Add(root);
+            for (int j = 0; j < toSee.Count; j++)
+            {
+                root = toSee[j];
+                for (int i = 0; i < root.Childs.Count; i++)
+                {
+                    toSee.Add(root.Childs[i]);
+                }
+            }
+
+            AllDirectories = toSee;
         }
 
         #endregion

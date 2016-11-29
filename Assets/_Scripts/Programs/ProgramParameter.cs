@@ -193,6 +193,17 @@ namespace Hash17.Programs
             return param != null;
         }
 
+        public Param GetFirstParamWithValue()
+        {
+            for (int i = 0; i < Params.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(Params[i].Value))
+                    return Params[i];
+            }
+
+            return null;
+        }
+
         #endregion
     }
 }
