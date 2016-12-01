@@ -16,5 +16,6 @@ namespace Hash17.Programs
         public string[] KnownParametersAndOptions;
         public GameObject ProgramPrefab;
         public bool AvailableInGamePlay = true;
+        public bool DeviceIndependent;
     }
 }

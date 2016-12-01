@@ -12,7 +12,7 @@ namespace Hash17.Files
     {
         public static FileSystem Instance
         {
-            get { return Blackboard.Instance.FileSystem; }
+            get { return Blackboard.Instance.CurrentConnectedDevice.FileSystem; }
         }
 
         #region Inner types

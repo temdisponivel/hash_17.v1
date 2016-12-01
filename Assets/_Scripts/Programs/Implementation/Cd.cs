@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Hash17.Blackboard_;
+using Hash17.Devices.Networks;
+using Hash17.Devices.Security;
 using Hash17.Files;
 using Hash17.Terminal_;
 using Hash17.Utils;

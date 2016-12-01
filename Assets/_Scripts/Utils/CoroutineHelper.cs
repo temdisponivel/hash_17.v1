@@ -9,6 +9,16 @@ namespace Hash17.Utils
 {
     public class CoroutineHelper : PersistentSingleton<CoroutineHelper>
     {
+        public Coroutine Start(IEnumerator coroutine)
+        {
+            return StartCoroutine(coroutine);
+        }
+
+        public void Stop(IEnumerator coroutine)
+        {
+            StopCoroutine(coroutine);
+        }
+
         public Coroutine WaitAndCall(Action callback, float secondsToWait)
         {
             return StartCoroutine(InnerWaitAndCall(callback, secondsToWait));

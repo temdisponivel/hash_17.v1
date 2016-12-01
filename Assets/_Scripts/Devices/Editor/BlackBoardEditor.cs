@@ -18,7 +18,7 @@ namespace Hash17.Blackboard_
             {
                 serializedObject.Update();
                 var blackboard = target as Blackboard;
-                blackboard.FileSystemScriptableObject = Resources.LoadAll<FileSystemScriptableObject>("")[0];
+                blackboard.FileSystemScriptableObjects = Resources.LoadAll<FileSystemScriptableObject>("");
                 blackboard.ProgramsScriptableObjects = Resources.LoadAll<ProgramScriptableObject>("");
                 serializedObject.ApplyModifiedProperties();
             }

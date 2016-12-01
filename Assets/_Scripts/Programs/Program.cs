@@ -25,11 +25,11 @@ namespace Hash17.Programs
         {
             get { return Definition.Description; }
         }
+
+        public bool DeviceIndependent { get; set; }
         
         public ProgramParameter Parameters { get; set; }
-
         public bool Running { get; private set; }
-
         protected Coroutine ExecCoroutine { get; set; }
 
         private ProgramScriptableObject _definition;

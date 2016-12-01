@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
+using Hash17.Devices;
 using Hash17.Files;
 using Hash17.Files.SO;
 using Hash17.Programs;
@@ -9,29 +12,29 @@ namespace Hash17.Blackboard_
 {
     public class Blackboard : PersistentSingleton<Blackboard>
     {
-        #region Properties
-
         public readonly Dictionary<string, IProgram> Programs = new Dictionary<string, IProgram>();
         public readonly Dictionary<ProgramId, IProgram> SpecialPrograms = new Dictionary<ProgramId, IProgram>();
         public readonly Dictionary<ProgramId, ProgramScriptableObject> ProgramDefinitionById = new Dictionary<ProgramId, ProgramScriptableObject>();
-        public FileSystem FileSystem = new FileSystem();
+
+        public FileSystem FileSystem
+        {
+            get { return CurrentConnectedDevice.FileSystem; }
+        }
+
+        public IDevice CurrentConnectedDevice;
+        public IDevice OwnDevice;
 
         [SerializeField]
         public ProgramScriptableObject[] ProgramsScriptableObjects;
 
         [SerializeField]
-        public FileSystemScriptableObject FileSystemScriptableObject;
+        public FileSystemScriptableObject[] FileSystemScriptableObjects;
 
         public List<File> AllFiles { get; protected set; }
         public List<Directory> AllDirectories { get; protected set; }
 
-        #endregion
-
-        #region setup 
-
         protected override void Awake()
         {
-            base.Awake();
             LoadProgramsDefinitions();
             LoadFileSystem();
         }
@@ -47,24 +50,29 @@ namespace Hash17.Blackboard_
                 if (program.AvailableInGamePlay)
                     Programs.Add(programs[i].Command, program.ProgramPrefab.GetComponent<IProgram>());
                 else
-                    SpecialPrograms.Add(programs[i].Id, program.ProgramPrefab.GetComponent<IProgram>()); 
+                    SpecialPrograms.Add(programs[i].Id, program.ProgramPrefab.GetComponent<IProgram>());
             }
         }
 
         protected void LoadFileSystem()
         {
-            FileSystem = FileSystemScriptableObject.ToFileSystem();
             UpdateAllDirectories();
             UpdateAllFiles();
         }
 
         public void UpdateAllFiles()
         {
-            var files = new List<File>(FileSystem.Files);
-            for (int i = 0; i < AllDirectories.Count; i++)
+            var fileSystems = FileSystemScriptableObjects;
+            var files = new List<File>();
+            for (int i = 0; i < fileSystems.Length; i++)
             {
-                var currentdir = AllDirectories[i];
-                files.AddRange(currentdir.Files);
+                var fileSystem = fileSystems[i].ToFileSystem();
+                files.AddRange(fileSystem.Files);
+                for (int j = 0; j < AllDirectories.Count; j++)
+                {
+                    var currentdir = AllDirectories[j];
+                    files.AddRange(currentdir.Files);
+                }
             }
 
             AllFiles = files;
@@ -72,21 +80,24 @@ namespace Hash17.Blackboard_
 
         public void UpdateAllDirectories()
         {
-            var root = FileSystem as Directory;
+            var fileSystems = FileSystemScriptableObjects;
             var toSee = new List<Directory>();
-            toSee.Add(root);
-            for (int j = 0; j < toSee.Count; j++)
+            for (int i = 0; i < fileSystems.Length; i++)
             {
-                root = toSee[j];
-                for (int i = 0; i < root.Childs.Count; i++)
+                var fileSystem = fileSystems[i].ToFileSystem();
+                var root = fileSystem as Directory;
+                toSee.Add(root);
+                for (int j = 0; j < toSee.Count; j++)
                 {
-                    toSee.Add(root.Childs[i]);
+                    root = toSee[j];
+                    for (int k = 0; k < root.Childs.Count; k++)
+                    {
+                        toSee.Add(root.Childs[k]);
+                    }
                 }
             }
 
             AllDirectories = toSee;
         }
-
-        #endregion
     }
 }

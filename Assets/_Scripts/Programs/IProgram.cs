@@ -7,6 +7,7 @@ namespace Hash17.Programs
         void Execute(string parameters);
         string Description { get; }
         string Usage { get; }
+        bool DeviceIndependent { get; }
         void Stop();
         event Action<IProgram> OnStart;
         event Action<IProgram> OnFinish;
