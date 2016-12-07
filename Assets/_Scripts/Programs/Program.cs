@@ -11,7 +11,7 @@ namespace Hash17.Programs
     public abstract class Program : MonoBehaviour, IProgram
     {
         #region Properties
-
+        
         public ProgramId Id;
         public event Action<IProgram> OnStart;
         public event Action<IProgram> OnFinish;
@@ -26,8 +26,18 @@ namespace Hash17.Programs
             get { return Definition.Description; }
         }
 
-        public bool DeviceIndependent { get; set; }
-        
+        [SerializeField]
+        private bool _deviceIndependent = true;
+
+        public bool DeviceIndependent
+        {
+            get
+            {
+                return _deviceIndependent;
+            }
+            set { _deviceIndependent = value; }
+        }
+
         public ProgramParameter Parameters { get; set; }
         public bool Running { get; private set; }
         protected Coroutine ExecCoroutine { get; set; }

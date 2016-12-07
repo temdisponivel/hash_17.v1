@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace Hash17.Files
 {
@@ -10,8 +11,24 @@ namespace Hash17.Files
     {
         public virtual string Name { get; internal set; }
         public virtual Directory Parent { get; internal set; }
-        internal List<Directory> Childs = new List<Directory>();
-        internal List<File> Files = new List<File>();
+
+        [SerializeField]
+        private List<Directory> _childs;
+
+        [SerializeField]
+        private List<File> _files;
+
+        public List<Directory> Childs
+        {
+            get { return _childs; }
+            set { _childs = value; }
+        }
+
+        public List<File> Files
+        {
+            get { return _files; }
+            set { _files = value; }
+        }
 
         public string Path
         {

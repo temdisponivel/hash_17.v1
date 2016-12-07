@@ -3,7 +3,6 @@ using System.Collections;
 using System.Security.AccessControl;
 using Hash17.Blackboard_;
 using Hash17.Files;
-using Hash17.Files.SO;
 using Hash17.Programs;
 using UnityEditor;
 
@@ -14,14 +13,7 @@ namespace Hash17.Blackboard_
     {
         public override void OnInspectorGUI()
         {
-            if (GUILayout.Button("Bake"))
-            {
-                serializedObject.Update();
-                var blackboard = target as Blackboard;
-                blackboard.FileSystemScriptableObjects = Resources.LoadAll<FileSystemScriptableObject>("");
-                blackboard.ProgramsScriptableObjects = Resources.LoadAll<ProgramScriptableObject>("");
-                serializedObject.ApplyModifiedProperties();
-            }
+            DrawDefaultInspector();
         }
     }
 }

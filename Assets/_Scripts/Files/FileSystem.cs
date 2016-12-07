@@ -8,11 +8,12 @@ using UnityEngine.VR;
 
 namespace Hash17.Files
 {
+    [Serializable]
     public class FileSystem : Directory
     {
         public static FileSystem Instance
         {
-            get { return Blackboard.Instance.CurrentConnectedDevice.FileSystem; }
+            get { return Blackboard.Instance.CurrentDevice.FileSystem; }
         }
 
         #region Inner types

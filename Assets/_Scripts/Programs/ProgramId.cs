@@ -8,5 +8,6 @@
         Search,
         Help,
         Init,
+        Connect,
     }
 }

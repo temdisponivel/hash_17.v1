@@ -2,8 +2,8 @@
 using System.ComponentModel.Design;
 using System.Linq;
 using Hash17.Devices;
+using Hash17.Devices.Firewalls;
 using Hash17.Files;
-using Hash17.Files.SO;
 using Hash17.Programs;
 using Hash17.Utils;
 using UnityEngine;
@@ -12,92 +12,64 @@ namespace Hash17.Blackboard_
 {
     public class Blackboard : PersistentSingleton<Blackboard>
     {
-        public readonly Dictionary<string, IProgram> Programs = new Dictionary<string, IProgram>();
-        public readonly Dictionary<ProgramId, IProgram> SpecialPrograms = new Dictionary<ProgramId, IProgram>();
-        public readonly Dictionary<ProgramId, ProgramScriptableObject> ProgramDefinitionById = new Dictionary<ProgramId, ProgramScriptableObject>();
+        public Dictionary<string, IProgram> Programs = new Dictionary<string, IProgram>();
+        public Dictionary<ProgramId, IProgram> SpecialPrograms = new Dictionary<ProgramId, IProgram>();
+        public Dictionary<ProgramId, ProgramScriptableObject> ProgramDefinitionById = new Dictionary<ProgramId, ProgramScriptableObject>();
+        
+        public List<Device> Devices;
+        public string OwnedDeviceId;
 
+        private Device _currentDevice;
+        public Device CurrentDevice
+        {
+            get
+            {
+                if (_currentDevice == null)
+                    _currentDevice = Devices.Find(d => d.Id == OwnedDeviceId);
+
+                return _currentDevice;
+            }
+            set { _currentDevice = value; }
+        }
+        
         public FileSystem FileSystem
         {
-            get { return CurrentConnectedDevice.FileSystem; }
+            get
+            {
+                return CurrentDevice.FileSystem;
+            }
         }
-
-        public IDevice CurrentConnectedDevice;
-        public IDevice OwnDevice;
-
-        [SerializeField]
-        public ProgramScriptableObject[] ProgramsScriptableObjects;
-
-        [SerializeField]
-        public FileSystemScriptableObject[] FileSystemScriptableObjects;
 
         public List<File> AllFiles { get; protected set; }
         public List<Directory> AllDirectories { get; protected set; }
 
+        public Dictionary<FirewallType, IFirewall> Firewalls;
+
         protected override void Awake()
         {
-            LoadProgramsDefinitions();
-            LoadFileSystem();
+            LoadAll();
         }
 
-        void LoadProgramsDefinitions()
+        public void LoadAll()
         {
-            var programs = ProgramsScriptableObjects;
-            for (int i = 0; i < programs.Length; i++)
+            LoadPrograms();
+        }
+
+        private void LoadPrograms()
+        {
+            var allPrograms = Resources.LoadAll<ProgramScriptableObject>("").ToList();
+
+            for (int i = 0; i < allPrograms.Count; i++)
             {
-                var program = programs[i];
-                ProgramDefinitionById.Add(program.Id, program);
+                var program = allPrograms[i];
+
+                ProgramDefinitionById[program.Id] = program;
 
                 if (program.AvailableInGamePlay)
-                    Programs.Add(programs[i].Command, program.ProgramPrefab.GetComponent<IProgram>());
+                    Programs[program.Command] = program.ProgramPrefab.GetComponent<IProgram>();
                 else
-                    SpecialPrograms.Add(programs[i].Id, program.ProgramPrefab.GetComponent<IProgram>());
+                    SpecialPrograms[program.Id] = program.ProgramPrefab.GetComponent<IProgram>();
             }
-        }
-
-        protected void LoadFileSystem()
-        {
-            UpdateAllDirectories();
-            UpdateAllFiles();
-        }
-
-        public void UpdateAllFiles()
-        {
-            var fileSystems = FileSystemScriptableObjects;
-            var files = new List<File>();
-            for (int i = 0; i < fileSystems.Length; i++)
-            {
-                var fileSystem = fileSystems[i].ToFileSystem();
-                files.AddRange(fileSystem.Files);
-                for (int j = 0; j < AllDirectories.Count; j++)
-                {
-                    var currentdir = AllDirectories[j];
-                    files.AddRange(currentdir.Files);
-                }
-            }
-
-            AllFiles = files;
-        }
-
-        public void UpdateAllDirectories()
-        {
-            var fileSystems = FileSystemScriptableObjects;
-            var toSee = new List<Directory>();
-            for (int i = 0; i < fileSystems.Length; i++)
-            {
-                var fileSystem = fileSystems[i].ToFileSystem();
-                var root = fileSystem as Directory;
-                toSee.Add(root);
-                for (int j = 0; j < toSee.Count; j++)
-                {
-                    root = toSee[j];
-                    for (int k = 0; k < root.Childs.Count; k++)
-                    {
-                        toSee.Add(root.Childs[k]);
-                    }
-                }
-            }
-
-            AllDirectories = toSee;
         }
     }
 }

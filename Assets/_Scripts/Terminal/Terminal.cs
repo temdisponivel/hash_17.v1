@@ -63,7 +63,7 @@ namespace Hash17.Terminal_
 
         public string CurrentLocationAndUserName
         {
-            get { return string.Format("{0}:{1}", Blackboard.Instance.FileSystem.CurrentDirectory.Path, CurrentUserName); }
+            get { return string.Format("{0}:{1}{2}", Blackboard.Instance.FileSystem.CurrentDirectory.Path, Blackboard.Instance.CurrentDevice.Id, CurrentUserName); }
         }
 
         public event Action<IProgram> OnProgramExecuted;
@@ -130,7 +130,24 @@ namespace Hash17.Terminal_
             IProgram program;
             if (Blackboard.Instance.Programs.TryGetValue(programName, out program))
             {
-                var programInstance = RunProgram(program, programParams);
+                IProgram programInstance = null;
+
+                Program deviceProgram;
+                if ((deviceProgram = Blackboard.Instance.CurrentDevice.Programs.Find(p => p.Definition.Command == programName)) != null)
+                {
+                    programInstance = RunProgram(deviceProgram, programParams);
+                }
+                else if (!program.DeviceIndependent)
+                {
+                    ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
+                    ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
+                    return;
+                }
+                else
+                {
+                    programInstance = RunProgram(program, programParams);
+                }
+
 
                 if (OnProgramExecuted != null)
                     OnProgramExecuted(programInstance);
