@@ -176,7 +176,7 @@ namespace Hash17.Terminal_
             Input.isSelected = true;
         }
 
-        private void UpdateUserNameLocation()
+        public void UpdateUserNameLocation()
         {
             LabelUserNameLocation.text = CurrentLocationAndUserName;
         }
@@ -249,7 +249,7 @@ namespace Hash17.Terminal_
 
         public void ClearAll()
         {
-            Clear(TextTable.children.Count);
+            Clear(TextTable.GetChildList().Count);
         }
 
         public void Clear(int quantity)
@@ -257,12 +257,12 @@ namespace Hash17.Terminal_
             if (quantity == 0)
                 return;
 
-            for (int i = 0; quantity > 0 && i < TextTable.children.Count; i++)
+            for (int i = 0; quantity > 0 && i < TextTable.GetChildList().Count; i++)
             {
                 quantity--;
 
-                if (TextTable.children[i])
-                    Destroy(TextTable.children[i].gameObject);
+                if (TextTable.GetChildList()[i])
+                    Destroy(TextTable.GetChildList()[i].gameObject);
             }
 
             TextTable.Reposition();

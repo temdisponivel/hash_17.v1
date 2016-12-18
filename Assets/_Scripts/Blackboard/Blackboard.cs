@@ -5,6 +5,7 @@ using Hash17.Devices;
 using Hash17.Devices.Firewalls;
 using Hash17.Files;
 using Hash17.Programs;
+using Hash17.Terminal_;
 using Hash17.Utils;
 using UnityEngine;
 
@@ -15,8 +16,13 @@ namespace Hash17.Blackboard_
         public Dictionary<string, IProgram> Programs = new Dictionary<string, IProgram>();
         public Dictionary<ProgramId, IProgram> SpecialPrograms = new Dictionary<ProgramId, IProgram>();
         public Dictionary<ProgramId, ProgramScriptableObject> ProgramDefinitionById = new Dictionary<ProgramId, ProgramScriptableObject>();
-        
-        public List<Device> Devices;
+        public DeviceCollectionScriptableObject DeviceCollectionScriptableObject;
+
+        public List<Device> Devices
+        {
+            get { return DeviceCollectionScriptableObject.Devices; }
+        }
+
         public string OwnedDeviceId;
 
         private Device _currentDevice;
@@ -29,7 +35,11 @@ namespace Hash17.Blackboard_
 
                 return _currentDevice;
             }
-            set { _currentDevice = value; }
+            set
+            {
+                _currentDevice = value; 
+                Terminal.Instance.UpdateUserNameLocation();
+            }
         }
         
         public FileSystem FileSystem
@@ -48,6 +58,11 @@ namespace Hash17.Blackboard_
         protected override void Awake()
         {
             LoadAll();
+        }
+
+        public void LoadDeviceCollection()
+        {
+            DeviceCollectionScriptableObject = Resources.LoadAll<DeviceCollectionScriptableObject>("")[0];
         }
 
         public void LoadAll()
