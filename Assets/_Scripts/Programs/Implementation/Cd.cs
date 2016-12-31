@@ -23,7 +23,7 @@ namespace Hash17.Programs.Implementation
             var fileSystem = Blackboard.Instance.FileSystem;
 
             ProgramParameter.Param param;
-            if (Parameters.TryGetParam("C", out param))
+            if (Parameters.TryGetParam("c", out param))
             {
                 var path = param.Value;
 

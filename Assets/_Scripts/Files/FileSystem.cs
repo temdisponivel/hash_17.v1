@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
 using Hash17.Blackboard_;
-using UnityEngine.VR;
 
 namespace Hash17.Files
 {

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Hash17.Utils;
 using UnityEditor;
 
 namespace FH.DataRetrieving
@@ -17,12 +18,14 @@ namespace FH.DataRetrieving
 
 			if (NGUIEditorTools.DrawHeader ("Localization"))
 			{
+                NGUIEditorTools.BeginContents();
 				config.LocalizationSpreadSheetId = EditorGUILayout.TextField ("Localization Sheet Id", config.LocalizationSpreadSheetId);
 				EditorGUILayout.PropertyField (serializedObject.FindProperty ("Sheets"), true);
 				EditorGUILayout.PropertyField (serializedObject.FindProperty ("Languages"), true);
 				if (GUILayout.Button ("Fetch all localization data"))
-					DataRetrieverInstanceBase.Instance.FetchLocalizationInfo (config.LocalizationSpreadSheetId, config.Sheets, config.Languages);
-			}
+					Hash17DataRetrieverInstance.Instance.FetchLocalizationInfo (config.LocalizationSpreadSheetId, config.Sheets, config.Languages);
+                NGUIEditorTools.EndContents();
+            }
 		}
 	}
 }

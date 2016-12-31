@@ -8,56 +8,33 @@ using UnityEngine;
 
 namespace Hash17.Programs
 {
-    public abstract class Program : MonoBehaviour, IProgram
+    [Serializable]
+    public class Program
     {
         #region Properties
         
         public ProgramId Id;
-        public event Action<IProgram> OnStart;
-        public event Action<IProgram> OnFinish;
-
-        public string Usage
-        {
-            get { return Definition.Usage; }
-        }
-
-        public string Description
-        {
-            get { return Definition.Description; }
-        }
-
-        [SerializeField]
-        private bool _deviceIndependent = true;
-
-        public bool DeviceIndependent
-        {
-            get
-            {
-                return _deviceIndependent;
-            }
-            set { _deviceIndependent = value; }
-        }
+        public int UnitqueId;
+        public string Command;
+        public string Description;
+        public string Usage;
+        public string[] KnownParametersAndOptions;
+        public bool AvailableInGamePlay = true;
 
         public ProgramParameter Parameters { get; set; }
         public bool Running { get; private set; }
         protected Coroutine ExecCoroutine { get; set; }
 
-        private ProgramScriptableObject _definition;
-        public ProgramScriptableObject Definition
-        {
-            get
-            {
-                if (_definition == null)
-                    _definition = Blackboard.Instance.ProgramDefinitionById[Id];
+        #endregion
 
-                return _definition;
+        #region Events
 
-            }
-        }
+        public event Action<Program> OnStart;
+        public event Action<Program> OnFinish;
 
         #endregion
-        
-        #region IProgram
+
+        #region Program
 
         public void Execute(string parameters)
         {
@@ -79,9 +56,9 @@ namespace Hash17.Programs
             FinishExecution();
         }
 
-        public IProgram Clone()
+        public Program Clone()
         {
-            return Instantiate(this).GetComponent<IProgram>();
+            return MemberwiseClone() as Program;
         }
         
         protected bool AskedForHelp(bool showHelpIftrue)
@@ -104,7 +81,7 @@ namespace Hash17.Programs
         protected bool ValidateUnknowParameters(bool shouldShowUsage)
         {
             List<ProgramParameter.Param> unknownParams;
-            bool result = Parameters.HasParamOtherThan(out unknownParams, Definition.KnownParametersAndOptions);
+            bool result = Parameters.HasParamOtherThan(out unknownParams, KnownParametersAndOptions);
             if (result)
             {
                 for (int i = 0; i < unknownParams.Count; i++)
@@ -136,7 +113,7 @@ namespace Hash17.Programs
 
         #region Helpers
 
-        protected abstract IEnumerator InnerExecute();
+        protected virtual IEnumerator InnerExecute() { yield break; }
 
         protected void BlockInput()
         {
@@ -154,8 +131,6 @@ namespace Hash17.Programs
 
             if (OnFinish != null)
                 OnFinish(this);
-
-            Destroy(this.gameObject);
         }
 
         private IEnumerator WaitToFinish()
@@ -169,6 +144,20 @@ namespace Hash17.Programs
         protected void LoadUsageFromAsset()
         {
             
+        }
+
+        #endregion
+
+        #region Coroutine
+
+        protected Coroutine StartCoroutine(IEnumerator coroutine)
+        {
+            return CoroutineHelper.Instance.Start(coroutine);
+        }
+
+        protected void StopCoroutine(Coroutine coroutine)
+        {
+            CoroutineHelper.Instance.Stop(coroutine);
         }
 
         #endregion

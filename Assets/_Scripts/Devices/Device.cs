@@ -12,22 +12,8 @@ namespace Hash17.Devices
     {
         public string Name;
         public string Id;
-        public List<Program> Programs;
         public FileSystem FileSystem;
-
-        public Device()
-        {
-            Programs = new List<Program>();
-            FileSystem = new FileSystem();
-        }
-
-        public virtual DeviceType DeviceType
-        {
-            get
-            {
-                return DeviceType.Normal;
-            }
-        }
+        public virtual DeviceType DeviceType { get { return DeviceType.Normal; } }
 
         public virtual IEnumerator TryAccess(Action<bool, Device> callback)
         {
@@ -35,13 +21,5 @@ namespace Hash17.Devices
             if (callback != null)
                 callback(true, this);
         }
-
-#if UNITY_EDITOR
-        public virtual void DrawDeviceInspector()
-        {
-            Id = EditorGUILayout.TextField("Id", Id);
-            Name = EditorGUILayout.TextField("Name", Name);
-        }
-#endif
     }
 }

@@ -13,9 +13,9 @@ namespace Hash17.Blackboard_
 {
     public class Blackboard : PersistentSingleton<Blackboard>
     {
-        public Dictionary<string, IProgram> Programs = new Dictionary<string, IProgram>();
-        public Dictionary<ProgramId, IProgram> SpecialPrograms = new Dictionary<ProgramId, IProgram>();
-        public Dictionary<ProgramId, ProgramScriptableObject> ProgramDefinitionById = new Dictionary<ProgramId, ProgramScriptableObject>();
+        public Dictionary<string, Program> Programs = new Dictionary<string, Program>();
+        public Dictionary<ProgramId, Program> SpecialPrograms = new Dictionary<ProgramId, Program>();
+        public Dictionary<ProgramId, Program> ProgramDefinitionById = new Dictionary<ProgramId, Program>();
         public DeviceCollectionScriptableObject DeviceCollectionScriptableObject;
 
         public List<Device> Devices
@@ -68,11 +68,12 @@ namespace Hash17.Blackboard_
         public void LoadAll()
         {
             LoadPrograms();
+            LoadDeviceCollection();
         }
 
         private void LoadPrograms()
         {
-            var allPrograms = Resources.LoadAll<ProgramScriptableObject>("").ToList();
+            var allPrograms = Resources.LoadAll<ProgramCollection>("")[0].Programs;
 
             for (int i = 0; i < allPrograms.Count; i++)
             {
@@ -81,9 +82,9 @@ namespace Hash17.Blackboard_
                 ProgramDefinitionById[program.Id] = program;
 
                 if (program.AvailableInGamePlay)
-                    Programs[program.Command] = program.ProgramPrefab.GetComponent<IProgram>();
+                    Programs[program.Command] = program.Clone();
                 else
-                    SpecialPrograms[program.Id] = program.ProgramPrefab.GetComponent<IProgram>();
+                    SpecialPrograms[program.Id] = program.Clone();
             }
         }
     }

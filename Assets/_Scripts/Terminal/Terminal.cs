@@ -20,8 +20,8 @@ namespace Hash17.Terminal_
         public UIInput Input;
         public UILabel LabelUserNameLocation;
 
-        private readonly List<IProgram> _runningPrograms = new List<IProgram>();
-        public List<IProgram> RunningPrograms
+        private readonly List<Program> _runningPrograms = new List<Program>();
+        public List<Program> RunningPrograms
         {
             get
             {
@@ -66,8 +66,8 @@ namespace Hash17.Terminal_
             get { return string.Format("{0}:{1}{2}", Blackboard.Instance.FileSystem.CurrentDirectory.Path, Blackboard.Instance.CurrentDevice.Id, CurrentUserName); }
         }
 
-        public event Action<IProgram> OnProgramExecuted;
-        public event Action<IProgram> OnProgramFinished;
+        public event Action<Program> OnProgramExecuted;
+        public event Action<Program> OnProgramFinished;
         public event Action<string> OnInputSubmited;
         public event Action OnInputValueChange;
 
@@ -127,27 +127,10 @@ namespace Hash17.Terminal_
 
             string programName, programParams;
             Interpreter.GetProgram(text, out programName, out programParams);
-            IProgram program;
+            Program program;
             if (Blackboard.Instance.Programs.TryGetValue(programName, out program))
             {
-                IProgram programInstance = null;
-
-                Program deviceProgram;
-                if ((deviceProgram = Blackboard.Instance.CurrentDevice.Programs.Find(p => p.Definition.Command == programName)) != null)
-                {
-                    programInstance = RunProgram(deviceProgram, programParams);
-                }
-                else if (!program.DeviceIndependent)
-                {
-                    ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
-                    ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
-                    return;
-                }
-                else
-                {
-                    programInstance = RunProgram(program, programParams);
-                }
-
+                var programInstance = RunProgram(program, programParams);
 
                 if (OnProgramExecuted != null)
                     OnProgramExecuted(programInstance);
@@ -161,7 +144,7 @@ namespace Hash17.Terminal_
             }
         }
 
-        private IProgram RunProgram(IProgram program, string param)
+        private Program RunProgram(Program program, string param)
         {
             var programInstance = program.Clone();
             RunningPrograms.Add(programInstance);
@@ -272,7 +255,7 @@ namespace Hash17.Terminal_
 
         #region Callbacks
 
-        private void ProgramFinished(IProgram program)
+        private void ProgramFinished(Program program)
         {
             RunningPrograms.Remove(program);
 

@@ -14,7 +14,7 @@ namespace Hash17.Utils
             return StartCoroutine(coroutine);
         }
 
-        public void Stop(IEnumerator coroutine)
+        public void Stop(Coroutine coroutine)
         {
             StopCoroutine(coroutine);
         }

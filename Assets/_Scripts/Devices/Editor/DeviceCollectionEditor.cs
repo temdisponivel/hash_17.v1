@@ -18,34 +18,7 @@ public class DeviceCollectionEditor : Editor
         if (deviceCollection.Devices == null)
             deviceCollection.Devices = new List<Device>();
 
-        DrawList(deviceCollection);
-
-        serializedObject.ApplyModifiedProperties();
-    }
-
-    public void DrawList(DeviceCollectionScriptableObject deviceCollection)
-    {
-        var toRemove = new List<int>();
-        if (NGUIEditorTools.DrawHeader("Devices"))
-        {
-            NGUIEditorTools.BeginContents();
-            for (int i = 0; i < deviceCollection.Devices.Count; i++)
-            {
-                var device = deviceCollection.Devices[i];
-                if (NGUIEditorTools.DrawHeader(device.Name))
-                {
-                    NGUIEditorTools.BeginContents();
-                    device.DrawDeviceInspector();
-
-                    if (GUILayout.Button("Remove"))
-                    {
-                        toRemove.Add(i);
-                    }
-                    NGUIEditorTools.EndContents();
-                }
-            }
-            NGUIEditorTools.EndContents();
-        }
+        DrawDefaultInspector();
 
         if (GUILayout.Button("Add device"))
         {
@@ -61,9 +34,6 @@ public class DeviceCollectionEditor : Editor
             }
         }
 
-        for (int i = 0; i < toRemove.Count; i++)
-        {
-            deviceCollection.Devices.RemoveAt(toRemove[i]);
-        }
+        serializedObject.ApplyModifiedProperties();
     }
 }

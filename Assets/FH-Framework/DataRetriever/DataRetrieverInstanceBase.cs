@@ -15,7 +15,7 @@ using UnityEditor;
 
 namespace FH.DataRetrieving
 {
-	public class DataRetrieverInstanceBase : MonoBehaviour
+    public class DataRetrieverInstanceBase : MonoBehaviour
 	{
 		#if UNITY_EDITOR
 
@@ -26,17 +26,6 @@ namespace FH.DataRetrieving
 		public DataRetrieverBase DataRetriever
 		{
 			get { return _dataRetriever ?? (_dataRetriever = Resources.LoadAll<DataRetrieverBase>("")[0]); }
-		}
-
-		protected static DataRetrieverInstanceBase _instance;
-		public static DataRetrieverInstanceBase Instance
-		{
-			get
-			{
-				var go = new GameObject ("Data-Retriever-Instance");
-				_instance = go.AddComponent<DataRetrieverInstanceBase> ();
-				return _instance;
-			}
 		}
 
 		#endregion
@@ -195,8 +184,7 @@ namespace FH.DataRetrieving
 					Debug.Log ("Max wait time reached, connection aborted.");
 					break;
 				}
-				Debug.Log ("Waiting... ");
-				yield return null;  
+                Debug.Log("Loading...");
 			}
 			
 			Debug.Log ("Is www done? " + www.isDone);
