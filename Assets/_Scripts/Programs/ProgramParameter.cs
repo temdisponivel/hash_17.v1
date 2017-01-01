@@ -23,7 +23,7 @@ namespace Hash17.Programs
 
         public string RawData;
         public List<Param> Params = new List<Param>();
-        public static List<char> Prefixes = new List<char>() { '-', '/' };
+        public static List<char> Prefixes = new List<char>() { '-' };
 
         public ProgramParameter(string parameters)
         {

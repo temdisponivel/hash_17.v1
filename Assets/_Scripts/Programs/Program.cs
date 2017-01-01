@@ -19,7 +19,7 @@ namespace Hash17.Programs
         public string Description;
         public string Usage;
         public string[] KnownParametersAndOptions;
-        public bool AvailableInGamePlay = true;
+        public bool Global = true;
 
         public ProgramParameter Parameters { get; set; }
         public bool Running { get; private set; }

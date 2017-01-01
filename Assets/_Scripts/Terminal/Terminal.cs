@@ -63,7 +63,7 @@ namespace Hash17.Terminal_
 
         public string CurrentLocationAndUserName
         {
-            get { return string.Format("{0}:{1}{2}", Blackboard.Instance.FileSystem.CurrentDirectory.Path, Blackboard.Instance.CurrentDevice.Id, CurrentUserName); }
+            get { return string.Format("{0}:{1}>", Blackboard.Instance.CurrentDevice.UniqueId, Blackboard.Instance.FileSystem.CurrentDirectory.Path); }
         }
 
         public event Action<Program> OnProgramExecuted;
@@ -74,6 +74,14 @@ namespace Hash17.Terminal_
         public readonly List<string> AllCommandsTyped = new List<string>();
         private int _currentNavigationCommandIndex = -1;
 
+        private readonly StringBuilder _identationBuilder = new StringBuilder();
+        private string CurrentIdentation
+        {
+            get { return _identationBuilder.ToString(); }
+        }
+
+        private int _lastIdentationQuantity;
+
         #endregion
 
         #region Unity events
@@ -81,12 +89,12 @@ namespace Hash17.Terminal_
         protected override void Awake()
         {
             base.Awake();
-            ClearInput();
-            CurrentUserName = "#17";
+            CurrentUserName = "temdisponivel";
         }
 
         protected void Start()
         {
+            ClearInput();
             Blackboard.Instance.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
             RunProgram(Blackboard.Instance.SpecialPrograms[ProgramId.Init], string.Empty);
         }
@@ -128,20 +136,38 @@ namespace Hash17.Terminal_
             string programName, programParams;
             Interpreter.GetProgram(text, out programName, out programParams);
             Program program;
-            if (Blackboard.Instance.Programs.TryGetValue(programName, out program))
-            {
-                var programInstance = RunProgram(program, programParams);
-
-                if (OnProgramExecuted != null)
-                    OnProgramExecuted(programInstance);
-
-                programInstance.OnFinish += ProgramFinished;
-            }
-            else
+            if (!Blackboard.Instance.Programs.TryGetValue(programName, out program))
             {
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
+                return;
             }
+
+            var device = Blackboard.Instance.CurrentDevice;
+            var deviceProgramId = 0;
+            if (device.SpecialPrograms.TryGetValue(program.Id, out deviceProgramId))
+            {
+                var progBkp = program;
+                if (!Blackboard.Instance.ProgramDefinitionByUniqueId.TryGetValue(deviceProgramId, out program))
+                {
+                    program = progBkp;
+
+                    // if the program is not global and current device don't have it, error
+                    if (!program.Global)
+                    {
+                        ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
+                        ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
+                        return;
+                    }
+                }
+            }
+
+            var programInstance = RunProgram(program, programParams);
+
+            if (OnProgramExecuted != null)
+                OnProgramExecuted(programInstance);
+
+            programInstance.OnFinish += ProgramFinished;
         }
 
         private Program RunProgram(Program program, string param)
@@ -155,6 +181,7 @@ namespace Hash17.Terminal_
         private void ClearInput()
         {
             Input.value = string.Empty;
+            UpdateUserNameLocation();
             _currentNavigationCommandIndex = -1;
             Input.isSelected = true;
         }
@@ -191,7 +218,7 @@ namespace Hash17.Terminal_
 
         #region Interface
 
-        public void ShowText(string text, bool asNewLine = true)
+        public void ShowText(string text, bool asNewLine = true, bool ident = false)
         {
             TextEntry entry;
             if (asNewLine)
@@ -211,13 +238,20 @@ namespace Hash17.Terminal_
                 entry = TextTable.transform.GetChild(0).GetComponent<TextEntry>();
             }
 
-            entry.Setup(CurrentLocationAndUserName, text);
+            if (ident)
+                BeginIdentation();
+
+            entry.Setup(CurrentLocationAndUserName, _identationBuilder + text);
+
+            if (ident)
+                EndIdentation();
+
             TextTable.Reposition();
         }
 
-        public static void Showtext(string text)
+        public static void Showtext(string text, bool ident = false)
         {
-            Instance.ShowText(text);
+            Instance.ShowText(text, ident: ident);
         }
 
         public Coroutine ShowTextWithInterval(string text, float intervalBetweenChars = .02f, Action callback = null)
@@ -249,6 +283,22 @@ namespace Hash17.Terminal_
             }
 
             TextTable.Reposition();
+        }
+
+        public void BeginIdentation(int quantity = 4)
+        {
+            for (int i = 0; i < quantity; i++)
+                _identationBuilder.Append(" ");
+
+            _lastIdentationQuantity = quantity;
+        }
+
+        public void EndIdentation()
+        {
+            if (_identationBuilder.Length > _lastIdentationQuantity)
+                _identationBuilder.Remove(_identationBuilder.Length - (_lastIdentationQuantity + 1), _lastIdentationQuantity);
+            else
+                _identationBuilder.Remove(0, _identationBuilder.Length - 1);
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hash17.Blackboard_;
+using Newtonsoft.Json;
 
 namespace Hash17.Files
 {
@@ -28,8 +29,10 @@ namespace Hash17.Files
 
         public event Action OnChangeCurrentDirectory;
 
+        [JsonIgnore]
         private Directory _currentDirectory;
 
+        [JsonIgnore]
         public Directory CurrentDirectory
         {
             get
@@ -138,6 +141,21 @@ namespace Hash17.Files
                 Content = string.Empty,
             });
 
+            return OperationResult.Ok;
+        }
+
+        public OperationResult AddFileWithoutValidation(string path, File fileToAdd)
+        {
+            Directory parent;
+            CreateDiretory(path, out parent);
+            AddFileWithoutValidation(parent, fileToAdd);
+            return OperationResult.Ok;
+        }
+
+        public OperationResult AddFileWithoutValidation(Directory parent, File fileToAdd)
+        {
+            parent.Files.Add(fileToAdd);
+            fileToAdd.Directory = parent;
             return OperationResult.Ok;
         }
 
@@ -362,6 +380,9 @@ namespace Hash17.Files
             {
                 var current = parts[i];
 
+                if (string.IsNullOrEmpty(current))
+                    continue;
+
                 var currentDir = parent.FindDirectoryByName(current);
                 if (currentDir != null)
                 {
@@ -376,6 +397,8 @@ namespace Hash17.Files
                 if (result != OperationResult.Ok)
                     return result;
             }
+
+            dir = parent;
 
             return OperationResult.Ok;
         }

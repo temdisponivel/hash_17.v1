@@ -15,12 +15,13 @@ namespace Hash17.Blackboard_
     {
         public Dictionary<string, Program> Programs = new Dictionary<string, Program>();
         public Dictionary<ProgramId, Program> SpecialPrograms = new Dictionary<ProgramId, Program>();
+        public Dictionary<int, Program> ProgramDefinitionByUniqueId = new Dictionary<int, Program>();
         public Dictionary<ProgramId, Program> ProgramDefinitionById = new Dictionary<ProgramId, Program>();
-        public DeviceCollectionScriptableObject DeviceCollectionScriptableObject;
+        public DeviceCollection DeviceCollection;
 
         public List<Device> Devices
         {
-            get { return DeviceCollectionScriptableObject.Devices; }
+            get { return DeviceCollection.Devices; }
         }
 
         public string OwnedDeviceId;
@@ -31,7 +32,7 @@ namespace Hash17.Blackboard_
             get
             {
                 if (_currentDevice == null)
-                    _currentDevice = Devices.Find(d => d.Id == OwnedDeviceId);
+                    _currentDevice = Devices.Find(d => d.UniqueId == OwnedDeviceId);
 
                 return _currentDevice;
             }
@@ -62,7 +63,8 @@ namespace Hash17.Blackboard_
 
         public void LoadDeviceCollection()
         {
-            DeviceCollectionScriptableObject = Resources.LoadAll<DeviceCollectionScriptableObject>("")[0];
+            DeviceCollection = Resources.LoadAll<DeviceCollection>("")[0];
+            DeviceCollection.Load();
         }
 
         public void LoadAll()
@@ -73,17 +75,22 @@ namespace Hash17.Blackboard_
 
         private void LoadPrograms()
         {
-            var allPrograms = Resources.LoadAll<ProgramCollection>("")[0].Programs;
+            var progCollection = Resources.LoadAll<ProgramCollection>("")[0];
+            progCollection.Load();
+            var allPrograms = progCollection.Programs;
+
+            if (allPrograms == null)
+                return;
 
             for (int i = 0; i < allPrograms.Count; i++)
             {
                 var program = allPrograms[i];
-
+                
                 ProgramDefinitionById[program.Id] = program;
+                Programs[program.Command] = program;
+                ProgramDefinitionByUniqueId[program.UnitqueId] = program;
 
-                if (program.AvailableInGamePlay)
-                    Programs[program.Command] = program.Clone();
-                else
+                if (!program.Global)
                     SpecialPrograms[program.Id] = program.Clone();
             }
         }

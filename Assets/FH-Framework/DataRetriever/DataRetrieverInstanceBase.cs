@@ -15,6 +15,7 @@ using UnityEditor;
 
 namespace FH.DataRetrieving
 {
+    [ExecuteInEditMode]
     public class DataRetrieverInstanceBase : MonoBehaviour
 	{
 		#if UNITY_EDITOR

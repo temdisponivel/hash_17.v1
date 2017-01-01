@@ -15,15 +15,19 @@ namespace Hash17.Programs.Implementation
         {
             BlockInput();
 
+            Terminal.Instance.BeginIdentation();
+
             var programs = Blackboard.Instance.Programs;
 
             foreach (var program in programs)
             {
                 Terminal.Showtext(program.Key);
-                Terminal.Showtext("       " + program.Value.Description);
+                Terminal.Showtext(program.Value.Description, true);
                 yield return null;
             }
-            
+
+            Terminal.Instance.EndIdentation();
+
             UnblockInput();
         }
     }

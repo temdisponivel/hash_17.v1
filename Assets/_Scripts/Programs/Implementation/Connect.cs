@@ -20,13 +20,13 @@ namespace Hash17.Programs.Implementation
             {
                 for (int i = 0; i < Blackboard.Instance.Devices.Count; i++)
                 {
-                    Terminal.Showtext(string.Format("{0}: {1}", Blackboard.Instance.Devices[i].Id, Blackboard.Instance.Devices[i].Name));
+                    Terminal.Showtext(string.Format("{0}: {1}", Blackboard.Instance.Devices[i].UniqueId, Blackboard.Instance.Devices[i].Name));
                 }
             }
             else if (Parameters.TryGetParam("c", out param))
             {
                 var deviceId = param.Value;
-                var device = Blackboard.Instance.Devices.Find(d => d.Id == deviceId);
+                var device = Blackboard.Instance.Devices.Find(d => d.UniqueId == deviceId);
 
                 if (device == null)
                 {

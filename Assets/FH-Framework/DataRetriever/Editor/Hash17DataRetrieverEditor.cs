@@ -21,5 +21,14 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
                 Hash17DataRetrieverInstance.Instance.FetchProgramsInfo(config.ProgramsSpreadSheetId);
             NGUIEditorTools.EndContents();
         }
+
+        if (NGUIEditorTools.DrawHeader("Devices"))
+        {
+            NGUIEditorTools.BeginContents();
+            config.DevicesSpreadSheetId = EditorGUILayout.TextField("Devices Sheet Id", config.DevicesSpreadSheetId);
+            if (GUILayout.Button("Fetch all devices data"))
+                Hash17DataRetrieverInstance.Instance.FetchDeviceInfo(config.DevicesSpreadSheetId);
+            NGUIEditorTools.EndContents();
+        }
     }
 }

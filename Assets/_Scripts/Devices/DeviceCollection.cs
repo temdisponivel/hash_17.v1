@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization.Formatters;
-using System.Text;
+using Hash17.Programs;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Hash17.Programs
+namespace Hash17.Devices
 {
-    [CreateAssetMenu(fileName = "Device Collection", menuName = "Hash17/Program collection")]
-    public class ProgramCollection : ScriptableObject
+    [CreateAssetMenu(fileName = "Device Collection", menuName = "Hash17/Device collection")]
+    public class DeviceCollection : ScriptableObject
     {
         [SerializeField]
         private string _serializedData;
 
         [NonSerialized]
-        public List<Program> Programs;
+        public List<Device> Devices;
 
         public void Save()
         {
-            var data = JsonConvert.SerializeObject(Programs, new JsonSerializerSettings()
+            var data = JsonConvert.SerializeObject(Devices, new JsonSerializerSettings()
             {
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 TypeNameHandling = TypeNameHandling.All,
@@ -30,7 +29,7 @@ namespace Hash17.Programs
 
         public void Load()
         {
-            Programs = JsonConvert.DeserializeObject<List<Program>>(_serializedData, new JsonSerializerSettings()
+            Devices = JsonConvert.DeserializeObject<List<Device>>(_serializedData, new JsonSerializerSettings()
             {
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 TypeNameHandling = TypeNameHandling.All,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Hash17.Files
@@ -30,6 +31,7 @@ namespace Hash17.Files
             set { _files = value; }
         }
 
+        [JsonIgnore]
         public string Path
         {
             get
@@ -41,9 +43,16 @@ namespace Hash17.Files
                     builder = builder.Insert(0, string.Format("{0}/", parent.Name.Replace("/", "")));
                     parent = parent.Parent;
                 }
-                builder.Remove(builder.Length - 1, 1);
+                if (builder.Length > 1)
+                    builder.Remove(builder.Length - 1, 1);
                 return builder.ToString();
             }
+        }
+
+        public Directory()
+        {
+            _childs = new List<Directory>();
+            _files = new List<File>();
         }
 
         public virtual Directory FindDirectoryByName(string name)

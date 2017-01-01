@@ -11,5 +11,11 @@ namespace Hash17.Utils
         public string ProgramsSpreadSheetId;
 
         #endregion
+
+        #region Devices
+
+        public string DevicesSpreadSheetId;
+
+        #endregion
     }
 }

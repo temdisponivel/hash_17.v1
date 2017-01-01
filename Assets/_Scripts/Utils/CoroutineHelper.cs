@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Hash17.Utils
 {
+    [ExecuteInEditMode]
     public class CoroutineHelper : PersistentSingleton<CoroutineHelper>
     {
         public Coroutine Start(IEnumerator coroutine)

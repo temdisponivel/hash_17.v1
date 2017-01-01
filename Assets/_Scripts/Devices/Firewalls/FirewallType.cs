@@ -2,6 +2,7 @@
 {
     public enum FirewallType
     {
+        None,
         Password, 
     }
 }
