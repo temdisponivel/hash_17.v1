@@ -344,7 +344,7 @@ public class PropertyInspector : EditorWindow, IHasCustomMenu
 
     #region Init
 
-    [MenuItem("Window/Property Inspector Popup #f")]
+    [MenuItem("Window/Property Inspector Popup #&f")]
     private static void Init()
     {
         var window = CreateInstance<PropertyInspector>();

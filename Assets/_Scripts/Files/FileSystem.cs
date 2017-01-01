@@ -58,7 +58,7 @@ namespace Hash17.Files
         public override string Name
         {
             get { return "/"; }
-            internal set { }
+            set { }
         }
 
         #endregion

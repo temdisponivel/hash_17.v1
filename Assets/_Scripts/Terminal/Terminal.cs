@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Hash17.Blackboard_;
+using Hash17.Files;
 using Hash17.Programs;
 using Hash17.Programs.Implementation;
 using Hash17.Utils;
@@ -29,6 +30,8 @@ namespace Hash17.Terminal_
             }
         }
 
+        #region Input
+
         private bool _blockInput;
         public bool BlockInput
         {
@@ -50,6 +53,10 @@ namespace Hash17.Terminal_
             set { _treatInput = value; }
         }
 
+        #endregion
+
+        #region User name
+
         private string _currentUserName;
         public string CurrentUserName
         {
@@ -66,21 +73,30 @@ namespace Hash17.Terminal_
             get { return string.Format("{0}:{1}>", Blackboard.Instance.CurrentDevice.UniqueId, Blackboard.Instance.FileSystem.CurrentDirectory.Path); }
         }
 
-        public event Action<Program> OnProgramExecuted;
-        public event Action<Program> OnProgramFinished;
-        public event Action<string> OnInputSubmited;
-        public event Action OnInputValueChange;
+        #endregion
+
+        #region Commands
 
         public readonly List<string> AllCommandsTyped = new List<string>();
         private int _currentNavigationCommandIndex = -1;
 
-        private readonly StringBuilder _identationBuilder = new StringBuilder();
-        private string CurrentIdentation
-        {
-            get { return _identationBuilder.ToString(); }
-        }
+        #endregion
 
+        #region Identation
+
+        private readonly StringBuilder _identationBuilder = new StringBuilder();
         private int _lastIdentationQuantity;
+
+        #endregion
+
+        #endregion
+
+        #region Events
+
+        public event Action<Program> OnProgramExecuted;
+        public event Action<Program> OnProgramFinished;
+        public event Action<string> OnInputSubmited;
+        public event Action OnInputValueChange;
 
         #endregion
 
@@ -189,23 +205,6 @@ namespace Hash17.Terminal_
         public void UpdateUserNameLocation()
         {
             LabelUserNameLocation.text = CurrentLocationAndUserName;
-        }
-
-        public void OnUpPressed()
-        {
-            _currentNavigationCommandIndex = Math.Min(AllCommandsTyped.Count - 1, _currentNavigationCommandIndex + 1);
-            UpdateCommandLineToCommandIndex();
-        }
-
-        public void OnDownPressed()
-        {
-            _currentNavigationCommandIndex = Math.Max(0, _currentNavigationCommandIndex - 1);
-            UpdateCommandLineToCommandIndex();
-        }
-
-        public void OnEscPressed()
-        {
-            ClearInput();
         }
 
         public void UpdateCommandLineToCommandIndex()
@@ -320,6 +319,23 @@ namespace Hash17.Terminal_
             UpdateUserNameLocation();
         }
 
+        public void OnUpPressed()
+        {
+            _currentNavigationCommandIndex = Math.Min(AllCommandsTyped.Count - 1, _currentNavigationCommandIndex + 1);
+            UpdateCommandLineToCommandIndex();
+        }
+
+        public void OnDownPressed()
+        {
+            _currentNavigationCommandIndex = Math.Max(0, _currentNavigationCommandIndex - 1);
+            UpdateCommandLineToCommandIndex();
+        }
+
+        public void OnEscPressed()
+        {
+            ClearInput();
+        }
+        
         #endregion
     }
 }

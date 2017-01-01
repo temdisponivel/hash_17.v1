@@ -11,6 +11,8 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
     {
         base.OnInspectorGUI();
 
+        serializedObject.Update();
+
         var config = (Hash17DataRetriever)target;
 
         if (NGUIEditorTools.DrawHeader("Programs"))
@@ -30,5 +32,7 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
                 Hash17DataRetrieverInstance.Instance.FetchDeviceInfo(config.DevicesSpreadSheetId);
             NGUIEditorTools.EndContents();
         }
+
+        serializedObject.ApplyModifiedProperties();
     }
 }

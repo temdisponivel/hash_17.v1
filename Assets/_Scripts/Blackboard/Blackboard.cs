@@ -38,11 +38,11 @@ namespace Hash17.Blackboard_
             }
             set
             {
-                _currentDevice = value; 
+                _currentDevice = value;
                 Terminal.Instance.UpdateUserNameLocation();
             }
         }
-        
+
         public FileSystem FileSystem
         {
             get
@@ -58,6 +58,8 @@ namespace Hash17.Blackboard_
 
         protected override void Awake()
         {
+            AllFiles = new List<File>();
+            AllDirectories = new List<Directory>();
             LoadAll();
         }
 
@@ -65,6 +67,28 @@ namespace Hash17.Blackboard_
         {
             DeviceCollection = Resources.LoadAll<DeviceCollection>("")[0];
             DeviceCollection.Load();
+            for (int i = 0; i < DeviceCollection.Devices.Count; i++)
+            {
+                AddFilesAndDirToList(DeviceCollection.Devices[i].FileSystem);
+            }
+        }
+
+        private void AddFilesAndDirToList(Directory dir)
+        {
+            AllDirectories.Add(dir);
+
+            if (dir.Files != null)
+            {
+                AllFiles.AddRange(dir.Files);
+            }
+
+            if (dir.Childs != null)
+            {
+                for (int i = 0; i < dir.Childs.Count; i++)
+                {
+                    AddFilesAndDirToList(dir.Childs[i]);
+                }
+            }
         }
 
         public void LoadAll()
@@ -85,7 +109,7 @@ namespace Hash17.Blackboard_
             for (int i = 0; i < allPrograms.Count; i++)
             {
                 var program = allPrograms[i];
-                
+
                 ProgramDefinitionById[program.Id] = program;
                 Programs[program.Command] = program;
                 ProgramDefinitionByUniqueId[program.UnitqueId] = program;

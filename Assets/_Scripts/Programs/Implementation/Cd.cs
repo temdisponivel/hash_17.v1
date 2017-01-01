@@ -37,7 +37,20 @@ namespace Hash17.Programs.Implementation
             }
             else if (Parameters.TryGetParam("", out param))
             {
-                fileSystem.FindDirectory(param.Value, true);
+                var dir = fileSystem.FindDirectory(param.Value, true);
+                if (dir == null)
+                {
+                    File file;
+                    fileSystem.FindFileByPath(param.Value, out file);
+                    if (file != null)
+                    {
+                        Terminal.Showtext(TextBuilder.WarningText("This is a file. Use \"read\" command to read it."));
+                    }
+                    else
+                    {
+                        Terminal.Showtext(TextBuilder.WarningText("Directory not found."));
+                    }
+                }
             }
             else if (param == null)
             {
@@ -49,7 +62,7 @@ namespace Hash17.Programs.Implementation
 
                 for (int i = 0; i < dir.Files.Count; i++)
                 {
-                    Terminal.Instance.ShowText(TextBuilder.BuildText(dir.Files[i].Name, Color.blue));
+                    Terminal.Instance.ShowText(TextBuilder.BuildText(dir.Files[i].Name, Color.yellow));
                 }
             }
         }

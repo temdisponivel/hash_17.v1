@@ -10,8 +10,8 @@ namespace Hash17.Files
     [Serializable]
     public class Directory
     {
-        public virtual string Name { get; internal set; }
-        public virtual Directory Parent { get; internal set; }
+        public virtual string Name { get; set; }
+        public virtual Directory Parent { get; set; }
 
         [SerializeField]
         private List<Directory> _childs;

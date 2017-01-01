@@ -12,6 +12,8 @@ namespace FH.DataRetrieving
 		{
 			var config = (DataRetrieverBase) target;
 
+            serializedObject.Update();
+
 			config.WebServiceUrl = EditorGUILayout.TextField ("Web Service URL", config.WebServiceUrl);
 			config.Password = EditorGUILayout.TextField ("Pass Code", config.Password);
 			config.MaxWaitTime = EditorGUILayout.FloatField ("Max Wait Time", config.MaxWaitTime);
@@ -26,6 +28,8 @@ namespace FH.DataRetrieving
 					Hash17DataRetrieverInstance.Instance.FetchLocalizationInfo (config.LocalizationSpreadSheetId, config.Sheets, config.Languages);
                 NGUIEditorTools.EndContents();
             }
+
+		    serializedObject.ApplyModifiedProperties();
 		}
 	}
 }

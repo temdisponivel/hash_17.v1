@@ -124,6 +124,10 @@ namespace Hash17.Utils
             prog.Usage = usage;
             prog.Global = availableGame;
             prog.KnownParametersAndOptions = !knownParameters.StartsWith("--") ? knownParameters.Split(';') : new string[0];
+            for (int i = 0; i < prog.KnownParametersAndOptions.Length; i++)
+            {
+                prog.KnownParametersAndOptions[i] = prog.KnownParametersAndOptions[i].Trim();
+            }
         }
 
         private void SetProgramInitProperties(Init init, JsonData current)

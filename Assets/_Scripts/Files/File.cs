@@ -9,9 +9,9 @@ namespace Hash17.Files
     [Serializable]
     public class File
     {
-        public string Name { get; internal set; }
-        public Directory Directory { get; internal set; }
-        public string Content { get; internal set; }
+        public string Name { get; set; }
+        public Directory Directory { get; set; }
+        public string Content { get; set; }
         public string PathString { get; set; }
 
         [JsonIgnore]
