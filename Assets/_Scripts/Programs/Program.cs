@@ -140,24 +140,19 @@ namespace Hash17.Programs
             if (Running)
                 FinishExecution();
         }
-
-        protected void LoadUsageFromAsset()
-        {
-            
-        }
-
+        
         #endregion
 
         #region Coroutine
 
         protected Coroutine StartCoroutine(IEnumerator coroutine)
         {
-            return CoroutineHelper.Instance.Start(coroutine);
+            return CoroutineHelper.Instance.StartCoroutine(coroutine);
         }
 
         protected void StopCoroutine(Coroutine coroutine)
         {
-            CoroutineHelper.Instance.Stop(coroutine);
+            CoroutineHelper.Instance.StopCoroutine(coroutine);
         }
 
         #endregion

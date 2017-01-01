@@ -10,19 +10,9 @@ namespace Hash17.Utils
     [ExecuteInEditMode]
     public class CoroutineHelper : PersistentSingleton<CoroutineHelper>
     {
-        public Coroutine Start(IEnumerator coroutine)
-        {
-            return StartCoroutine(coroutine);
-        }
-
-        public void Stop(Coroutine coroutine)
-        {
-            StopCoroutine(coroutine);
-        }
-
         public Coroutine WaitAndCall(Action callback, float secondsToWait)
         {
-            return StartCoroutine(InnerWaitAndCall(callback, secondsToWait));
+            return ((MonoBehaviour) this).StartCoroutine(InnerWaitAndCall(callback, secondsToWait));
         }
 
         private IEnumerator InnerWaitAndCall(Action callback, float seconds)
@@ -34,7 +24,7 @@ namespace Hash17.Utils
 
         public Coroutine WaitAndCallTimes(Action<int> callback, int timesToCall, float interval, Action finishCallback)
         {
-            return StartCoroutine(InnerWaitAndCallTimes(callback, timesToCall, interval, finishCallback));
+            return ((MonoBehaviour) this).StartCoroutine(InnerWaitAndCallTimes(callback, timesToCall, interval, finishCallback));
         }
 
         private IEnumerator InnerWaitAndCallTimes(Action<int> callback, int timestoCall, float interval, Action finishCallback)

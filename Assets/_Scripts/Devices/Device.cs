@@ -20,16 +20,7 @@ namespace Hash17.Devices
 
         public virtual IEnumerator TryAccess(Action<bool, Device> callback)
         {
-            if (FirewallType == FirewallType.None)
-            {
-                yield return null;
-                if (callback != null)
-                    callback(true, this);
-            }
-            else
-            {
-                yield return Blackboard.Instance.Firewalls[FirewallType].Clone().Access(callback, this);
-            }
+            yield return Blackboard.Instance.Firewalls[FirewallType].Clone().Access(callback, this);
         }
     }
 }

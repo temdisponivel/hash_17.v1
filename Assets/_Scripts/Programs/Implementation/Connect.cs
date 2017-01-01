@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Hash17.Blackboard_;
 using Hash17.Terminal_;
+using Hash17.Utils;
 
 namespace Hash17.Programs.Implementation
 {
@@ -23,14 +24,14 @@ namespace Hash17.Programs.Implementation
                     Terminal.Showtext(string.Format("{0}: {1}", Blackboard.Instance.Devices[i].UniqueId, Blackboard.Instance.Devices[i].Name));
                 }
             }
-            else if (Parameters.TryGetParam("c", out param))
+            else if (Parameters.TryGetParam("c", out param) || Parameters.TryGetParam("", out param))
             {
                 var deviceId = param.Value;
                 var device = Blackboard.Instance.Devices.Find(d => d.UniqueId == deviceId);
 
                 if (device == null)
                 {
-
+                    Terminal.Showtext(TextBuilder.WarningText("Device not found."));
                 }
                 else
                 {
@@ -39,7 +40,7 @@ namespace Hash17.Programs.Implementation
                         if (b)
                             Blackboard.Instance.CurrentDevice = device1;
                         else
-                            Terminal.Showtext("Access denied.");
+                            Terminal.Showtext(TextBuilder.ErrorText("Access denied."));
                     });
                 }
             }

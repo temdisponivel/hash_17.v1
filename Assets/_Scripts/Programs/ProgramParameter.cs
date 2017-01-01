@@ -168,7 +168,7 @@ namespace Hash17.Programs
                 bool found = false;
                 for (int j = 0; j < parameters.Length; j++)
                 {
-                    if (!string.IsNullOrEmpty(parameters[i]) && Params[i].Name == parameters[j])
+                    if (Params[i].Name == parameters[j])
                     {
                         found = true;
                         break;

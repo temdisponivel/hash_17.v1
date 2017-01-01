@@ -53,6 +53,13 @@ namespace Hash17.Terminal_
             set { _treatInput = value; }
         }
 
+        private bool _showTextWhenNotTreatingInput = true;
+        public bool ShowTextWhenNotTreatingInput
+        {
+            get { return _showTextWhenNotTreatingInput; }
+            set { _showTextWhenNotTreatingInput = value; }
+        }
+
         #endregion
 
         #region User name
@@ -139,9 +146,20 @@ namespace Hash17.Terminal_
                 if (!string.IsNullOrEmpty(value))
                     AllCommandsTyped.Insert(0, value);
             }
+            else if (ShowTextWhenNotTreatingInput)
+            {
+                DontTreatInputText(Input.value);
+                ClearInput();
+            }
 
             if (OnInputSubmited != null)
                 OnInputSubmited(value);
+        }
+
+        private void DontTreatInputText(string text)
+        {
+            text = text.Replace("\n", string.Empty);
+            ShowText(text);
         }
 
         private void TreatInputText(string text)

@@ -3,6 +3,7 @@ using System.ComponentModel.Design;
 using System.Linq;
 using Hash17.Devices;
 using Hash17.Devices.Firewalls;
+using Hash17.Devices.Firewalls.Implementation;
 using Hash17.Files;
 using Hash17.Programs;
 using Hash17.Terminal_;
@@ -63,16 +64,6 @@ namespace Hash17.Blackboard_
             LoadAll();
         }
 
-        public void LoadDeviceCollection()
-        {
-            DeviceCollection = Resources.LoadAll<DeviceCollection>("")[0];
-            DeviceCollection.Load();
-            for (int i = 0; i < DeviceCollection.Devices.Count; i++)
-            {
-                AddFilesAndDirToList(DeviceCollection.Devices[i].FileSystem);
-            }
-        }
-
         private void AddFilesAndDirToList(Directory dir)
         {
             AllDirectories.Add(dir);
@@ -95,6 +86,7 @@ namespace Hash17.Blackboard_
         {
             LoadPrograms();
             LoadDeviceCollection();
+            LoadFirewalls();
         }
 
         private void LoadPrograms()
@@ -117,6 +109,23 @@ namespace Hash17.Blackboard_
                 if (!program.Global)
                     SpecialPrograms[program.Id] = program.Clone();
             }
+        }
+
+        public void LoadDeviceCollection()
+        {
+            DeviceCollection = Resources.LoadAll<DeviceCollection>("")[0];
+            DeviceCollection.Load();
+            for (int i = 0; i < DeviceCollection.Devices.Count; i++)
+            {
+                AddFilesAndDirToList(DeviceCollection.Devices[i].FileSystem);
+            }
+        }
+
+        public void LoadFirewalls()
+        {
+            Firewalls = new Dictionary<FirewallType, IFirewall>();
+            Firewalls[FirewallType.None] = new NoFirewall();
+            Firewalls[FirewallType.Password] = new PasswordFirewall();
         }
     }
 }
