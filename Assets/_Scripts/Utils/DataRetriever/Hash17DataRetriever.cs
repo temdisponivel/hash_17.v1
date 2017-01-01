@@ -17,5 +17,11 @@ namespace Hash17.Utils
         public string DevicesSpreadSheetId;
 
         #endregion
+
+        #region Text assets
+
+        public string TextAssetsSpreadSheetId;
+
+        #endregion
     }
 }

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Hash17.Blackboard_;
 using Hash17.Files;
+using Hash17.FilesSystem.Files;
 using Hash17.Terminal_;
 
 namespace Hash17.Programs.Implementation
@@ -51,6 +52,9 @@ namespace Hash17.Programs.Implementation
             for (int i = 0; i < files.Count; i++)
             {
                 var currentFile = files[i];
+
+                if (currentFile.FileType != FileType.Text)
+                    continue;
 
                 var content = currentFile.Content.ToLower();
 

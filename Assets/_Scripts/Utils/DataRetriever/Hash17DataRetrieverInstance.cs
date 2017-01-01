@@ -5,6 +5,7 @@ using FH.DataRetrieving;
 using Hash17.Devices;
 using Hash17.Devices.Firewalls;
 using Hash17.Files;
+using Hash17.FilesSystem.Files;
 using Hash17.Programs;
 using Hash17.Programs.Implementation;
 using LitJson;
@@ -41,6 +42,8 @@ namespace Hash17.Utils
         private IEnumerator RunFetchProgramsInfos(string spreadSheetId)
         {
             var results = new List<Program>();
+
+            AssetDatabase.DeleteAsset("Assets/Resources/Programs/ProgramsCollection.asset");
 
             yield return StartCoroutine(GetData(spreadSheetId, "Programs"));
 
@@ -98,6 +101,9 @@ namespace Hash17.Utils
                 case ProgramId.Connect:
                     result = new Connect();
                     break;
+                case ProgramId.Cypher:
+                    result = new Cypher();
+                    break;
             }
 
             SetProgramBaseProperties(id, result, current);
@@ -132,7 +138,7 @@ namespace Hash17.Utils
 
         private void SetProgramInitProperties(Init init, JsonData current)
         {
-            init.InitText = current["AditionalData"].ToString();
+            init.InitTextPath = current["AditionalData"].ToString();
         }
 
         #endregion
@@ -147,6 +153,8 @@ namespace Hash17.Utils
         private IEnumerator RunFetchDeviceInfos(string spreadSheetId)
         {
             var results = new List<Device>();
+
+            AssetDatabase.DeleteAsset("Assets/Resources/Devices/DevicesCollection.asset");
 
             yield return StartCoroutine(GetData(spreadSheetId, "Files"));
 
@@ -208,7 +216,12 @@ namespace Hash17.Utils
                 Name = current["Name"].ToString(),
                 Content = current["Content"].ToString(),
                 PathString = current["Path"].ToString(),
+                IsProtected = bool.Parse(current["IsProtected"].ToString()),
+                Password = current["Password"].ToString(),
             };
+
+            var fileType = (FileType) Enum.Parse(typeof (FileType), current["FileType"].ToString());
+            file.FileType = fileType;
 
             return current["DeviceUniqueId"].ToString();
         }
@@ -278,7 +291,44 @@ namespace Hash17.Utils
         {
             device.Password = current["AditionalData"].ToString();
         }
-        
+
+        #endregion
+
+        #region Fetch text assets
+
+        public void FetchTextAssets(string spreadSheetId)
+        {
+            StartCoroutine(RunFetchTextAsset(spreadSheetId));
+        }
+
+        public IEnumerator RunFetchTextAsset(string spreadSheetId)
+        {
+            yield return StartCoroutine(GetData(spreadSheetId, "TextAssets"));
+
+            Debug.Log("FINISH RETRIEVING TEXT ASSETS FROM GOOGLE");
+
+            if (_spreadSheetResults == null)
+            {
+                Debug.Log("NULL RETURN - DESTROYING");
+                Destroy(gameObject);
+                yield break;
+            }
+            
+            for (var i = 0; i < _spreadSheetResults.Length; i++)
+            {
+                var current = _spreadSheetResults[i];
+                var content = current["Content"].ToString();
+                var path = current["Path"].ToString();
+                var name = current["Name"].ToString();
+                if (System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);
+                System.IO.Directory.CreateDirectory(path);
+                System.IO.File.WriteAllText(string.Format("{0}{1}", path, name), content);
+            }
+
+            AssetDatabase.Refresh();
+        }
+
         #endregion
     }
 }

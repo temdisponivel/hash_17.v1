@@ -33,6 +33,15 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
             NGUIEditorTools.EndContents();
         }
 
+        if (NGUIEditorTools.DrawHeader("Text assets"))
+        {
+            NGUIEditorTools.BeginContents();
+            config.TextAssetsSpreadSheetId = EditorGUILayout.TextField("Text assets Sheet Id", config.TextAssetsSpreadSheetId);
+            if (GUILayout.Button("Fetch all text assets data"))
+                Hash17DataRetrieverInstance.Instance.FetchTextAssets(config.TextAssetsSpreadSheetId);
+            NGUIEditorTools.EndContents();
+        }
+
         serializedObject.ApplyModifiedProperties();
     }
 }

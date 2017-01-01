@@ -74,8 +74,10 @@ namespace Hash17.Programs
 
         public void ShowHelp()
         {
+            Terminal.Instance.BeginIdentation();
             Terminal.Instance.ShowText(Description);
-            Terminal.Instance.ShowText(Usage);
+            Terminal.Instance.ShowText(Usage, ident: true);
+            Terminal.Instance.EndIdentation();
         }
 
         protected bool ValidateUnknowParameters(bool shouldShowUsage)

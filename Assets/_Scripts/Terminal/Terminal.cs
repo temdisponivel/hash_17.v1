@@ -108,18 +108,13 @@ namespace Hash17.Terminal_
         #endregion
 
         #region Unity events
-
-        protected override void Awake()
-        {
-            base.Awake();
-            CurrentUserName = "temdisponivel";
-        }
-
+        
         protected void Start()
         {
             ClearInput();
             Blackboard.Instance.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
             RunProgram(Blackboard.Instance.SpecialPrograms[ProgramId.Init], string.Empty);
+            CurrentUserName = "temdisponivel";
         }
 
         #endregion

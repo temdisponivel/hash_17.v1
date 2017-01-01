@@ -9,5 +9,6 @@
         Help,
         Init,
         Connect,
+        Cypher,
     }
 }

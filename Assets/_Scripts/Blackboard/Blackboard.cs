@@ -18,6 +18,7 @@ namespace Hash17.Blackboard_
         public Dictionary<ProgramId, Program> SpecialPrograms = new Dictionary<ProgramId, Program>();
         public Dictionary<int, Program> ProgramDefinitionByUniqueId = new Dictionary<int, Program>();
         public Dictionary<ProgramId, Program> ProgramDefinitionById = new Dictionary<ProgramId, Program>();
+        public HashSet<int> UnlockedFiles = new HashSet<int>();
         public DeviceCollection DeviceCollection;
 
         public List<Device> Devices
