@@ -108,7 +108,7 @@ namespace Hash17.Terminal_
         #endregion
 
         #region Unity events
-        
+
         protected void Start()
         {
             ClearInput();
@@ -275,7 +275,7 @@ namespace Hash17.Terminal_
                 var entry = TextTable.transform.GetChild(0).GetComponent<TextEntry>();
                 textBuilder.Append(entry.Content.text);
             }
-            
+
             return CoroutineHelper.Instance.WaitAndCallTimesControlled((index) =>
             {
                 var currentChar = text[index];
@@ -377,7 +377,7 @@ namespace Hash17.Terminal_
         {
             ClearInput();
         }
-        
+
         #endregion
     }
 }

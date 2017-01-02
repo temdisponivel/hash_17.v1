@@ -120,11 +120,13 @@ namespace Hash17.Programs
         protected void BlockInput()
         {
             Alias.Term.BlockInput = true;
+            Alias.Term.TreatInput = false;
         }
 
         protected void UnblockInput()
         {
             Alias.Term.BlockInput = false;
+            Alias.Term.TreatInput = true;
         }
 
         protected void FinishExecution()
