@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Hash17.Blackboard_;
 using Hash17.Devices.Firewalls;
 using Hash17.Files;
 using Hash17.Programs;
+using Hash17.Utils;
 
 namespace Hash17.Devices
 {
@@ -20,7 +20,7 @@ namespace Hash17.Devices
 
         public virtual IEnumerator TryAccess(Action<bool, Device> callback)
         {
-            yield return Blackboard.Instance.Firewalls[FirewallType].Clone().Access(callback, this);
+            yield return Alias.Board.Firewalls[FirewallType].Clone().Access(callback, this);
         }
     }
 }

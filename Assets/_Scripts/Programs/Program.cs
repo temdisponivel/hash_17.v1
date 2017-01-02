@@ -74,10 +74,10 @@ namespace Hash17.Programs
 
         public void ShowHelp()
         {
-            Terminal.Instance.BeginIdentation();
-            Terminal.Instance.ShowText(Description);
-            Terminal.Instance.ShowText(Usage, ident: true);
-            Terminal.Instance.EndIdentation();
+            Alias.Term.BeginIdentation();
+            Alias.Term.ShowText(Description);
+            Alias.Term.ShowText(Usage, ident: true);
+            Alias.Term.EndIdentation();
         }
 
         protected bool ValidateUnknowParameters(bool shouldShowUsage)
@@ -88,9 +88,9 @@ namespace Hash17.Programs
             {
                 for (int i = 0; i < unknownParams.Count; i++)
                 {
-                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Unknow parameter {0}.", unknownParams[i].Name)));
+                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("Unknow parameter {0}.", unknownParams[i].Name)));
                 }
-                Terminal.Instance.ShowText(Usage);
+                Alias.Term.ShowText(Usage);
             }
 
             return result;
@@ -119,12 +119,12 @@ namespace Hash17.Programs
 
         protected void BlockInput()
         {
-            Terminal.Instance.BlockInput = true;
+            Alias.Term.BlockInput = true;
         }
 
         protected void UnblockInput()
         {
-            Terminal.Instance.BlockInput = false;
+            Alias.Term.BlockInput = false;
         }
 
         protected void FinishExecution()

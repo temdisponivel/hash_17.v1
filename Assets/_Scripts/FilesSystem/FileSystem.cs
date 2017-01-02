@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Hash17.Blackboard_;
+using Hash17.Utils;
 using Newtonsoft.Json;
 
 namespace Hash17.Files
@@ -10,7 +10,7 @@ namespace Hash17.Files
     {
         public static FileSystem Instance
         {
-            get { return Blackboard.Instance.CurrentDevice.FileSystem; }
+            get { return Alias.Board.CurrentDevice.FileSystem; }
         }
 
         #region Inner types

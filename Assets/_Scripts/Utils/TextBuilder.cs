@@ -8,17 +8,19 @@ namespace Hash17.Utils
 {
     public static class TextBuilder
     {
-        public static Color WarningColor = Color.yellow;
-        public static Color ErrorColor = Color.red;
-        
         public static string WarningText(string text)
         {
-            return BuildText(text, WarningColor);
+            return BuildText(text, Alias.GameConfig.WarningMessageColor);
         }
 
         public static string ErrorText(string text)
         {
-            return BuildText(text, ErrorColor);
+            return BuildText(text, Alias.GameConfig.ErrorMessageColor);
+        }
+
+        public static string MessageText(string text)
+        {
+            return BuildText(text, Alias.GameConfig.CommonMessageColor);
         }
 
         public static string BuildText(string text, Color color)

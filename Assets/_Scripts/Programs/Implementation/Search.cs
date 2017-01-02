@@ -2,12 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using Hash17.Blackboard_;
 using Hash17.Files;
 using Hash17.FilesSystem.Files;
-using Hash17.Terminal_;
+using Hash17.Utils;
 
 namespace Hash17.Programs.Implementation
 {
@@ -40,14 +37,14 @@ namespace Hash17.Programs.Implementation
             List<File> files;
             if (all)
             {
-                files = Blackboard.Instance.AllFiles;
+                files = Alias.Board.AllFiles;
             }
             else
             {
-                files = Blackboard.Instance.FileSystem.CurrentDirectory.Files;
+                files = Alias.Board.FileSystem.CurrentDirectory.Files;
             }
 
-            Terminal.Instance.ShowText("Terms found in:");
+            Alias.Term.ShowText("Terms found in:");
 
             for (int i = 0; i < files.Count; i++)
             {
@@ -75,7 +72,7 @@ namespace Hash17.Programs.Implementation
                     content = content.Replace(terms[j], string.Format("[b][i]{0}[/i][/b]", terms[j]));
                 }
 
-                Terminal.Instance.ShowText(string.Format("{0} - {1}: {2}", files[i].Name, files[i].Directory.Path, content));
+                Alias.Term.ShowText(string.Format("{0} - {1}: {2}", files[i].Name, files[i].Directory.Path, content));
             }
         }
     }

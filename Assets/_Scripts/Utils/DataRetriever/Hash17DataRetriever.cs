@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Hash17.Utils
 {
-    [CreateAssetMenu()]
+    [CreateAssetMenu(fileName = "Hash17DataRetriever", menuName = "Hash17/Data retriever")]
     public class Hash17DataRetriever : DataRetrieverBase
     {
         #region Programs

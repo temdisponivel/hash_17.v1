@@ -25,29 +25,30 @@ namespace Hash17.Programs.Implementation
 
                 var filePath = param.Value;
                 File file;
-                Blackboard.Instance.FileSystem.FindFileByPath(filePath, out file);
+                Alias.Board.FileSystem.FindFileByPath(filePath, out file);
 
                 if (file != null)
                 {
                     if (file.FileType != FileType.Text)
                     {
-                        Terminal.Showtext(TextBuilder.WarningText("This is not a text file."));
+                        Alias.Term.ShowText(TextBuilder.WarningText("This is not a text file."));
                     }
                     else
                     {
                         if (!file.CanBeRead)
                         {
-                            string message = "This file is protected. Use the program 'cypher' to decrypt it \n The following are the encrypted file:";
-                            Terminal.Showtext(TextBuilder.WarningText(message));
+                            Alias.Term.ShowText(TextBuilder.WarningText("This file is protected. Use the program 'cypher' to decrypt it."));
                         }
 
-                        Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("{0}:", file.Name)));
-                        Terminal.Instance.ShowText(file.Content);
+                        Alias.Term.BeginIdentation();
+                        Alias.Term.ShowText(TextBuilder.WarningText(string.Format("{0}:", file.Name)));
+                        Alias.Term.ShowText(file.Content, ident: true);
+                        Alias.Term.EndIdentation();
                     }
                 }
                 else
                 {
-                    Terminal.Instance.ShowText(TextBuilder.ErrorText(string.Format("File not found")));
+                    Alias.Term.ShowText(TextBuilder.ErrorText("File not found"));
                 }
             }
 

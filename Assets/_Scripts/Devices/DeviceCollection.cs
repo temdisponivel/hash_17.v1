@@ -12,7 +12,7 @@ namespace Hash17.Devices
     {
         [SerializeField]
         private string _serializedData;
-
+        
         [NonSerialized]
         public List<Device> Devices;
 

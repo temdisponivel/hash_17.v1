@@ -20,7 +20,7 @@ namespace Hash17.Programs.Implementation
             if (HelpOrUnknownParameters(true))
                 yield break;
 
-            var fileSystem = Blackboard.Instance.FileSystem;
+            var fileSystem = Alias.Board.FileSystem;
 
             ProgramParameter.Param param;
             if (Parameters.TryGetParam("c", out param))
@@ -32,7 +32,7 @@ namespace Hash17.Programs.Implementation
 
                 if (result == FileSystem.OperationResult.DuplicatedName)
                 {
-                    Terminal.Instance.ShowText("There already is a directory with this name");
+                    Alias.Term.ShowText("There already is a directory with this name");
                 }
             }
             else if (Parameters.TryGetParam("", out param))
@@ -44,11 +44,11 @@ namespace Hash17.Programs.Implementation
                     fileSystem.FindFileByPath(param.Value, out file);
                     if (file != null)
                     {
-                        Terminal.Showtext(TextBuilder.WarningText("This is a file. Use \"read\" command to read it."));
+                        Alias.Term.ShowText(TextBuilder.WarningText("This is a file. Use \"read\" command to read it."));
                     }
                     else
                     {
-                        Terminal.Showtext(TextBuilder.WarningText("Directory not found."));
+                        Alias.Term.ShowText(TextBuilder.WarningText("Directory not found."));
                     }
                 }
             }
@@ -57,12 +57,12 @@ namespace Hash17.Programs.Implementation
                 var dir = fileSystem.CurrentDirectory;
                 for (int i = 0; i < dir.Childs.Count; i++)
                 {
-                    Terminal.Instance.ShowText(TextBuilder.BuildText(dir.Childs[i].Name, Color.blue));
+                    Alias.Term.ShowText(dir.Childs[i].PrettyName);
                 }
 
                 for (int i = 0; i < dir.Files.Count; i++)
                 {
-                    Terminal.Instance.ShowText(TextBuilder.BuildText(dir.Files[i].Name, Color.yellow));
+                    Alias.Term.ShowText(dir.Files[i].PrettyName);
                 }
             }
         }

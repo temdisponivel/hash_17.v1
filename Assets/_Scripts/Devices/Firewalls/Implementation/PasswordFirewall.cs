@@ -18,7 +18,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         {
             yield return null;
 
-            if (Blackboard.Instance.UnlockedDevices.Contains(device.UniqueId))
+            if (Alias.Board.UnlockedDevices.Contains(device.UniqueId))
                 callback(true, device);
 
             BlockTerminal();
@@ -26,7 +26,7 @@ namespace Hash17.Devices.Firewalls.Implementation
             Callback = callback;
             Device = device;
 
-            Terminal.Showtext(TextBuilder.BuildText(string.Format("Password for {0}:", device.UniqueId), Color.gray));
+            Alias.Term.ShowText(TextBuilder.MessageText(string.Format("Password for {0}:", device.UniqueId)));
         }
 
         void InputSubmited(string input)
@@ -38,7 +38,7 @@ namespace Hash17.Devices.Firewalls.Implementation
                 if (result)
                 {
                     UnblockTerminal();
-                    Blackboard.Instance.UnlockedDevices.Add(Device.UniqueId);
+                    Alias.Board.UnlockedDevices.Add(Device.UniqueId);
                     Callback(true, Device);
                 }
                 else
@@ -50,8 +50,8 @@ namespace Hash17.Devices.Firewalls.Implementation
                     }
                     else
                     {
-                        Terminal.Showtext(string.Format("Invalid password. You have {0} more tries.", 3 - _tries));
-                        Terminal.Showtext(TextBuilder.BuildText("Password:", Color.gray));
+                        Alias.Term.ShowText(string.Format("Invalid password. You have {0} more tries.", 3 - _tries));
+                        Alias.Term.ShowText(TextBuilder.MessageText("Password:"));
                     }
                 }
             }
@@ -65,16 +65,16 @@ namespace Hash17.Devices.Firewalls.Implementation
 
         private void BlockTerminal()
         {
-            Terminal.Instance.TreatInput = false;
-            Terminal.Instance.ShowTextWhenNotTreatingInput = true;
-            Terminal.Instance.OnInputSubmited += InputSubmited;
+            Alias.Term.TreatInput = false;
+            Alias.Term.ShowTextWhenNotTreatingInput = true;
+            Alias.Term.OnInputSubmited += InputSubmited;
         }
 
         private void UnblockTerminal()
         {
-            Terminal.Instance.TreatInput = true;
-            Terminal.Instance.ShowTextWhenNotTreatingInput = false;
-            Terminal.Instance.OnInputSubmited -= InputSubmited;
+            Alias.Term.TreatInput = true;
+            Alias.Term.ShowTextWhenNotTreatingInput = false;
+            Alias.Term.OnInputSubmited -= InputSubmited;
         }
     }
 }

@@ -77,7 +77,7 @@ namespace Hash17.Terminal_
 
         public string CurrentLocationAndUserName
         {
-            get { return string.Format("{0}:{1}>", Blackboard.Instance.CurrentDevice.UniqueId, Blackboard.Instance.FileSystem.CurrentDirectory.Path); }
+            get { return string.Format("{0}:{1}>", Alias.Board.CurrentDevice.UniqueId, Alias.Board.FileSystem.CurrentDirectory.Path); }
         }
 
         #endregion
@@ -112,8 +112,8 @@ namespace Hash17.Terminal_
         protected void Start()
         {
             ClearInput();
-            Blackboard.Instance.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
-            RunProgram(Blackboard.Instance.SpecialPrograms[ProgramId.Init], string.Empty);
+            Alias.Board.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
+            RunProgram(Alias.Board.SpecialPrograms[ProgramId.Init], string.Empty);
             CurrentUserName = "temdisponivel";
         }
 
@@ -165,19 +165,20 @@ namespace Hash17.Terminal_
             string programName, programParams;
             Interpreter.GetProgram(text, out programName, out programParams);
             Program program;
-            if (!Blackboard.Instance.Programs.TryGetValue(programName, out program))
+            if (!Alias.Board.Programs.TryGetValue(programName, out program))
             {
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
+                ShowText(TextBuilder.WarningText("You can also search for programs, files and etc using the 'search' program."));
                 return;
             }
 
-            var device = Blackboard.Instance.CurrentDevice;
+            var device = Alias.Board.CurrentDevice;
             var deviceProgramId = 0;
             if (device.SpecialPrograms.TryGetValue(program.Id, out deviceProgramId))
             {
                 var progBkp = program;
-                if (!Blackboard.Instance.ProgramDefinitionByUniqueId.TryGetValue(deviceProgramId, out program))
+                if (!Alias.Board.ProgramDefinitionByUniqueId.TryGetValue(deviceProgramId, out program))
                 {
                     program = progBkp;
 
@@ -191,6 +192,7 @@ namespace Hash17.Terminal_
                 }
             }
 
+            BeginIdentation();
             var programInstance = RunProgram(program, programParams);
 
             if (OnProgramExecuted != null)
@@ -261,18 +263,43 @@ namespace Hash17.Terminal_
             TextTable.Reposition();
         }
 
-        public static void Showtext(string text, bool ident = false)
-        {
-            Instance.ShowText(text, ident: ident);
-        }
-
-        public Coroutine ShowTextWithInterval(string text, float intervalBetweenChars = .02f, Action callback = null)
+        public Coroutine ShowTextWithInterval(string text, float intervalBetweenChars = .02f, bool startOnNewLine = false, Action callback = null)
         {
             StringBuilder textBuilder = new StringBuilder();
-            return CoroutineHelper.Instance.WaitAndCallTimes((index) =>
+
+            // if we will NOT start this text on previous line
+            // get the text from the previous line and add to the text to show
+            // if we don't do this, the previous text will be cleaned 
+            if (!startOnNewLine && TextTable.transform.childCount > 0)
             {
-                textBuilder = textBuilder.Append(text[index]);
-                ShowText(textBuilder.ToString(), false);
+                var entry = TextTable.transform.GetChild(0).GetComponent<TextEntry>();
+                textBuilder.Append(entry.Content.text);
+            }
+            
+            return CoroutineHelper.Instance.WaitAndCallTimesControlled((index) =>
+            {
+                var currentChar = text[index];
+
+                if (currentChar == '[')
+                {
+                    textBuilder.Append(currentChar);
+                    var stepsToSkip = 0;
+                    while (currentChar != ']' && index < text.Length)
+                    {
+                        index++;
+                        stepsToSkip++;
+                        currentChar = text[index];
+                        textBuilder.Append(currentChar);
+                    }
+                    return stepsToSkip;
+                }
+
+                textBuilder.Append(currentChar);
+                ShowText(textBuilder.ToString(), startOnNewLine);
+                startOnNewLine = false;
+
+                // number of steps to skip
+                return 0;
             }, text.Length, intervalBetweenChars, callback);
         }
 
@@ -319,6 +346,8 @@ namespace Hash17.Terminal_
 
         private void ProgramFinished(Program program)
         {
+            EndIdentation();
+
             RunningPrograms.Remove(program);
 
             program.OnFinish -= ProgramFinished;

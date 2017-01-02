@@ -24,16 +24,16 @@ namespace Hash17.Programs.Implementation
                 int quant = 0;
                 if (int.TryParse(param.Value, out quant) && quant > 0)
                 {
-                    Terminal.Instance.Clear(quant);
+                    Alias.Term.Clear(quant);
                 }
                 else
                 {
-                    Terminal.Instance.ShowText(TextBuilder.WarningText(string.Format("Invalid value for parameter -C.\n{0}", Usage)));
+                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("Invalid value for parameter -C.\n{0}", Usage)));
                 }
             }
             else
             {
-                Terminal.Instance.ClearAll();
+                Alias.Term.ClearAll();
             }
 
             yield break;

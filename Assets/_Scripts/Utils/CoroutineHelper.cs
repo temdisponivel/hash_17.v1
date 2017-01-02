@@ -40,5 +40,26 @@ namespace Hash17.Utils
                 finishCallback();
         }
 
+        public Coroutine WaitAndCallTimesControlled(Func<int, int> callback, int timesToCall, float interval, Action finishCallback)
+        {
+            return ((MonoBehaviour)this).StartCoroutine(InnerWaitAndCallTimesControlled(callback, timesToCall, interval, finishCallback));
+        }
+
+        private IEnumerator InnerWaitAndCallTimesControlled(Func<int, int> callback, int timestoCall, float interval, Action finishCallback)
+        {
+            for (int i = 0; i < timestoCall; i++)
+            {
+                yield return new WaitForSeconds(interval);
+                if (callback != null)
+                {
+                    var result = callback(i);
+                    i += result;
+                }
+            }
+
+            if (finishCallback != null)
+                finishCallback();
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Hash17.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace Hash17.Files
     [Serializable]
     public class Directory
     {
+        
         public virtual string Name { get; set; }
         public virtual Directory Parent { get; set; }
 
@@ -47,6 +49,12 @@ namespace Hash17.Files
                     builder.Remove(builder.Length - 1, 1);
                 return builder.ToString();
             }
+        }
+
+        [JsonIgnore]
+        public virtual string PrettyName
+        {
+            get { return TextBuilder.BuildText(Name, Alias.GameConfig.DirectoryColor); }
         }
 
         public Directory()

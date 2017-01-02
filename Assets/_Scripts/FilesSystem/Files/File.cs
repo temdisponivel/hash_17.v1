@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Hash17.Blackboard_;
 using Hash17.FilesSystem.Files;
+using Hash17.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -31,10 +32,10 @@ namespace Hash17.Files
                 if (!IsProtected)
                     return _content;
                 
-                if (Blackboard.Instance.UnlockedFiles.Contains(UniqueId))
+                if (Alias.Board.UnlockedFiles.Contains(UniqueId))
                     return _content;
 
-                return Convert.ToBase64String(Encoding.ASCII.GetBytes(_content));
+                return _content.Encrypt(Password);
             }
             set { _content = value; }
         }
@@ -43,7 +44,21 @@ namespace Hash17.Files
 
         public bool CanBeRead
         {
-            get { return !IsProtected || Blackboard.Instance.UnlockedFiles.Contains(UniqueId); }
+            get { return !IsProtected || Alias.Board.UnlockedFiles.Contains(UniqueId); }
+        }
+
+        [JsonIgnore]
+        public virtual string PrettyName
+        {
+            get
+            {
+                Color color = Alias.GameConfig.FileColor;
+                if (!CanBeRead)
+                    color = Alias.GameConfig.LockedFileColor;
+                else if (IsProtected)
+                    color = Alias.GameConfig.SecureFileColor;
+                return TextBuilder.BuildText(Name, color);
+            }
         }
 
         [JsonIgnore]

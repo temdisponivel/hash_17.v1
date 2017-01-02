@@ -21,18 +21,18 @@ namespace Hash17.Programs.Implementation
             ProgramParameter.Param param;
             if (Parameters.ContainParam("s"))
             {
-                for (int i = 0; i < Blackboard.Instance.Devices.Count; i++)
+                for (int i = 0; i < Alias.Board.Devices.Count; i++)
                 {
-                    Terminal.Showtext(string.Format("{0}: {1}", Blackboard.Instance.Devices[i].UniqueId, Blackboard.Instance.Devices[i].Name));
+                    Alias.Term.ShowText(string.Format("{0}: {1}", Alias.Board.Devices[i].UniqueId, Alias.Board.Devices[i].Name));
                 }
             }
             else if (Parameters.TryGetParam("c", out param) || Parameters.TryGetParam("", out param))
             {
                 var deviceId = param.Value;
                 Device device;
-                if (!Blackboard.Instance.DevicesById.TryGetValue(deviceId, out device))
+                if (!Alias.Board.DevicesById.TryGetValue(deviceId, out device))
                 {
-                    Terminal.Showtext(TextBuilder.WarningText("Device not found."));
+                    Alias.Term.ShowText(TextBuilder.WarningText("Device not found."));
                 }
                 else
                 {
@@ -40,12 +40,12 @@ namespace Hash17.Programs.Implementation
                     {
                         if (b)
                         {
-                            Terminal.Showtext(TextBuilder.BuildText(string.Format("Access granted. You are now on {0}.", device1.UniqueId), Color.green));
-                            Blackboard.Instance.CurrentDevice = device1;
+                            Alias.Term.ShowText(TextBuilder.MessageText(string.Format("Access granted. You are now on {0}.", device1.UniqueId)));
+                            Alias.Board.CurrentDevice = device1;
                         }
                         else
                         {
-                            Terminal.Showtext(TextBuilder.ErrorText("Access denied."));
+                            Alias.Term.ShowText(TextBuilder.ErrorText("Access denied."));
                         }
                     });
                 }

@@ -5,6 +5,7 @@ using Hash17.Blackboard_;
 using Hash17.Files;
 using Hash17.Terminal_;
 using Hash17.Utils;
+using UnityEngine;
 
 namespace Hash17.Programs.Implementation
 {
@@ -24,7 +25,7 @@ namespace Hash17.Programs.Implementation
 
                 if (parts.Length < 2)
                 {
-                    Terminal.Showtext(TextBuilder.WarningText("Invalid number of parameters."));
+                    Alias.Term.ShowText(TextBuilder.WarningText("Invalid number of parameters."));
                     ShowHelp();
                     UnblockInput();
                     yield break;
@@ -34,10 +35,10 @@ namespace Hash17.Programs.Implementation
                 var passWord = parts[1];
 
                 File file;
-                Blackboard.Instance.FileSystem.FindFileByPath(filePath, out file);
+                Alias.Board.FileSystem.FindFileByPath(filePath, out file);
                 if (file == null)
                 {
-                    Terminal.Showtext(TextBuilder.WarningText(string.Format("File {0} not found.", filePath)));
+                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("File {0} not found.", filePath)));
                     UnblockInput();
                     yield break;
                 }
@@ -47,42 +48,42 @@ namespace Hash17.Programs.Implementation
                     if (file.Password != passWord)
                     {
                         UnblockInput();
-                        Terminal.Showtext("Invalid password...");
+                        Alias.Term.ShowText("Invalid password.");
                         yield break;
                     }
 
-                    Terminal.Showtext("Decrypting file...");
+                    Alias.Term.ShowText("Decrypting file");
                 }
                 else
                 {
-                    Terminal.Showtext("Encrypting file...");
+                    Alias.Term.ShowText("Encrypting file");
                 }
 
                 var textToShow = new StringBuilder();
-                var length = file.Content.Length;
+                var length = Mathf.Max(file.Content.Length, 50);
                 for (int i = 0; i < length; i++)
                 {
                     textToShow.Append(".");
                 }
 
-                Terminal.Instance.ShowTextWithInterval(textToShow.ToString(), .5f/30f, () => OnFinishDecryptingCallback(file, passWord));
+                Alias.Term.ShowTextWithInterval(textToShow.ToString(), .5f/30f, callback: () => OnFinishDecryptingCallback(file, passWord));
             }
         }
 
         protected void OnFinishDecryptingCallback(File file, string passWord)
         {
-            if (!Blackboard.Instance.UnlockedFiles.Contains(file.UniqueId))
-                Blackboard.Instance.UnlockedFiles.Add(file.UniqueId);
+            if (!Alias.Board.UnlockedFiles.Contains(file.UniqueId))
+                Alias.Board.UnlockedFiles.Add(file.UniqueId);
 
             if (file.IsProtected)
             {
-                Terminal.Showtext("File decrypted. You can read this file now.");
+                Alias.Term.ShowText("File decrypted. You can read this file now.");
             }
             else
             {
                 file.IsProtected = true;
                 file.Password = passWord;
-                Terminal.Showtext("File encrypted. You can read the file, but other people can't (unless they have the password).");
+                Alias.Term.ShowText("File encrypted. You can read the file, but other people can't (unless they have the password).");
             }
 
             UnblockInput();

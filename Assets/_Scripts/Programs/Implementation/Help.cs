@@ -15,20 +15,20 @@ namespace Hash17.Programs.Implementation
         {
             BlockInput();
 
-            Terminal.Instance.BeginIdentation();
+            Alias.Term.BeginIdentation();
 
-            var programs = Blackboard.Instance.Programs;
+            var programs = Alias.Board.Programs;
 
             foreach (var program in programs)
             {
                 int id;
-                if (Blackboard.Instance.CurrentDevice.SpecialPrograms.TryGetValue(program.Value.Id, out id))
+                if (Alias.Board.CurrentDevice.SpecialPrograms.TryGetValue(program.Value.Id, out id))
                 {
-                    var prog = Blackboard.Instance.ProgramDefinitionByUniqueId[id];
+                    var prog = Alias.Board.ProgramDefinitionByUniqueId[id];
                     if (prog != null)
                     {
-                        Terminal.Showtext(prog.Command);
-                        Terminal.Showtext(prog.Description, true);
+                        Alias.Term.ShowText(prog.Command);
+                        Alias.Term.ShowText(prog.Description, true);
                         yield return null;
                         continue;
                     }
@@ -37,12 +37,12 @@ namespace Hash17.Programs.Implementation
                 if (!program.Value.Global)
                     continue;
 
-                Terminal.Showtext(program.Key);
-                Terminal.Showtext(program.Value.Description, true);
+                Alias.Term.ShowText(program.Key);
+                Alias.Term.ShowText(program.Value.Description, true);
                 yield return null;
             }
 
-            Terminal.Instance.EndIdentation();
+            Alias.Term.EndIdentation();
 
             UnblockInput();
         }
