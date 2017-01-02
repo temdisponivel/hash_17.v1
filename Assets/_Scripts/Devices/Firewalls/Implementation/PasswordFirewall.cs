@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Hash17.Blackboard_;
 using Hash17.Terminal_;
 using Hash17.Utils;
 using UnityEngine;
@@ -16,6 +17,9 @@ namespace Hash17.Devices.Firewalls.Implementation
         public IEnumerator Access(Action<bool, Device> callback, Device device)
         {
             yield return null;
+
+            if (Blackboard.Instance.UnlockedDevices.Contains(device.UniqueId))
+                callback(true, device);
 
             BlockTerminal();
 
@@ -34,6 +38,7 @@ namespace Hash17.Devices.Firewalls.Implementation
                 if (result)
                 {
                     UnblockTerminal();
+                    Blackboard.Instance.UnlockedDevices.Add(Device.UniqueId);
                     Callback(true, Device);
                 }
                 else

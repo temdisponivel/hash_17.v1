@@ -19,6 +19,8 @@ namespace Hash17.Blackboard_
         public Dictionary<int, Program> ProgramDefinitionByUniqueId = new Dictionary<int, Program>();
         public Dictionary<ProgramId, Program> ProgramDefinitionById = new Dictionary<ProgramId, Program>();
         public HashSet<int> UnlockedFiles = new HashSet<int>();
+        public HashSet<string> UnlockedDevices = new HashSet<string>();
+        public Dictionary<string, Device> DevicesById = new Dictionary<string, Device>();
         public DeviceCollection DeviceCollection;
 
         public List<Device> Devices
@@ -119,6 +121,7 @@ namespace Hash17.Blackboard_
             for (int i = 0; i < DeviceCollection.Devices.Count; i++)
             {
                 AddFilesAndDirToList(DeviceCollection.Devices[i].FileSystem);
+                DevicesById[DeviceCollection.Devices[i].UniqueId] = DeviceCollection.Devices[i];
             }
         }
 

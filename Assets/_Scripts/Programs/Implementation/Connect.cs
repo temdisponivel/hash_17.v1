@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Hash17.Blackboard_;
+using Hash17.Devices;
 using Hash17.Terminal_;
 using Hash17.Utils;
+using UnityEngine;
 
 namespace Hash17.Programs.Implementation
 {
@@ -27,9 +29,8 @@ namespace Hash17.Programs.Implementation
             else if (Parameters.TryGetParam("c", out param) || Parameters.TryGetParam("", out param))
             {
                 var deviceId = param.Value;
-                var device = Blackboard.Instance.Devices.Find(d => d.UniqueId == deviceId);
-
-                if (device == null)
+                Device device;
+                if (!Blackboard.Instance.DevicesById.TryGetValue(deviceId, out device))
                 {
                     Terminal.Showtext(TextBuilder.WarningText("Device not found."));
                 }
@@ -38,9 +39,14 @@ namespace Hash17.Programs.Implementation
                     yield return device.TryAccess((b, device1) =>
                     {
                         if (b)
+                        {
+                            Terminal.Showtext(TextBuilder.BuildText(string.Format("Access granted. You are now on {0}.", device1.UniqueId), Color.green));
                             Blackboard.Instance.CurrentDevice = device1;
+                        }
                         else
+                        {
                             Terminal.Showtext(TextBuilder.ErrorText("Access denied."));
+                        }
                     });
                 }
             }

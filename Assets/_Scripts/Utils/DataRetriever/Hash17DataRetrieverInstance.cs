@@ -327,6 +327,9 @@ namespace Hash17.Utils
             }
 
             AssetDatabase.Refresh();
+
+            Debug.Log("FINISH CREATING TEXT ASSETS");
+            DestroyImmediate(gameObject);
         }
 
         #endregion
