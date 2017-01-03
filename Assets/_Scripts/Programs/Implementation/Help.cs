@@ -28,7 +28,7 @@ namespace Hash17.Programs.Implementation
                     if (prog != null)
                     {
                         Alias.Term.ShowText(prog.Command);
-                        Alias.Term.ShowText(prog.Description, true);
+                        Alias.Term.ShowText(prog.Description, ident: true);
                         yield return null;
                         continue;
                     }
@@ -38,7 +38,7 @@ namespace Hash17.Programs.Implementation
                     continue;
 
                 Alias.Term.ShowText(program.Key);
-                Alias.Term.ShowText(program.Value.Description, true);
+                Alias.Term.ShowText(program.Value.Description, ident: true);
                 yield return null;
             }
 

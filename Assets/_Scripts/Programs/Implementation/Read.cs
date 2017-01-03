@@ -41,7 +41,6 @@ namespace Hash17.Programs.Implementation
                         }
 
                         Alias.Term.BeginIdentation();
-                        Alias.Term.ShowText(TextBuilder.WarningText(string.Format("{0}:", file.Name)));
                         Alias.Term.ShowText(file.Content, ident: true);
                         Alias.Term.EndIdentation();
                     }
