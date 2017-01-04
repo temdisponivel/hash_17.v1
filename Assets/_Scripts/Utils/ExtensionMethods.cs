@@ -174,5 +174,20 @@ namespace Hash17.Utils
         #endregion
 
         #endregion
+
+        #region NGUI
+
+        #region Label
+
+        public static void SetupWithHash17Settings(this UILabel label)
+        {
+            label.fontSize = Alias.GameConfig.TextSize;
+            label.color = Alias.GameConfig.TextColor;
+            label.bitmapFont = Alias.GameConfig.TextFont;
+        }
+
+        #endregion
+
+        #endregion
     }
 }

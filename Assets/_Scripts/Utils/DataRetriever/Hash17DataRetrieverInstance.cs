@@ -104,6 +104,9 @@ namespace Hash17.Utils
                 case ProgramId.Cypher:
                     result = new Cypher();
                     break;
+                case ProgramId.Open:
+                    result = new Open();
+                    break;
             }
 
             SetProgramBaseProperties(id, result, current);

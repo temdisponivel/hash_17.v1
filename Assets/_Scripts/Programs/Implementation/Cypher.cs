@@ -66,7 +66,7 @@ namespace Hash17.Programs.Implementation
                     textToShow.Append(".");
                 }
 
-                Alias.Term.ShowTextWithInterval(textToShow.ToString(), .5f/30f, callback: () => OnFinishDecryptingCallback(file, passWord));
+                Alias.Term.ShowTypeWriterText(textToShow.ToString(), .5f/30f, callback: () => OnFinishDecryptingCallback(file, passWord));
             }
         }
 

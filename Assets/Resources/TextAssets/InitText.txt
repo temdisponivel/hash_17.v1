@@ -1,4 +1,4 @@
-        I know you are new, but [D0FFB0FF]Alexis[-] trusted you so we trust you too. We don’t have much time, so i will be brief.
+        I know you are new, but [D0FFB0FF]Alexis[-] trusted you so we trust you too. I donâ€™t have much time, so i will be brief.
         We became aware of a [D0FFB0FF]Syndicate's[-] meeting being held today and we need your help. We just put in motion a plan to kill Michael, a key member of the Syndicate, and we need you to do the job.
         We manage to install a backdoor in the traffic control system. We want you to use this backdoor and provoque an accident to kill Michael.
         You need to [D0FFB0FF]connect[-] yourself to that backdoor using the instructions found on our FTP Server. Make sure that you will not be traced.

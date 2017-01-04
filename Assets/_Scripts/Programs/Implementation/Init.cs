@@ -20,6 +20,8 @@ namespace Hash17.Programs.Implementation
         private TextAsset _initTextAsset;
         private ResourceRequest _textAssetRequest;
 
+        private bool _wasCanceled;
+
         protected override IEnumerator InnerExecute()
         {
             BlockInput();
@@ -27,7 +29,7 @@ namespace Hash17.Programs.Implementation
             
             Alias.Term.ShowText("Retrieving message from Vox Populi FTP Server...");
             Alias.Term.ShowText(string.Format("Connecting to {0}", Alias.Board.GameConfiguration.VoxPopuliServer));
-            Alias.Term.ShowTextWithInterval(".....", .3f, callback: FinishShowingInitialText);
+            Alias.Term.ShowTypeWriterText(".....", .3f, callback: FinishShowingInitialText);
             yield return null;
         }
 
@@ -42,7 +44,7 @@ namespace Hash17.Programs.Implementation
             yield return _textAssetRequest;
             _initTextAsset = _textAssetRequest.asset as TextAsset;
             Alias.Term.BeginIdentation();
-            yield return Alias.Term.ShowTextWithInterval(_initTextAsset.text, startOnNewLine: true, callback: FinishShowingMessage);
+            yield return Alias.Term.ShowTypeWriterTextWithCancel(_initTextAsset.text, startOnNewLine: true, callback: FinishShowingMessage);
             Alias.Term.EndIdentation();
         }
 

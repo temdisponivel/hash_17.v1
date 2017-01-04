@@ -16,6 +16,12 @@ namespace Hash17.Blackboard_
     {
         #region Properties
 
+        #region References
+
+        public GameConfiguration GameConfiguration;
+
+        #endregion
+
         #region Programs
 
         public Dictionary<string, Program> Programs = new Dictionary<string, Program>();
@@ -91,13 +97,7 @@ namespace Hash17.Blackboard_
         }
 
         #endregion
-
-        #region Gameconfig
-
-        public GameConfiguration GameConfiguration;
-
-        #endregion
-
+        
         #region Load
 
         public void LoadAll()

@@ -9,6 +9,14 @@ namespace Hash17.Utils
         public string OwnedDeviceId;
         public string VoxPopuliServer;
 
+        #region Text
+
+        public UIFont TextFont;
+        public Color TextColor;
+        public int TextSize;
+
+        #endregion
+
         #region Colors
 
         public Color FileColor;
@@ -19,6 +27,12 @@ namespace Hash17.Utils
         public Color WarningMessageColor;
         public Color ErrorMessageColor;
         public Color CommonMessageColor;
+
+        #endregion
+
+        #region Window
+
+        public GameObject WindowPrefab;
 
         #endregion
     }

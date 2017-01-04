@@ -10,5 +10,6 @@
         Init,
         Connect,
         Cypher,
+        Open,
     }
 }

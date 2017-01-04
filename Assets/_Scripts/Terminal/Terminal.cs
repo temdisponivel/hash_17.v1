@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using Hash17.Blackboard_;
 using Hash17.Files;
@@ -16,13 +15,14 @@ namespace Hash17.Terminal_
     {
         #region Properties
 
+        public UIPanel RootPanel;
         public GameObject TextEntryPrefab;
         public UITable TextTable;
         public UIInput Input;
         public UILabel LabelUserNameLocation;
 
-        private readonly List<Program> _runningPrograms = new List<Program>();
-        public List<Program> RunningPrograms
+        private readonly System.Collections.Generic.List<Program> _runningPrograms = new System.Collections.Generic.List<Program>();
+        public System.Collections.Generic.List<Program> RunningPrograms
         {
             get
             {
@@ -84,7 +84,7 @@ namespace Hash17.Terminal_
 
         #region Commands
 
-        public readonly List<string> AllCommandsTyped = new List<string>();
+        public readonly System.Collections.Generic.List<string> AllCommandsTyped = new System.Collections.Generic.List<string>();
         private int _currentNavigationCommandIndex = -1;
 
         #endregion
@@ -115,6 +115,8 @@ namespace Hash17.Terminal_
             Alias.Board.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
             RunProgram(Alias.Board.SpecialPrograms[ProgramId.Init], string.Empty);
             CurrentUserName = "temdisponivel";
+            Input.label.SetupWithHash17Settings();
+            LabelUserNameLocation.SetupWithHash17Settings();
         }
 
         #endregion
@@ -263,7 +265,16 @@ namespace Hash17.Terminal_
             TextTable.Reposition();
         }
 
-        public Coroutine ShowTextWithInterval(string text, float intervalBetweenChars = .02f, bool startOnNewLine = false, Action callback = null)
+        public Coroutine ShowTypeWriterTextWithCancel(string text, float intervalBetweenChars = .02f,
+            bool startOnNewLine = false, Action callback = null)
+        {
+            return ShowTypeWriterText(text, intervalBetweenChars, startOnNewLine, callback, () =>
+            {
+                return UnityEngine.Input.GetKeyDown(KeyCode.C) && UnityEngine.Input.GetKey(KeyCode.LeftControl);
+            });
+        }
+
+        public Coroutine ShowTypeWriterText(string text, float intervalBetweenChars = .02f, bool startOnNewLine = false, Action callback = null, Func<bool> cancellationToken = null)
         {
             StringBuilder textBuilder = new StringBuilder();
 
@@ -293,6 +304,18 @@ namespace Hash17.Terminal_
                     }
                     return stepsToSkip;
                 }
+
+                if (cancellationToken != null)
+                {
+                    if (cancellationToken())
+                    {
+                        var lastingText = text.Substring(index);
+                        textBuilder.Append(lastingText);
+                        ShowText(textBuilder.ToString(), false);
+                        return text.Length - index;
+                    }
+                }
+
 
                 textBuilder.Append(currentChar);
                 ShowText(textBuilder.ToString(), startOnNewLine);
