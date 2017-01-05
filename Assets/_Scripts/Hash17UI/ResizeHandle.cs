@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Hash17.Hash17UI
 {
-    public class ResizeHandle
+    public class ResizeHandle : MonoBehaviour
     {
         #region Inner type
 
@@ -22,6 +22,7 @@ namespace Hash17.Hash17UI
         #region References
 
         public Side Pivot;
+        public UIWidget Widget;
         public Window WindowToResize;
 
         #endregion
@@ -34,36 +35,23 @@ namespace Hash17.Hash17UI
         
         #endregion
 
-        void OnDrag(Vector3 delta)
+        void OnDragStart()
         {
-            _deltaDrag = delta;
             switch (Pivot)
             {
                 case Side.Left:
+                    Widget.leftAnchor.target = null;
+                    Widget.rightAnchor.target = null;
+                    WindowToResize.MainPanel.leftAnchor.target = transform;
+                    WindowToResize.MainPanel.rightAnchor.target = transform;
+                    break;
                 case Side.Right:
-                    DragHorizontal();
                     break;
                 case Side.Top:
+                    break;
                 case Side.Bottom:
-                    DragVertical();
                     break;
             }
-        }
-
-        void DragHorizontal()
-        {
-            var quantity = _deltaDrag.x;
-            var windowSize = WindowToResize.MainPanel.GetViewSize();
-            var windowPos = WindowToResize.MainPanel.transform.position;
-            WindowToResize.MainPanel.SetRect(windowPos.x, windowSize.y, windowSize.x + quantity, windowSize.y);
-        }
-
-        void DragVertical()
-        {
-            var quantity = _deltaDrag.y;
-            var windowSize = WindowToResize.MainPanel.GetViewSize();
-            var windowPos = WindowToResize.MainPanel.transform.position;
-            WindowToResize.MainPanel.SetRect(windowPos.x, windowSize.y, windowSize.x, windowSize.y + quantity);
         }
     }
 }
