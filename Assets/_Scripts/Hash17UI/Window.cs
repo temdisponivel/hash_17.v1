@@ -159,7 +159,6 @@ public class Window : MonoBehaviour
     {
         _initialScale = transform.localScale;
         _content = new UIWidget();
-        TitleLabel.SetupWithHash17Settings();
     }
 
     void Start()
