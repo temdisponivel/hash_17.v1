@@ -257,7 +257,7 @@ namespace Hash17.Terminal_
             if (ident)
                 BeginIdentation();
 
-            entry.Setup(CurrentLocationAndUserName, _identationBuilder + text);
+            entry.Setup(CurrentLocationAndUserName, _identationBuilder + text, TextTable.transform);
 
             if (ident)
                 EndIdentation();

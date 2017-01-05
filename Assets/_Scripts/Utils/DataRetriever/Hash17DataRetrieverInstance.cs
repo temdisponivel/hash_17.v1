@@ -20,18 +20,6 @@ namespace Hash17.Utils
     [ExecuteInEditMode]
     public class Hash17DataRetrieverInstance : DataRetrieverInstanceBase
     {
-        protected static Hash17DataRetrieverInstance _instance;
-
-        public static Hash17DataRetrieverInstance Instance
-        {
-            get
-            {
-                var go = new GameObject("Data-Retriever-Instance");
-                _instance = go.AddComponent<Hash17DataRetrieverInstance>();
-                return _instance;
-            }
-        }
-
         #region Fetch Programs
 
         public void FetchProgramsInfo(string spreadSheetId)
@@ -110,9 +98,6 @@ namespace Hash17.Utils
             }
 
             SetProgramBaseProperties(id, result, current);
-
-            if (id == ProgramId.Init)
-                SetProgramInitProperties(result as Init, current);
             
             return result;
         }
@@ -125,6 +110,7 @@ namespace Hash17.Utils
             var usage = current["Usage"].ToString();
             var knownParameters = current["KnownParametersAndOptions"].ToString();
             var availableGame = bool.Parse(current["Global"].ToString());
+            var aditionalData = current["AditionalData"].ToString().Trim();
 
             prog.Id = programId;
             prog.Command = com;
@@ -132,18 +118,14 @@ namespace Hash17.Utils
             prog.Description = desc;
             prog.Usage = usage;
             prog.Global = availableGame;
+            prog.AditionalData = aditionalData;
             prog.KnownParametersAndOptions = !knownParameters.StartsWith("--") ? knownParameters.Split(';') : new string[0];
             for (int i = 0; i < prog.KnownParametersAndOptions.Length; i++)
             {
                 prog.KnownParametersAndOptions[i] = prog.KnownParametersAndOptions[i].Trim();
             }
         }
-
-        private void SetProgramInitProperties(Init init, JsonData current)
-        {
-            init.InitTextPath = current["AditionalData"].ToString();
-        }
-
+        
         #endregion
 
         #region Fetch Devices

@@ -15,8 +15,6 @@ namespace Hash17.Programs.Implementation
 {
     public class Init : Program
     {
-        public string InitTextPath;
-
         private TextAsset _initTextAsset;
         private ResourceRequest _textAssetRequest;
 
@@ -25,7 +23,7 @@ namespace Hash17.Programs.Implementation
         protected override IEnumerator InnerExecute()
         {
             BlockInput();
-            _textAssetRequest = Resources.LoadAsync<TextAsset>(InitTextPath);
+            _textAssetRequest = Resources.LoadAsync<TextAsset>(AditionalData);
             
             Alias.Term.ShowText("Retrieving message from Vox Populi FTP Server...");
             Alias.Term.ShowText(string.Format("Connecting to {0}", Alias.Board.GameConfiguration.VoxPopuliServer));

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Hash17.Utils;
+using UnityEngine;
 using System.Collections;
 using LitJson;
 using System;
@@ -16,8 +17,8 @@ using UnityEditor;
 namespace FH.DataRetrieving
 {
     [ExecuteInEditMode]
-    public class DataRetrieverInstanceBase : MonoBehaviour
-	{
+    public class DataRetrieverInstanceBase : Singleton<Hash17DataRetrieverInstance>
+    {
 		#if UNITY_EDITOR
 
 		#region Data Retriever
@@ -28,12 +29,12 @@ namespace FH.DataRetrieving
 		{
 			get { return _dataRetriever ?? (_dataRetriever = Resources.LoadAll<DataRetrieverBase>("")[0]); }
 		}
+        
+        #endregion
 
-		#endregion
+        #region Fetch localization
 
-		#region Fetch localization
-
-		public void FetchLocalizationInfo(string spreadSheetId, string[] sheetName, SystemLanguage[] languages)
+        public void FetchLocalizationInfo(string spreadSheetId, string[] sheetName, SystemLanguage[] languages)
 		{
 			StartCoroutine(RunFetchLocalizationInfos(spreadSheetId, sheetName, languages));
 		}

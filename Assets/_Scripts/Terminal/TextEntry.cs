@@ -15,10 +15,11 @@ namespace Hash17.Terminal_
             Content.SetupWithHash17Settings();
         }
 
-        public void Setup(string userName, string text)
+        public void Setup(string userName, string text, Transform parent)
         {
             UserName.text = userName;
             Content.text = text;
+            Content.rightAnchor.target = parent;
         }
     }
 }

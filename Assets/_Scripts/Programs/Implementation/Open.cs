@@ -9,6 +9,21 @@ namespace Hash17.Programs.Implementation
 {
     public class Open : Program
     {
+        public override string AditionalData
+        {
+            get { return base.AditionalData; }
+            set
+            {
+                base.AditionalData = value;
+                var parts = base.AditionalData.Split(',');
+                LabelPrefabPath = parts[0];
+                TexturePrefabPath = parts[1];
+            }
+        }
+
+        public string LabelPrefabPath;
+        public string TexturePrefabPath;
+
         protected override IEnumerator InnerExecute()
         {
             if (HelpOrUnknownParameters(true))
@@ -29,28 +44,43 @@ namespace Hash17.Programs.Implementation
             {
                 UIWidget content;
 
+                var rootPanelSize = Alias.Term.RootPanel.GetViewSize();
+
+                var windowWidth = (rootPanelSize.x / 3) *2;
+                var windowHeight = rootPanelSize.y/2;
+
+                var window = Window.Create();
+                
                 if (file.FileType == FileType.Image)
                 {
-                    var image = new GameObject().AddComponent<UITexture>();
-                    image.mainTexture = Resources.Load<Texture>(file.Content);
+                    var image = Object.Instantiate(Resources.Load<GameObject>(TexturePrefabPath)).GetComponent<UITexture>();
+                    var texture = Resources.Load<Texture>(file.Content);
+                    image.mainTexture = texture;
                     content = image;
+                    image.width = texture.width;
+                    image.height = texture.height;
+                    windowWidth = texture.width;
+                    windowHeight = texture.height;
                 }
                 else
                 {
-                    var label = new GameObject().AddComponent<UILabel>();
+                    var label = Object.Instantiate(Resources.Load<GameObject>(LabelPrefabPath)).GetComponent<UILabel>();
                     label.SetupWithHash17Settings();
                     label.text = file.Content;
+                    label.overflowMethod = UILabel.Overflow.ResizeHeight;
+                    label.rightAnchor.target = window.transform;
+                    label.leftAnchor.target = window.transform;
                     content = label;
+                    windowWidth = label.width;
                 }
 
-                var rootPanelSize = Alias.Term.RootPanel.GetViewSize();
-                var window = Window.Create();
+                window.LosesFocus = true;
+
                 window.Setup(file.Name,
                     content,
-                    Window.ContentFitType.Strech,
                     showMaximizeButton: false,
                     startClosed: true);
-                window.Size = new Vector2((rootPanelSize.x / 3) * 2, rootPanelSize.y / 2);
+                window.Size = new Vector2(windowWidth, windowHeight);
             }
             else
             {

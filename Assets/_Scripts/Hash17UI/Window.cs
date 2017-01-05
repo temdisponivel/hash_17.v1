@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Permissions;
 using DG.Tweening;
 using FH.Util.Extensions;
 using Hash17.Utils;
@@ -9,17 +10,6 @@ using JetBrains.Annotations;
 
 public class Window : MonoBehaviour
 {
-    #region Inner Types
-
-    public enum ContentFitType
-    {
-        Fit,
-        Strech,
-        Free,
-    }
-
-    #endregion
-
     #region Properties
 
     #region References
@@ -57,7 +47,7 @@ public class Window : MonoBehaviour
     #region Controls
 
     public string Title { get { return TitleLabel.text; } set { TitleLabel.text = value; } }
-    
+
     public Vector2 Position
     {
         get { return MainPanel.transform.position; }
@@ -77,18 +67,6 @@ public class Window : MonoBehaviour
     {
         get { return MainPanel.GetViewSize(); }
         set { MainPanel.SetRect(Position.x, Position.y, value.x, value.y); }
-    }
-
-    [SerializeField]
-    private ContentFitType _contentFit;
-    public ContentFitType ContentFit
-    {
-        get { return _contentFit; }
-        set
-        {
-            _contentFit = value;
-            AdjustContent();
-        }
     }
 
     [SerializeField]
@@ -134,7 +112,25 @@ public class Window : MonoBehaviour
         set { Background.color = value; }
     }
 
+    public int StartDepth { get; private set; }
+
+    private HashSet<GameObject> _hovedObjects = new HashSet<GameObject>();
+
     #endregion
+
+    #region Static
+
+    private static readonly List<Window> _allOpenedWindows = new List<Window>();
+    private static int _currentWindowQueue { get; set; }
+
+    #endregion
+
+    #endregion
+
+    #region Events
+
+    public Action OnOpen;
+    public Action OnClose;
 
     #endregion
 
@@ -144,6 +140,14 @@ public class Window : MonoBehaviour
     {
         var windowPrefab = Alias.GameConfig.WindowPrefab;
         var windowIntance = NGUITools.AddChild(Alias.Term.RootPanel.gameObject, windowPrefab).GetComponent<Window>();
+
+        windowIntance.StartDepth = _currentWindowQueue;
+
+        windowIntance.MainPanel.depth = ++_currentWindowQueue;
+        windowIntance.ContentPanel.depth = ++_currentWindowQueue;
+
+        _allOpenedWindows.Add(windowIntance);
+
         return windowIntance;
     }
 
@@ -160,12 +164,25 @@ public class Window : MonoBehaviour
     void Start()
     {
         Open(null);
+        UICamera.onClick += OnClickCamera;
+        UICamera.onHover += OnHoverCamera;
+    }
+
+    void OnDestroy()
+    {
+        UICamera.onClick -= OnClickCamera;
+        UICamera.onHover -= OnHoverCamera;
     }
 
     #endregion
 
     #region UI Callback
 
+    public void Click()
+    {
+        BringToFront();
+    }
+    
     public void OnFocus()
     {
         if (_focusTweener != null)
@@ -176,6 +193,8 @@ public class Window : MonoBehaviour
             {
                 _focusTweener = null;
             });
+
+        BringToFront();
     }
 
     public void OnUnfocus()
@@ -206,20 +225,17 @@ public class Window : MonoBehaviour
 
     public void Setup(string title,
         UIWidget content,
-        ContentFitType fitType,
         bool showCloseButtons = true,
         bool showMaximizeButton = true,
         bool lockPosition = false,
         bool startClosed = false)
     {
         Title = title;
-        _contentFit = fitType;
         ShowCloseButton = showCloseButtons;
         ShowMaximizeButton = ShowMaximizeButton;
         PositionLocked = lockPosition;
         if (startClosed)
             transform.localScale = Vector3.zero;
-        gameObject.SetActive(true);
         ShowObject(content);
     }
 
@@ -234,16 +250,23 @@ public class Window : MonoBehaviour
 
     public void Open(Action callback)
     {
+        if (OnOpen != null)
+            OnOpen();
+
         transform.localScale = Vector3.zero;
         transform.DOScale(_initialScale, TransitionTime).OnComplete(() =>
         {
             if (callback != null)
                 callback();
         });
+        gameObject.SetActive(true);
     }
 
     public void Close(Action callback, bool destroyAfter = true)
     {
+        if (OnClose != null)
+            OnClose();
+
         transform.DOScale(Vector3.zero, TransitionTime).OnComplete(() =>
         {
             if (callback != null)
@@ -251,6 +274,8 @@ public class Window : MonoBehaviour
 
             if (destroyAfter)
                 Destroy();
+
+            _allOpenedWindows.Remove(this);
         });
     }
 
@@ -279,35 +304,27 @@ public class Window : MonoBehaviour
 
     public void Restore()
     {
-
         MainPanel.SetRect(_rectBeforeMaximize.x, _rectBeforeMaximize.y, _rectBeforeMaximize.width, _rectBeforeMaximize.height);
     }
 
     #endregion
 
-    #region _content
+    #region Stack
 
-    public void AdjustContent()
+    public void BringToFront()
     {
-        switch (ContentFit)
+        for (int i = 0; i < _allOpenedWindows.Count; i++)
         {
-            case ContentFitType.Fit:
-                AdjustFitContent();
-                break;
-            case ContentFitType.Strech:
-                AdjustStrechContent();
-                break;
+            var currentWindow = _allOpenedWindows[i];
+            if (currentWindow.MainPanel.depth == 999)
+            {
+                currentWindow.MainPanel.depth = currentWindow.StartDepth + 1;
+                currentWindow.ContentPanel.depth = currentWindow.StartDepth + 2;
+            }
         }
-    }
 
-    private void AdjustFitContent()
-    {
-        Size = _content.localSize;
-    }
-
-    private void AdjustStrechContent()
-    {
-        _content.SetAnchor(ContentPanel.transform);
+        MainPanel.depth = 999;
+        ContentPanel.depth = 1000;
     }
 
     #endregion
@@ -324,15 +341,47 @@ public class Window : MonoBehaviour
         content.transform.SetParent(ContentPanel.transform);
         content.transform.Reset();
         _content = content;
-        AdjustContent();
     }
 
     public void HideObject()
     {
-        if (_contentFit == ContentFitType.Strech)
-            _content.SetAnchor((GameObject)null);
         _content.transform.SetParent(null);
         _content = null;
+    }
+
+    #endregion
+
+    #region UI Camera callback
+
+    void OnClickCamera(GameObject clicked)
+    {
+        if (clicked.transform.IsChildOf(this.transform))
+        {
+            Click();
+        }
+    }
+
+    void OnHoverCamera(GameObject hovered, bool state)
+    {
+        if (hovered.transform.IsChildOf(this.transform))
+        {
+            if (state)
+            {   
+                if (_hovedObjects.Contains(hovered))
+                    return;
+
+                _hovedObjects.Add(hovered);
+                OnFocus();
+            }
+            else
+            {
+                if (_hovedObjects.Contains(hovered))
+                    _hovedObjects.Remove(hovered);
+
+                if (_hovedObjects.Count == 0)
+                    OnUnfocus();
+            }
+        }
     }
 
     #endregion
