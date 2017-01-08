@@ -162,7 +162,7 @@ namespace Hash17.Terminal_
         private void TreatInputText(string text)
         {
             text = text.Replace("\n", string.Empty);
-            ShowText(text);
+            ShowText(text, showLocation: true);
 
             string programName, programParams;
             Interpreter.GetProgram(text, out programName, out programParams);
@@ -234,7 +234,7 @@ namespace Hash17.Terminal_
 
         #region Interface
 
-        public void ShowText(string text, bool asNewLine = true, bool ident = false)
+        public void ShowText(string text, bool asNewLine = true, bool ident = false, bool showLocation = false)
         {
             TextEntry entry;
             if (asNewLine)
@@ -257,7 +257,7 @@ namespace Hash17.Terminal_
             if (ident)
                 BeginIdentation();
 
-            entry.Setup(CurrentLocationAndUserName, _identationBuilder + text, TextTable.transform);
+            entry.Setup(showLocation ? CurrentLocationAndUserName : "", _identationBuilder + text, TextTable.transform);
 
             if (ident)
                 EndIdentation();

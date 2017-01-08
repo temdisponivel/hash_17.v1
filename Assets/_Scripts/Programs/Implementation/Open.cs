@@ -68,8 +68,8 @@ namespace Hash17.Programs.Implementation
                     label.SetupWithHash17Settings();
                     label.text = file.Content;
                     label.overflowMethod = UILabel.Overflow.ResizeHeight;
-                    label.rightAnchor.target = window.transform;
-                    label.leftAnchor.target = window.transform;
+                    label.rightAnchor.target = window.ContentPanel.transform;
+                    label.leftAnchor.target = window.ContentPanel.transform;
                     content = label;
                     windowWidth = label.width;
                 }

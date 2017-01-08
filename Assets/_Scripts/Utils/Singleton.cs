@@ -17,7 +17,7 @@ namespace Hash17.Utils
                 {
                     if (_instance == null)
                     {
-
+                        
                         _instance = FindObjectOfType<T>();
 
                         if (_instance == null)

@@ -12,30 +12,40 @@ namespace Hash17.Programs
     public class ProgramCollection : ScriptableObject
     {
         [SerializeField]
-        private string _serializedData;
+        private List<string> _serializedData;
 
         [NonSerialized]
         public List<Program> Programs;
 
         public void Save()
         {
-            var data = JsonConvert.SerializeObject(Programs, new JsonSerializerSettings()
+            _serializedData = new List<string>();
+            for (int i = 0; i < Programs.Count; i++)
             {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
-            });
-            _serializedData = data;
+                var current = Programs[i];
+                var data = JsonConvert.SerializeObject(current, new JsonSerializerSettings()
+                {
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                    TypeNameHandling = TypeNameHandling.All,
+                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                });
+                _serializedData.Add(data);
+            }
         }
 
         public void Load()
         {
-            Programs = JsonConvert.DeserializeObject<List<Program>>(_serializedData, new JsonSerializerSettings()
+            Programs = new List<Program>();
+            for (int i = 0; i < _serializedData.Count; i++)
             {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
-            });
+                var current = _serializedData[i];
+                Programs.Add(JsonConvert.DeserializeObject<Program>(current, new JsonSerializerSettings()
+                {
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                    TypeNameHandling = TypeNameHandling.All,
+                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                }));
+            }
         }
     }
 }
