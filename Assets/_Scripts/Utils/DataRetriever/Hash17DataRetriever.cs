@@ -6,7 +6,7 @@ namespace Hash17.Utils
     [CreateAssetMenu(fileName = "Hash17DataRetriever", menuName = "Hash17/Data retriever")]
     public class Hash17DataRetriever : DataRetrieverBase
     {
-        #region Programs
+        #region ProgramsByCommand
 
         public string ProgramsSpreadSheetId;
 

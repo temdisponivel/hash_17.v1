@@ -39,28 +39,26 @@ namespace Hash17.Programs.Implementation
             List<File> files;
             if (all)
             {
-                files = Alias.Board.AllFiles;
+                files = Alias.Board.CurrentDevice.FileSystem.AllFiles;
             }
             else
             {
                 files = Alias.Board.FileSystem.CurrentDirectory.Files;
             }
 
-            Alias.Term.ShowText("Files found:");
+            Alias.Term.ShowText("Files found - (use 'open <file_path>' to open one of them):");
 
             Alias.Term.BeginIdentation();
 
+            bool hasFiles = false;
             for (int i = 0; i < files.Count; i++)
             {
                 var currentFile = files[i];
-
-                if (currentFile.FileType != FileType.Text)
-                    continue;
-
+                
                 var content = currentFile.Content.ToLower();
 
                 var nameValidated = false;
-                if (!Validate(terms, content, only))
+                if (currentFile.FileType != FileType.Text || !Validate(terms, content, only))
                 {
                     content = currentFile.Name;
                     if (!Validate(terms, content, only))
@@ -68,6 +66,8 @@ namespace Hash17.Programs.Implementation
 
                     nameValidated = true;
                 }
+
+                hasFiles = true;
 
                 content = currentFile.Content.SubString(10, 10, terms);
                 string name = currentFile.Name;
@@ -80,12 +80,19 @@ namespace Hash17.Programs.Implementation
                         content = content.Replace(terms[j], string.Format("[b][i]{0}[/i][/b]", terms[j]));
                 }
 
-                Alias.Term.ShowText(string.Format("Name: {0} | Path: {1}", name, files[i].Directory.Path));
+                Alias.Term.ShowText(string.Format("Name: {0} | Path: {1}", name, files[i].Path));
                 if (!nameValidated)
                 {
                     Alias.Term.ShowText("Content:");
                     Alias.Term.ShowText(content, ident: true);
                 }
+
+                Alias.Term.ShowText("-----------------------------------");
+            }
+
+            if (!hasFiles)
+            {
+                Alias.Term.ShowText("None.");
             }
 
             Alias.Term.EndIdentation();
@@ -93,11 +100,14 @@ namespace Hash17.Programs.Implementation
             Alias.Term.ShowText("Programs found:");
 
             Alias.Term.BeginIdentation();
-            foreach (var program in Alias.Board.Programs)
+            bool hasProgram = false;
+            foreach (var program in Alias.Board.ProgramsByCommand)
             {
                 var prog = program.Value;
-                if (Validate(terms, prog.Command, only) || Validate(terms, prog.Description, only))
+                if (Validate(terms, prog.Command.ToLower(), only) || Validate(terms, prog.Description.ToLower(), only))
                 {
+                    hasProgram = true;
+
                     string name = prog.Command;
                     var content = prog.Description;
 
@@ -109,7 +119,14 @@ namespace Hash17.Programs.Implementation
 
                     Alias.Term.ShowText(name);
                     Alias.Term.ShowText(content, ident: true);
+
+                    Alias.Term.ShowText("-----------------------------------");
                 }
+            }
+
+            if (!hasProgram)
+            {
+                Alias.Term.ShowText("None.");
             }
 
             Alias.Term.EndIdentation();

@@ -15,7 +15,7 @@ namespace Hash17.Programs.Implementation
     {
         protected override IEnumerator InnerExecute()
         {
-            if (AskedForHelp(true))
+            if (HelpOrUnknownParameters(true))
                 yield break;
 
             ProgramParameter.Param param;
@@ -40,7 +40,9 @@ namespace Hash17.Programs.Implementation
                     {
                         if (b)
                         {
-                            Alias.Term.ShowText(TextBuilder.MessageText(string.Format("Access granted. You are now on {0}.", device1.UniqueId)));
+                            Alias.Term.ShowText(
+                                TextBuilder.MessageText(string.Format("Access granted. You are now on {0}.",
+                                    device1.UniqueId)));
                             Alias.Board.CurrentDevice = device1;
                         }
                         else
@@ -49,6 +51,10 @@ namespace Hash17.Programs.Implementation
                         }
                     });
                 }
+            }
+            else
+            {
+                ShowHelp();
             }
         }
     }

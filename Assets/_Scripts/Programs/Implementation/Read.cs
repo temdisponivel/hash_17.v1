@@ -35,11 +35,6 @@ namespace Hash17.Programs.Implementation
                     }
                     else
                     {
-                        if (!file.CanBeRead)
-                        {
-                            Alias.Term.ShowText(TextBuilder.WarningText("This file is protected. Use the program 'cypher' to decrypt it."));
-                        }
-
                         Alias.Term.BeginIdentation();
                         Alias.Term.ShowText(file.Content, ident: true);
                         Alias.Term.EndIdentation();

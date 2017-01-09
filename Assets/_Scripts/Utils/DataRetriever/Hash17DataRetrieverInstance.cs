@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 using FH.DataRetrieving;
 using Hash17.Devices;
 using Hash17.Devices.Firewalls;
@@ -20,7 +21,7 @@ namespace Hash17.Utils
     [ExecuteInEditMode]
     public class Hash17DataRetrieverInstance : DataRetrieverInstanceBase
     {
-        #region Fetch Programs
+        #region Fetch ProgramsByCommand
 
         public void FetchProgramsInfo(string spreadSheetId)
         {
@@ -30,8 +31,6 @@ namespace Hash17.Utils
         private IEnumerator RunFetchProgramsInfos(string spreadSheetId)
         {
             var results = new List<Program>();
-
-            AssetDatabase.DeleteAsset("Assets/Resources/Programs/ProgramsCollection.asset");
 
             yield return StartCoroutine(GetData(spreadSheetId, "Programs"));
 
@@ -51,10 +50,16 @@ namespace Hash17.Utils
                 var prog = GetProgramInstance(id, current);
                 results.Add(prog);
             }
+            
+            var serializedData = JsonConvert.SerializeObject(results,
+                        new JsonSerializerSettings()
+                        {
+                            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                            TypeNameHandling = TypeNameHandling.All,
+                            TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                        });
 
-            var collection = DataRetrieverBase.CreateAsset<ProgramCollection>("Assets/Resources/Programs/", "ProgramsCollection.asset");
-            collection.Programs = results;
-            collection.Save();
+            CreateFile(Alias.GameConfig.CollectionsSavePath, "ProgramCollectionData.txt", serializedData);
 
             AssetDatabase.Refresh();
             AssetDatabase.SaveAssets();
@@ -138,9 +143,7 @@ namespace Hash17.Utils
         private IEnumerator RunFetchDeviceInfos(string spreadSheetId)
         {
             var results = new List<Device>();
-
-            AssetDatabase.DeleteAsset("Assets/Resources/Devices/DevicesCollection.asset");
-
+            
             yield return StartCoroutine(GetData(spreadSheetId, "Files"));
 
             Debug.Log("FINISH RETRIEVING FILEs FROM GOOGLE");
@@ -183,9 +186,15 @@ namespace Hash17.Utils
                 results.Add(device);
             }
 
-            var collection = DataRetrieverBase.CreateAsset<DeviceCollection>("Assets/Resources/Devices/", "DevicesCollection.asset");
-            collection.Devices = results;
-            collection.Save();
+            var serializedData = JsonConvert.SerializeObject(results,
+                        new JsonSerializerSettings()
+                        {
+                            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                            TypeNameHandling = TypeNameHandling.All,
+                            TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                        });
+
+            CreateFile(Alias.GameConfig.CollectionsSavePath, "DeviceCollectionData.txt", serializedData);
 
             AssetDatabase.Refresh();
             AssetDatabase.SaveAssets();
@@ -305,16 +314,25 @@ namespace Hash17.Utils
                 var content = current["Content"].ToString();
                 var path = current["Path"].ToString();
                 var name = current["Name"].ToString();
-                if (System.IO.File.Exists(path))
-                    System.IO.File.Delete(path);
-                System.IO.Directory.CreateDirectory(path);
-                System.IO.File.WriteAllText(string.Format("{0}{1}", path, name), content);
+                CreateFile(path, name, content);
             }
 
             AssetDatabase.Refresh();
 
             Debug.Log("FINISH CREATING TEXT ASSETS");
             DestroyImmediate(gameObject);
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public void CreateFile(string path, string name, string content)
+        {
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
+            System.IO.Directory.CreateDirectory(path);
+            System.IO.File.WriteAllText(string.Format("{0}{1}", path, name), content);
         }
 
         #endregion

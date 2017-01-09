@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Runtime.Serialization.Formatters;
 using Hash17.Devices;
 using Hash17.Devices.Firewalls;
 using Hash17.Devices.Firewalls.Implementation;
@@ -8,6 +9,7 @@ using Hash17.Files;
 using Hash17.Programs;
 using Hash17.Terminal_;
 using Hash17.Utils;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Hash17.Blackboard_
@@ -19,25 +21,60 @@ namespace Hash17.Blackboard_
         #region References
 
         public GameConfiguration GameConfiguration;
+        public TextAsset ProgramsSerializedData;
+        public TextAsset DevicesSerializedData;
 
         #endregion
 
-        #region Programs
+        #region ProgramsByCommand
 
-        public Dictionary<string, Program> Programs = new Dictionary<string, Program>();
+        public Dictionary<string, Program> ProgramsByCommand = new Dictionary<string, Program>();
         public Dictionary<ProgramId, Program> SpecialPrograms = new Dictionary<ProgramId, Program>();
         public Dictionary<int, Program> ProgramDefinitionByUniqueId = new Dictionary<int, Program>();
         public Dictionary<ProgramId, Program> ProgramDefinitionById = new Dictionary<ProgramId, Program>();
+
+        private List<Program> _programs;
+        public List<Program> Programs
+        {
+            get
+            {
+                if (_programs == null || _programs.Count == 0)
+                {
+                    _programs = JsonConvert.DeserializeObject<List<Program>>(ProgramsSerializedData.text, new JsonSerializerSettings()
+                    {
+                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        TypeNameHandling = TypeNameHandling.All,
+                        TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                    });
+                }
+
+                return _programs;
+            }
+        }
 
         #endregion
 
         #region Devices
 
         public Dictionary<string, Device> DevicesById = new Dictionary<string, Device>();
-        public DeviceCollection DeviceCollection;
+
+        private List<Device> _devices;
         public List<Device> Devices
         {
-            get { return DeviceCollection.Devices; }
+            get
+            {
+                if (_devices == null || _devices.Count == 0)
+                {
+                    _devices = JsonConvert.DeserializeObject<List<Device>>(DevicesSerializedData.text, new JsonSerializerSettings()
+                    {
+                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        TypeNameHandling = TypeNameHandling.All,
+                        TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                    });
+                }
+
+                return _devices;
+            }
         }
         private Device _currentDevice;
         public Device CurrentDevice
@@ -75,7 +112,7 @@ namespace Hash17.Blackboard_
             }
         }
         public List<File> AllFiles { get; protected set; }
-        public List<Directory> AllDirectories { get; protected set; }
+        public List<Directory> AllDirectories { get; set; }
 
         #endregion
 
@@ -110,9 +147,7 @@ namespace Hash17.Blackboard_
 
         private void LoadPrograms()
         {
-            var progCollection = Resources.LoadAll<ProgramCollection>("")[0];
-            progCollection.Load();
-            var allPrograms = progCollection.Programs;
+            var allPrograms = Programs;
 
             if (allPrograms == null)
                 return;
@@ -122,7 +157,7 @@ namespace Hash17.Blackboard_
                 var program = allPrograms[i];
 
                 ProgramDefinitionById[program.Id] = program;
-                Programs[program.Command] = program;
+                ProgramsByCommand[program.Command] = program;
                 ProgramDefinitionByUniqueId[program.UnitqueId] = program;
 
                 if (!program.Global)
@@ -132,12 +167,10 @@ namespace Hash17.Blackboard_
 
         public void LoadDeviceCollection()
         {
-            DeviceCollection = Resources.LoadAll<DeviceCollection>("")[0];
-            DeviceCollection.Load();
-            for (int i = 0; i < DeviceCollection.Devices.Count; i++)
+            for (int i = 0; i < Devices.Count; i++)
             {
-                AddFilesAndDirToList(DeviceCollection.Devices[i].FileSystem);
-                DevicesById[DeviceCollection.Devices[i].UniqueId] = DeviceCollection.Devices[i];
+                AddFilesAndDirToList(Devices[i].FileSystem);
+                DevicesById[Devices[i].UniqueId] = Devices[i];
             }
         }
 
@@ -150,7 +183,8 @@ namespace Hash17.Blackboard_
 
         public void LoadGameConfiguration()
         {
-            GameConfiguration = Resources.LoadAll<GameConfiguration>("")[0];
+            if (GameConfiguration == null)
+                GameConfiguration = Resources.LoadAll<GameConfiguration>("")[0];
         }
 
         #endregion
@@ -173,6 +207,13 @@ namespace Hash17.Blackboard_
                     AddFilesAndDirToList(dir.Childs[i]);
                 }
             }
+        }
+
+        public void Bake()
+        {
+            GameConfiguration = Resources.LoadAll<GameConfiguration>("")[0];
+            ProgramsSerializedData = Resources.Load<TextAsset>(Alias.GameConfig.CollectionLoadPath + "ProgramCollectionData");
+            DevicesSerializedData = Resources.Load<TextAsset>(Alias.GameConfig.CollectionLoadPath + "DeviceCollectionData");
         }
 
         #endregion

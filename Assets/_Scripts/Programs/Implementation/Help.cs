@@ -17,7 +17,7 @@ namespace Hash17.Programs.Implementation
 
             Alias.Term.BeginIdentation();
 
-            var programs = Alias.Board.Programs;
+            var programs = Alias.Board.ProgramsByCommand;
 
             foreach (var program in programs)
             {

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Policy;
+using Hash17.Blackboard_;
 using Hash17.Utils;
 using Newtonsoft.Json;
 
@@ -60,11 +62,19 @@ namespace Hash17.Files
             get { return "/"; }
             set { }
         }
+        
+        public List<File> AllFiles
+        {
+            get
+            {
+                return GetFilesInDirectoriesAndChilds(new List<File>());
+            }
+        }
 
         #endregion
 
         #region Files
-        
+
         private void GetFileNameAndPath(string pathWithName, out string fileName, out string path)
         {
             var parts = pathWithName.Split('/');
@@ -102,6 +112,8 @@ namespace Hash17.Files
             }
 
             fileFound = dir.FindFileByName(fileName);
+            if (fileFound == null)
+                return OperationResult.NotFound;
             return OperationResult.Ok;
         }
 
@@ -140,6 +152,8 @@ namespace Hash17.Files
                 Name = name,
                 Content = string.Empty,
             });
+
+            Blackboard.Instance.AllFiles.Add(file);
 
             return OperationResult.Ok;
         }
@@ -429,6 +443,11 @@ namespace Hash17.Files
                 Files = new List<File>(),
                 Parent = parent,
             });
+
+            if (Blackboard.Instance.AllDirectories == null)
+                Blackboard.Instance.AllDirectories = new List<Directory>();
+
+            Blackboard.Instance.AllDirectories.Add(dir);
 
             return OperationResult.Ok;
         }

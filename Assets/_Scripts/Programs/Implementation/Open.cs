@@ -51,7 +51,7 @@ namespace Hash17.Programs.Implementation
 
                 var window = Window.Create();
                 
-                if (file.FileType == FileType.Image)
+                if (file.CanBeRead && file.FileType == FileType.Image)
                 {
                     var image = Object.Instantiate(Resources.Load<GameObject>(TexturePrefabPath)).GetComponent<UITexture>();
                     var texture = Resources.Load<Texture>(file.Content);
@@ -61,6 +61,11 @@ namespace Hash17.Programs.Implementation
                     image.height = texture.height;
                     windowWidth = texture.width;
                     windowHeight = texture.height;
+
+                    content.rightAnchor.target = window.ContentPanel.transform;
+                    content.leftAnchor.target = window.ContentPanel.transform;
+                    content.topAnchor.target = window.ContentPanel.transform;
+                    content.bottomAnchor.target = window.ContentPanel.transform;
                 }
                 else
                 {

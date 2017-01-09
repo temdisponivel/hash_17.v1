@@ -26,6 +26,9 @@ namespace Hash17.Utils
                 throw new ArgumentException("Cannot encrypt using an empty key. Please supply an encryption key.");
             }
 
+            return string.Format("Encrypted data: \n {0}", BitConverter.ToString(Encoding.ASCII.GetBytes(text)));
+
+
             System.Security.Cryptography.CspParameters cspp = new System.Security.Cryptography.CspParameters();
             cspp.KeyContainerName = password;
 

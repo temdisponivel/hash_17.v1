@@ -34,7 +34,7 @@ namespace Hash17.Files
                 
                 if (Alias.Board.UnlockedFiles.Contains(UniqueId))
                     return _content;
-
+                
                 return _content.Encrypt(Password);
             }
             set { _content = value; }
@@ -64,7 +64,7 @@ namespace Hash17.Files
         [JsonIgnore]
         public string Path
         {
-            get { return string.Format("{0}{1}{2}", Directory.Path, FileSystem.Instance.DirectorySeparator, Name); }
+            get { return string.Format("{0}{1}", Directory.Path, Name); }
         }
     }
 }

@@ -121,7 +121,7 @@ namespace Hash17.Terminal_
 
         #endregion
 
-        #region Programs
+        #region ProgramsByCommand
 
         public void InputValueChange()
         {
@@ -167,11 +167,11 @@ namespace Hash17.Terminal_
             string programName, programParams;
             Interpreter.GetProgram(text, out programName, out programParams);
             Program program;
-            if (!Alias.Board.Programs.TryGetValue(programName, out program))
+            if (!Alias.Board.ProgramsByCommand.TryGetValue(programName, out program))
             {
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
-                ShowText(TextBuilder.WarningText("You can also search for programs, files and etc using the 'search' program."));
+                ShowText(TextBuilder.WarningText(string.Format("Use 'search -all {0}' to search for {0} in all files.", text)));
                 return;
             }
 
@@ -193,8 +193,7 @@ namespace Hash17.Terminal_
                     }
                 }
             }
-
-            BeginIdentation();
+            
             var programInstance = RunProgram(program, programParams);
 
             if (OnProgramExecuted != null)
@@ -262,7 +261,12 @@ namespace Hash17.Terminal_
             if (ident)
                 EndIdentation();
 
-            TextTable.Reposition();
+            CoroutineHelper.Instance.WaitAndCall(() =>
+            {
+                TextTable.Reposition();
+            }, 0.1f);
+
+            //TextTable.Reposition();
         }
 
         public Coroutine ShowTypeWriterTextWithCancel(string text, float intervalBetweenChars = .02f,
@@ -369,14 +373,14 @@ namespace Hash17.Terminal_
 
         private void ProgramFinished(Program program)
         {
-            EndIdentation();
-
             RunningPrograms.Remove(program);
 
             program.OnFinish -= ProgramFinished;
 
             if (OnProgramFinished != null)
                 OnProgramFinished(program);
+
+            ShowText("");
         }
 
         private void OnCurrentDirChanged()

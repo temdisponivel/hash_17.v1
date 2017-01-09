@@ -15,10 +15,10 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
 
         var config = (Hash17DataRetriever)target;
 
-        if (NGUIEditorTools.DrawHeader("Programs"))
+        if (NGUIEditorTools.DrawHeader("ProgramsByCommand"))
         {
             NGUIEditorTools.BeginContents();
-            config.ProgramsSpreadSheetId = EditorGUILayout.TextField("Programs Sheet Id", config.ProgramsSpreadSheetId);
+            config.ProgramsSpreadSheetId = EditorGUILayout.TextField("ProgramsByCommand Sheet Id", config.ProgramsSpreadSheetId);
             if (GUILayout.Button("Fetch all programs data"))
                 Hash17DataRetrieverInstance.Instance.FetchProgramsInfo(config.ProgramsSpreadSheetId);
             NGUIEditorTools.EndContents();

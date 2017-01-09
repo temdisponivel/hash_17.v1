@@ -9,6 +9,9 @@ namespace Hash17.Utils
         public string OwnedDeviceId;
         public string VoxPopuliServer;
 
+        public string CollectionsSavePath;
+        public string CollectionLoadPath;
+
         #region Text
 
         public UIFont TextFont;

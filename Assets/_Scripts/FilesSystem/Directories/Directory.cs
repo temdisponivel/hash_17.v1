@@ -45,8 +45,8 @@ namespace Hash17.Files
                     builder = builder.Insert(0, string.Format("{0}/", parent.Name.Replace("/", "")));
                     parent = parent.Parent;
                 }
-                if (builder.Length > 1)
-                    builder.Remove(builder.Length - 1, 1);
+                //if (builder.Length > 1)
+                //    builder.Remove(builder.Length - 1, 1);
                 return builder.ToString();
             }
         }
@@ -71,6 +71,16 @@ namespace Hash17.Files
         public virtual File FindFileByName(string name)
         {
             return Files.Find(d => String.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public List<File> GetFilesInDirectoriesAndChilds(List<File> toAdd)
+        {
+            toAdd.AddRange(Files);
+            for (int i = 0; i < Childs.Count; i++)
+            {
+                toAdd = Childs[i].GetFilesInDirectoriesAndChilds(toAdd);
+            }
+            return toAdd;
         }
     }
 }

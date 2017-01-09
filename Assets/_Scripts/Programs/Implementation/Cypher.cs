@@ -83,7 +83,7 @@ namespace Hash17.Programs.Implementation
             {
                 file.IsProtected = true;
                 file.Password = passWord;
-                Alias.Term.ShowText("File encrypted. You can read the file, but other people can't (unless they have the password).");
+                Alias.Term.ShowText("File encrypted. You can open the file, but other people can't (unless they have the password).");
             }
 
             UnblockInput();
