@@ -54,7 +54,7 @@ namespace Hash17.Programs.Implementation
             file.FileType = FileType.Text;
             Alias.Term.ShowText(TextBuilder.WarningText("This message was saved to file 'vox_populi_msg.txt' and can be opened using 'read' program."));
             UnblockInput();
-            Alias.Term.RunProgram(Alias.Board.ProgramDefinitionById[ProgramId.Timer], "180");
+            Alias.Term.RunProgram(Alias.Board.ProgramDefinitionById[ProgramId.Timer], "10");
         }
     }
 }

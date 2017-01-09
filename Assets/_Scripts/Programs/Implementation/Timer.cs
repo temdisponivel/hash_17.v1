@@ -44,17 +44,19 @@ public class Timer : Program
             label.text = seconds.ToString();
             label.AssumeNaturalSize();
 
-            _windowInstance.Setup("Timer", label, false, true, startClosed:true);
-            _windowInstance.Size = new Vector2(label.width + 100, label.height + 100);
-
-            //_windowInstance.SizeLocked = true;
+            _windowInstance.Setup("Timer", label, true, false, startClosed:true);
+            _windowInstance.Size = new Vector2(label.width + 20, label.height + 10);
+            _windowInstance.SizeLocked = true;
 
             yield return CoroutineHelper.Instance.WaitAndCallTimes((i) =>
             {
-                label.text = (seconds - i).ToString();
+                if (label != null)
+                    label.text = (seconds - i).ToString();
             }, seconds, 1, () =>
             {
-                _windowInstance.Close(null);
+                if (_windowInstance != null)
+                    _windowInstance.Close(null);
+
                 if (OnTimerFinish != null)
                     OnTimerFinish();
             });
