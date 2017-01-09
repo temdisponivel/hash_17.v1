@@ -202,7 +202,7 @@ namespace Hash17.Terminal_
             programInstance.OnFinish += ProgramFinished;
         }
 
-        private Program RunProgram(Program program, string param)
+        public Program RunProgram(Program program, string param)
         {
             var programInstance = program.Clone();
             RunningPrograms.Add(programInstance);

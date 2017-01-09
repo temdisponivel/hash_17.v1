@@ -18,6 +18,10 @@ public class Window : MonoBehaviour
     public UISprite Topbar;
     public UISprite Background;
     public UIDragObject DragObject;
+    public UIDragObject LeftResizer;
+    public UIDragObject RightResizer;
+    public UIDragObject TopResizer;
+    public UIDragObject BottomResizer;
     public UIPanel MainPanel;
     public UIPanel ContentPanel;
     public GameObject CloseButton;
@@ -53,20 +57,24 @@ public class Window : MonoBehaviour
         get { return MainPanel.transform.position; }
         set { MainPanel.transform.localPosition = value; }
     }
-    public Vector2 ScreenRelativePosition
-    {
-        get
-        {
-            var rootSize = Alias.Term.RootPanel.GetViewSize();
-            var finalX = Position.x / rootSize.x;
-            var finalY = Position.y / rootSize.y;
-            return new Vector2(finalX, finalY);
-        }
-    }
+
     public Vector2 Size
     {
-        get { return MainPanel.GetViewSize(); }
-        set { MainPanel.SetRect(Position.x, Position.y, value.x, value.y); }
+        get { return new Vector2(Background.width, Background.height); }
+        set
+        {
+            var rightPosition = new Vector3();
+            rightPosition.z = RightResizer.transform.localPosition.z;
+            rightPosition.y = RightResizer.transform.localPosition.y;
+            rightPosition.x = LeftResizer.transform.localPosition.x + value.x;
+            RightResizer.transform.localPosition = rightPosition;
+
+            var bottomPosition = new Vector3();
+            bottomPosition.z = BottomResizer.transform.localPosition.z;
+            bottomPosition.x = BottomResizer.transform.localPosition.x;
+            bottomPosition.y = TopResizer.transform.localPosition.y - value.y - Topbar.height;
+            BottomResizer.transform.localPosition = bottomPosition;
+        }
     }
 
     [SerializeField]
@@ -78,6 +86,21 @@ public class Window : MonoBehaviour
         {
             _positionLocked = value;
             DragObject.enabled = !_positionLocked;
+        }
+    }
+
+    [SerializeField]
+    private bool _sizeLocked;
+    public bool SizeLocked
+    {
+        get { return _sizeLocked; }
+        set
+        {
+            _sizeLocked = value;
+            LeftResizer.enabled = !_sizeLocked;
+            RightResizer.enabled = !_sizeLocked;
+            TopResizer.enabled = !_sizeLocked;
+            BottomResizer.enabled = !_sizeLocked;
             ShowMaximizeButton &= !_positionLocked;
         }
     }
@@ -232,7 +255,7 @@ public class Window : MonoBehaviour
     {
         Title = title;
         ShowCloseButton = showCloseButtons;
-        ShowMaximizeButton = ShowMaximizeButton;
+        ShowMaximizeButton = showMaximizeButton;
         PositionLocked = lockPosition;
         if (startClosed)
             transform.localScale = Vector3.zero;
@@ -295,7 +318,7 @@ public class Window : MonoBehaviour
 
     public void Maximize()
     {
-        _rectBeforeMaximize = new Rect(ScreenRelativePosition, MainPanel.GetViewSize());
+        _rectBeforeMaximize = new Rect(Position, Size);
         var rootSize = Alias.Term.RootPanel.GetViewSize();
         Size = rootSize;
         Position = Vector2.zero;
@@ -304,7 +327,8 @@ public class Window : MonoBehaviour
 
     public void Restore()
     {
-        MainPanel.SetRect(_rectBeforeMaximize.x, _rectBeforeMaximize.y, _rectBeforeMaximize.width, _rectBeforeMaximize.height);
+        Size = new Vector2(_rectBeforeMaximize.width, _rectBeforeMaximize.height);
+        Position = _rectBeforeMaximize.position;
     }
 
     #endregion

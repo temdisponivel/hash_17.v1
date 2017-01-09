@@ -11,5 +11,6 @@
         Connect,
         Cypher,
         Open,
+        Timer,
     }
 }

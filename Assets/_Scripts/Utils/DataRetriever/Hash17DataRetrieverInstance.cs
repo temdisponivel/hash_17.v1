@@ -100,6 +100,9 @@ namespace Hash17.Utils
                 case ProgramId.Open:
                     result = new Open();
                     break;
+                case ProgramId.Timer:
+                    result = new Timer();
+                    break;
             }
 
             SetProgramBaseProperties(id, result, current);
