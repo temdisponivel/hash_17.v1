@@ -1,13 +1,8 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 using System.Text;
-using Hash17.Blackboard_;
-using Hash17.Files;
 using Hash17.Programs;
-using Hash17.Programs.Implementation;
 using Hash17.Utils;
-using UnityEditor;
 
 namespace Hash17.Terminal_
 {

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FH.DataRetrieving;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters;
-using FH.DataRetrieving;
 using Hash17.Devices;
 using Hash17.Devices.Firewalls;
 using Hash17.Files;
@@ -11,10 +11,12 @@ using Hash17.Programs;
 using Hash17.Programs.Implementation;
 using LitJson;
 using Newtonsoft.Json;
-using UnityEditor;
 using UnityEngine;
 using Help = Hash17.Programs.Implementation.Help;
 using DeviceType = Hash17.Devices.DeviceType;
+
+#if UNITY_EDITOR
+using UnityEditor;
 
 namespace Hash17.Utils
 {
@@ -341,3 +343,4 @@ namespace Hash17.Utils
         #endregion
     }
 }
+#endif

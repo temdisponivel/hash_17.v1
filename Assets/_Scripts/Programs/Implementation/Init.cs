@@ -8,7 +8,6 @@ using Hash17.Files;
 using Hash17.FilesSystem.Files;
 using Hash17.Terminal_;
 using Hash17.Utils;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace Hash17.Programs.Implementation

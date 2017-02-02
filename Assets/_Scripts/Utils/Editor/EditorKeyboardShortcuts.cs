@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 namespace Hash17.Utils
@@ -17,3 +18,4 @@ namespace Hash17.Utils
         }
     }
 }
+#endif

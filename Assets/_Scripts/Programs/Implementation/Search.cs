@@ -14,10 +14,10 @@ namespace Hash17.Programs.Implementation
         {
             ProgramParameter.Param param;
 
-            bool all = Parameters.TryGetParam("all", out param);
+            bool any = Parameters.TryGetParam("any", out param);
             bool only = Parameters.TryGetParam("only", out param);
 
-            if (!(all || only || Parameters.TryGetParam("", out param)))
+            if (!(any || only || Parameters.TryGetParam("", out param)))
             {
                 ShowHelp();
                 yield break;
@@ -37,7 +37,7 @@ namespace Hash17.Programs.Implementation
             terms = terms.Distinct().ToArray();
 
             List<File> files;
-            if (all)
+            if (any)
             {
                 files = Alias.Board.CurrentDevice.FileSystem.AllFiles;
             }
