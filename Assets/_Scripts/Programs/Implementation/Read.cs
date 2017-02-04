@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Hash17.Blackboard_;
+﻿using System.Collections;
+using FH.Util.Extensions;
 using Hash17.Files;
 using Hash17.FilesSystem.Files;
-using Hash17.Terminal_;
 using Hash17.Utils;
 
 namespace Hash17.Programs.Implementation
@@ -31,7 +26,7 @@ namespace Hash17.Programs.Implementation
                 {
                     if (file.FileType != FileType.Text)
                     {
-                        Alias.Term.ShowText(TextBuilder.WarningText("This is not a text file."));
+                        Alias.Term.ShowText(TextBuilder.WarningText("{0} is not a text file.".InLineFormat(file.Name)));
                     }
                     else
                     {

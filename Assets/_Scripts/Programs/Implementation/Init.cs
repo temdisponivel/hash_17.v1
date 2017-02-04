@@ -40,9 +40,7 @@ namespace Hash17.Programs.Implementation
         {
             yield return _textAssetRequest;
             _initTextAsset = _textAssetRequest.asset as TextAsset;
-            Alias.Term.BeginIdentation();
             yield return Alias.Term.ShowTypeWriterTextWithCancel(_initTextAsset.text, startOnNewLine: true, callback: FinishShowingMessage);
-            Alias.Term.EndIdentation();
         }
 
         private void FinishShowingMessage()
@@ -53,7 +51,6 @@ namespace Hash17.Programs.Implementation
             file.FileType = FileType.Text;
             Alias.Term.ShowText(TextBuilder.WarningText("This message was saved to file 'vox_populi_msg.txt' and can be opened using 'read' program."));
             UnblockInput();
-            Alias.Term.RunProgram(Alias.Board.ProgramDefinitionById[ProgramId.Timer], "10");
         }
     }
 }

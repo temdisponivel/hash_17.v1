@@ -23,7 +23,9 @@ namespace Hash17.Programs.Implementation
             {
                 for (int i = 0; i < Alias.Board.Devices.Count; i++)
                 {
-                    Alias.Term.ShowText(string.Format("{0}: {1}", Alias.Board.Devices[i].UniqueId, Alias.Board.Devices[i].Name));
+                    var deviceId = TextBuilder.BuildText(Alias.Board.Devices[i].UniqueId, Alias.GameConfig.DeviceIdColor);
+                    var deviceName = Alias.Board.Devices[i].Name;
+                    Alias.Term.ShowText(string.Format("ID: {0} | NAME: {1}", deviceId, deviceName));
                 }
             }
             else if (Parameters.TryGetParam("c", out param) || Parameters.TryGetParam("", out param))

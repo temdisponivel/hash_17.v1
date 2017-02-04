@@ -27,6 +27,8 @@ namespace Hash17.Utils
         public Color SecureFileColor;
         public Color DirectoryColor;
 
+        public Color DeviceIdColor;
+
         public Color WarningMessageColor;
         public Color ErrorMessageColor;
         public Color CommonMessageColor;

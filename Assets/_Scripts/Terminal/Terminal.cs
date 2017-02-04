@@ -12,6 +12,7 @@ namespace Hash17.Terminal_
 
         public UIPanel RootPanel;
         public GameObject TextEntryPrefab;
+        public UIScrollView TextScrollView;
         public UITable TextTable;
         public UIInput Input;
         public UILabel LabelUserNameLocation;
@@ -55,6 +56,17 @@ namespace Hash17.Terminal_
             set { _showTextWhenNotTreatingInput = value; }
         }
 
+        private bool _hideUserLocationLabel = false;
+        public bool HideUserLocationLabel
+        {
+            get { return _hideUserLocationLabel; }
+            set
+            {
+                _hideUserLocationLabel = value;
+                LabelUserNameLocation.gameObject.SetActive(!_hideUserLocationLabel);
+            }
+        }
+
         #endregion
 
         #region User name
@@ -72,7 +84,13 @@ namespace Hash17.Terminal_
 
         public string CurrentLocationAndUserName
         {
-            get { return string.Format("{0}:{1}>", Alias.Board.CurrentDevice.UniqueId, Alias.Board.FileSystem.CurrentDirectory.Path); }
+            get
+            {
+                var deviceId = TextBuilder.BuildText(Alias.Board.CurrentDevice.UniqueId, Alias.GameConfig.DeviceIdColor);
+                var currentDir = TextBuilder.BuildText(Alias.Board.FileSystem.CurrentDirectory.Path, Alias.GameConfig.DirectoryColor);
+
+                return string.Format("{0} : {1}", deviceId, currentDir);
+            }
         }
 
         #endregion
@@ -144,6 +162,8 @@ namespace Hash17.Terminal_
                 ClearInput();
             }
 
+            RepositionText();
+
             if (OnInputSubmited != null)
                 OnInputSubmited(value);
         }
@@ -211,6 +231,7 @@ namespace Hash17.Terminal_
             UpdateUserNameLocation();
             _currentNavigationCommandIndex = -1;
             Input.isSelected = true;
+            RepositionText();
         }
 
         public void UpdateUserNameLocation()
@@ -251,17 +272,12 @@ namespace Hash17.Terminal_
             if (ident)
                 BeginIdentation();
 
-            entry.Setup(showLocation ? CurrentLocationAndUserName : "", _identationBuilder + text, TextTable.transform);
+            entry.Setup(showLocation ? CurrentLocationAndUserName + " >" : "", _identationBuilder + text, TextTable.transform);
 
             if (ident)
                 EndIdentation();
 
-            CoroutineHelper.Instance.WaitAndCall(() =>
-            {
-                TextTable.Reposition();
-            }, 0.1f);
-
-            //TextTable.Reposition();
+            RepositionText();
         }
 
         public Coroutine ShowTypeWriterTextWithCancel(string text, float intervalBetweenChars = .02f,
@@ -338,7 +354,7 @@ namespace Hash17.Terminal_
             for (int i = 0; quantity > 0 && i < TextTable.GetChildList().Count; i++)
             {
                 quantity--;
-
+                
                 if (TextTable.GetChildList()[i])
                     Destroy(TextTable.GetChildList()[i].gameObject);
             }
@@ -362,6 +378,12 @@ namespace Hash17.Terminal_
                 _identationBuilder.Remove(0, _identationBuilder.Length - 1);
         }
 
+        public void RepositionText()
+        {
+            TextTable.Reposition();
+            TextScrollView.ResetPosition();
+        }
+        
         #endregion
 
         #region Callbacks

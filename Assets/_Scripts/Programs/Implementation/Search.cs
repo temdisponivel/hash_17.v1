@@ -69,7 +69,7 @@ namespace Hash17.Programs.Implementation
 
                 hasFiles = true;
 
-                content = currentFile.Content.SubString(10, 10, terms);
+                content = currentFile.Content.SubString(15, 15, terms);
                 string name = currentFile.Name;
 
                 for (int j = 0; j < terms.Length; j++)

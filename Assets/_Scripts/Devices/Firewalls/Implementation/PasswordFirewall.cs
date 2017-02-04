@@ -32,7 +32,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         void InputSubmited(string input)
         {
             var passDevice = Device as PasswordedDevice;
-            var result = passDevice.Password == input;
+            var result = passDevice.Password.Trim() == input.Trim();
             if (Callback != null)
             {
                 if (result)
@@ -67,6 +67,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         {
             Alias.Term.TreatInput = false;
             Alias.Term.ShowTextWhenNotTreatingInput = true;
+            Alias.Term.HideUserLocationLabel = true;
             Alias.Term.OnInputSubmited += InputSubmited;
         }
 
@@ -74,6 +75,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         {
             Alias.Term.TreatInput = true;
             Alias.Term.ShowTextWhenNotTreatingInput = false;
+            Alias.Term.HideUserLocationLabel = false;
             Alias.Term.OnInputSubmited -= InputSubmited;
         }
     }

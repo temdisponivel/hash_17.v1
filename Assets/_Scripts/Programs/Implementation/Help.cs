@@ -15,8 +15,6 @@ namespace Hash17.Programs.Implementation
         {
             BlockInput();
 
-            Alias.Term.BeginIdentation();
-
             var programs = Alias.Board.ProgramsByCommand;
 
             foreach (var program in programs)
@@ -41,8 +39,6 @@ namespace Hash17.Programs.Implementation
                 Alias.Term.ShowText(program.Value.Description, ident: true);
                 yield return null;
             }
-
-            Alias.Term.EndIdentation();
 
             UnblockInput();
         }
