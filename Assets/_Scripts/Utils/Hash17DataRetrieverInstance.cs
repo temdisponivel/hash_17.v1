@@ -48,11 +48,11 @@ namespace Hash17.Utils
             for (var i = 0; i < _spreadSheetResults.Length; i++)
             {
                 var current = _spreadSheetResults[i];
-                var id = (ProgramId) Enum.Parse(typeof(ProgramId), current["Id"].ToString());
+                var id = (ProgramId)Enum.Parse(typeof(ProgramId), current["Id"].ToString());
                 var prog = GetProgramInstance(id, current);
                 results.Add(prog);
             }
-            
+
             var serializedData = JsonConvert.SerializeObject(results,
                         new JsonSerializerSettings()
                         {
@@ -73,42 +73,49 @@ namespace Hash17.Utils
         private Program GetProgramInstance(ProgramId id, JsonData current)
         {
             Program result = null;
-            switch (id)
-            {
-                case ProgramId.Clear:
-                    result = new Clear();
-                    break;
-                case ProgramId.Cd:
-                    result = new Cd();
-                    break;
-                case ProgramId.Read:
-                    result = new Read();
-                    break;
-                case ProgramId.Search:
-                    result = new Search();
-                    break;
-                case ProgramId.Help:
-                    result = new Help();
-                    break;
-                case ProgramId.Init:
-                    result = new Init();
-                    break;
-                case ProgramId.Connect:
-                    result = new Connect();
-                    break;
-                case ProgramId.Cypher:
-                    result = new Cypher();
-                    break;
-                case ProgramId.Open:
-                    result = new Open();
-                    break;
-                case ProgramId.Timer:
-                    result = new Timer();
-                    break;
-            }
+            //switch (id)
+            //{
+            //    case ProgramId.Clear:
+            //        result = new Clear();
+            //        break;
+            //    case ProgramId.Cd:
+            //        result = new Cd();
+            //        break;
+            //    case ProgramId.Read:
+            //        result = new Read();
+            //        break;
+            //    case ProgramId.Search:
+            //        result = new Search();
+            //        break;
+            //    case ProgramId.Help:
+            //        result = new Help();
+            //        break;
+            //    case ProgramId.Init:
+            //        result = new Init();
+            //        break;
+            //    case ProgramId.Connect:
+            //        result = new Connect();
+            //        break;
+            //    case ProgramId.Cypher:
+            //        result = new Cypher();
+            //        break;
+            //    case ProgramId.Open:
+            //        result = new Open();
+            //        break;
+            //    case ProgramId.Timer:
+            //        result = new Timer();
+            //        break;
+            //    case ProgramId.Set:
+            //        result = new Set();
+            //        break;
+            //}
+            var typeName = "Hash17.Programs.Implementation.{0}".InLineFormat(id.ToString());
+            Debug.Log(typeName);
+            var programType = Type.GetType(typeName);
+            result = Activator.CreateInstance(programType) as Program;
 
             SetProgramBaseProperties(id, result, current);
-            
+
             return result;
         }
 
@@ -135,7 +142,7 @@ namespace Hash17.Utils
                 prog.KnownParametersAndOptions[i] = prog.KnownParametersAndOptions[i].Trim();
             }
         }
-        
+
         #endregion
 
         #region Fetch Devices
@@ -148,7 +155,7 @@ namespace Hash17.Utils
         private IEnumerator RunFetchDeviceInfos(string spreadSheetId)
         {
             var results = new List<Device>();
-            
+
             yield return StartCoroutine(GetData(spreadSheetId, "Files"));
 
             Debug.Log("FINISH RETRIEVING FILEs FROM GOOGLE");
@@ -171,7 +178,7 @@ namespace Hash17.Utils
 
                 files[deviceUniqueId].Add(file);
             }
-            
+
             yield return StartCoroutine(GetData(spreadSheetId, "Devices"));
 
             Debug.Log("FINISH RETRIEVING DEVICES FROM GOOGLE");
@@ -186,7 +193,7 @@ namespace Hash17.Utils
             for (var i = 0; i < _spreadSheetResults.Length; i++)
             {
                 var current = _spreadSheetResults[i];
-                var deviceType = (DeviceType) Enum.Parse(typeof (DeviceType), current["DeviceType"].ToString());
+                var deviceType = (DeviceType)Enum.Parse(typeof(DeviceType), current["DeviceType"].ToString());
                 var device = GetDeviceInstance(deviceType, current, files);
                 results.Add(device);
             }
@@ -219,7 +226,7 @@ namespace Hash17.Utils
                 Password = current["Password"].ToString(),
             };
 
-            var fileType = (FileType) Enum.Parse(typeof (FileType), current["FileType"].ToString());
+            var fileType = (FileType)Enum.Parse(typeof(FileType), current["FileType"].ToString());
             file.FileType = fileType;
 
             return current["DeviceUniqueId"].ToString();
@@ -250,7 +257,7 @@ namespace Hash17.Utils
         {
             var uniqueId = currentDevice["UniqueId"].ToString();
             var name = currentDevice["Name"].ToString();
-            var firewallType = (FirewallType) Enum.Parse(typeof (FirewallType), currentDevice["FirewallType"].ToString());
+            var firewallType = (FirewallType)Enum.Parse(typeof(FirewallType), currentDevice["FirewallType"].ToString());
             var specialPrograms = currentDevice["SpecialPrograms"].ToString().Trim();
             var dicSpecialProgram = new Dictionary<ProgramId, int>();
             if (!string.IsNullOrEmpty(specialPrograms))
@@ -270,7 +277,7 @@ namespace Hash17.Utils
             prog.Name = name;
             prog.FirewallType = firewallType;
             prog.SpecialPrograms = dicSpecialProgram;
-            
+
             FileSystem fileSystem = new FileSystem();
             prog.FileSystem = fileSystem;
 
@@ -312,7 +319,7 @@ namespace Hash17.Utils
                 Destroy(gameObject);
                 yield break;
             }
-            
+
             for (var i = 0; i < _spreadSheetResults.Length; i++)
             {
                 var current = _spreadSheetResults[i];

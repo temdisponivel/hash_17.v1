@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
+using Hash17.MockSystem;
 using Hash17.Programs;
 using Hash17.Utils;
 
@@ -16,9 +18,10 @@ namespace Hash17.Terminal_
         public UITable TextTable;
         public UIInput Input;
         public UILabel LabelUserNameLocation;
+        public UILabel CarrotLabel;
 
-        private readonly System.Collections.Generic.List<Program> _runningPrograms = new System.Collections.Generic.List<Program>();
-        public System.Collections.Generic.List<Program> RunningPrograms
+        private readonly List<Program> _runningPrograms = new List<Program>();
+        public List<Program> RunningPrograms
         {
             get
             {
@@ -70,14 +73,13 @@ namespace Hash17.Terminal_
         #endregion
 
         #region User name
-
-        private string _currentUserName;
+        
         public string CurrentUserName
         {
-            get { return _currentUserName; }
+            get { return Alias.Board.SystemVariable[SystemVariableType.USERNAME]; }
             set
             {
-                _currentUserName = value;
+                Alias.Board.SystemVariable[SystemVariableType.USERNAME] = value;
                 UpdateUserNameLocation();
             }
         }
@@ -86,10 +88,11 @@ namespace Hash17.Terminal_
         {
             get
             {
+                var userName = TextBuilder.BuildText(CurrentUserName, Alias.GameConfig.UserNameColor);
                 var deviceId = TextBuilder.BuildText(Alias.Board.CurrentDevice.UniqueId, Alias.GameConfig.DeviceIdColor);
                 var currentDir = TextBuilder.BuildText(Alias.Board.FileSystem.CurrentDirectory.Path, Alias.GameConfig.DirectoryColor);
 
-                return string.Format("{0} : {1}", deviceId, currentDir);
+                return string.Format("{0} @ {1} : {2}", userName, deviceId, currentDir);
             }
         }
 
@@ -97,7 +100,7 @@ namespace Hash17.Terminal_
 
         #region Commands
 
-        public readonly System.Collections.Generic.List<string> AllCommandsTyped = new System.Collections.Generic.List<string>();
+        public readonly List<string> AllCommandsTyped = new List<string>();
         private int _currentNavigationCommandIndex = -1;
 
         #endregion
@@ -124,12 +127,14 @@ namespace Hash17.Terminal_
 
         protected void Start()
         {
-            ClearInput();
             Alias.Board.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
+            Alias.Board.SystemVariable.OnSystemVariableChange += OnSystemVariableChange;
             RunProgram(Alias.Board.SpecialPrograms[ProgramId.Init], string.Empty);
-            CurrentUserName = "temdisponivel";
             Input.label.SetupWithHash17Settings();
             LabelUserNameLocation.SetupWithHash17Settings();
+            CarrotLabel.SetupWithHash17Settings();
+            CarrotLabel.text = Alias.GameConfig.CarrotChar;
+            UpdateUserNameLocation();
         }
 
         #endregion
@@ -257,6 +262,15 @@ namespace Hash17.Terminal_
                 var newText = NGUITools.AddChild(TextTable.gameObject, TextEntryPrefab);
                 newText.transform.SetAsFirstSibling();
                 entry = newText.GetComponent<TextEntry>();
+
+                if (showLocation)
+                {
+                    entry.Setup(CurrentLocationAndUserName, string.Empty, TextTable.transform);
+
+                    newText = NGUITools.AddChild(TextTable.gameObject, TextEntryPrefab);
+                    newText.transform.SetAsFirstSibling();
+                    entry = newText.GetComponent<TextEntry>();
+                }
             }
             else
             {
@@ -272,7 +286,7 @@ namespace Hash17.Terminal_
             if (ident)
                 BeginIdentation();
 
-            entry.Setup(showLocation ? CurrentLocationAndUserName + " >" : "", _identationBuilder + text, TextTable.transform);
+            entry.Setup(showLocation ? Alias.GameConfig.CarrotChar : string.Empty, _identationBuilder + text, TextTable.transform);
 
             if (ident)
                 EndIdentation();
@@ -422,6 +436,16 @@ namespace Hash17.Terminal_
             ClearInput();
         }
 
+        public void OnSystemVariableChange(SystemVariableType variableType)
+        {
+            switch (variableType)
+            {
+                case SystemVariableType.USERNAME:
+                    UpdateUserNameLocation();
+                    break;
+            }
+        }
+        
         #endregion
     }
 }

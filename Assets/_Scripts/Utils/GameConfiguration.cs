@@ -17,6 +17,7 @@ namespace Hash17.Utils
         public UIFont TextFont;
         public Color TextColor;
         public int TextSize;
+        public string CarrotChar;
 
         #endregion
 
@@ -28,6 +29,7 @@ namespace Hash17.Utils
         public Color DirectoryColor;
 
         public Color DeviceIdColor;
+        public Color UserNameColor;
 
         public Color WarningMessageColor;
         public Color ErrorMessageColor;

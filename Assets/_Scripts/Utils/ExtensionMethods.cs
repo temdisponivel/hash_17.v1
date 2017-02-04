@@ -2,8 +2,10 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Hash17.Utils
@@ -16,27 +18,27 @@ namespace Hash17.Utils
 
         public static string Encrypt(this string text, string password)
         {
-            if (string.IsNullOrEmpty(text))
+            if (String.IsNullOrEmpty(text))
             {
                 throw new ArgumentException("An empty string value cannot be encrypted.");
             }
 
-            if (string.IsNullOrEmpty(password))
+            if (String.IsNullOrEmpty(password))
             {
                 throw new ArgumentException("Cannot encrypt using an empty key. Please supply an encryption key.");
             }
 
-            return string.Format("Encrypted data: \n {0}", BitConverter.ToString(Encoding.ASCII.GetBytes(text)));
+            return String.Format("Encrypted data: \n {0}", BitConverter.ToString(Encoding.ASCII.GetBytes(text)));
 
 
-            System.Security.Cryptography.CspParameters cspp = new System.Security.Cryptography.CspParameters();
+            CspParameters cspp = new CspParameters();
             cspp.KeyContainerName = password;
 
-            System.Security.Cryptography.RSACryptoServiceProvider rsa =
-                new System.Security.Cryptography.RSACryptoServiceProvider(cspp);
+            RSACryptoServiceProvider rsa =
+                new RSACryptoServiceProvider(cspp);
             rsa.PersistKeyInCsp = true;
 
-            byte[] bytes = rsa.Encrypt(System.Text.UTF8Encoding.UTF8.GetBytes(text), true);
+            byte[] bytes = rsa.Encrypt(UTF8Encoding.UTF8.GetBytes(text), true);
 
             return BitConverter.ToString(bytes);
         }
@@ -45,33 +47,33 @@ namespace Hash17.Utils
         {
             string result = null;
 
-            if (string.IsNullOrEmpty(text))
+            if (String.IsNullOrEmpty(text))
             {
                 throw new ArgumentException("An empty string value cannot be encrypted.");
             }
 
-            if (string.IsNullOrEmpty(password))
+            if (String.IsNullOrEmpty(password))
             {
                 throw new ArgumentException("Cannot decrypt using an empty key. Please supply a decryption key.");
             }
 
             try
             {
-                System.Security.Cryptography.CspParameters cspp = new System.Security.Cryptography.CspParameters();
+                CspParameters cspp = new CspParameters();
                 cspp.KeyContainerName = password;
 
-                System.Security.Cryptography.RSACryptoServiceProvider rsa =
-                    new System.Security.Cryptography.RSACryptoServiceProvider(cspp);
+                RSACryptoServiceProvider rsa =
+                    new RSACryptoServiceProvider(cspp);
                 rsa.PersistKeyInCsp = true;
 
                 string[] decryptArray = text.Split(new string[] { "-" }, StringSplitOptions.None);
                 byte[] decryptByteArray = Array.ConvertAll<string, byte>(decryptArray,
-                    (s => Convert.ToByte(byte.Parse(s, System.Globalization.NumberStyles.HexNumber))));
+                    (s => Convert.ToByte(Byte.Parse(s, NumberStyles.HexNumber))));
 
 
                 byte[] bytes = rsa.Decrypt(decryptByteArray, true);
 
-                result = System.Text.UTF8Encoding.UTF8.GetString(bytes);
+                result = UTF8Encoding.UTF8.GetString(bytes);
 
             }
             finally
@@ -116,7 +118,7 @@ namespace Hash17.Utils
             {
                 var current = garanteeInResult[i];
 
-                if (string.IsNullOrEmpty(current))
+                if (String.IsNullOrEmpty(current))
                     continue;
                 
                 indexOfs[current] = text.MultipleIndexOf(current, StringComparison.OrdinalIgnoreCase);
@@ -165,13 +167,18 @@ namespace Hash17.Utils
                     // add dots before or after if necessary
                     var before = (indexToStart > 0 ? "..." : "");
                     var after = (endIndex < text.Length ? "..." : "");
-                    result.Append(string.Format(before + "{0}" + after, text.Substring(indexToStart, quantity)));
+                    result.Append(String.Format(before + "{0}" + after, text.Substring(indexToStart, quantity)));
                     result.Append(";");
                     maxIndexReached = endIndex;
                 }
             }
 
             return result.ToString();
+        }
+
+        public static string InLineFormat(this string format, params object[] args)
+        {
+            return String.Format(format, args);
         }
 
         #endregion

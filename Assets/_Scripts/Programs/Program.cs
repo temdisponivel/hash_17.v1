@@ -12,7 +12,7 @@ namespace Hash17.Programs
     public class Program
     {
         #region Properties
-        
+
         public ProgramId Id;
         public int UnitqueId;
         public string Command;
@@ -40,7 +40,12 @@ namespace Hash17.Programs
         public void Execute(string parameters)
         {
             Parameters = new ProgramParameter(parameters);
-            
+
+            if (AskedForHelp(true))
+            {
+                return;
+            }
+
             Running = true;
             ExecCoroutine = StartCoroutine(InnerExecute());
             StartCoroutine(WaitToFinish());
@@ -61,7 +66,7 @@ namespace Hash17.Programs
         {
             return MemberwiseClone() as Program;
         }
-        
+
         protected bool AskedForHelp(bool showHelpIftrue)
         {
             bool result = Parameters.ContainParam("h");
@@ -75,10 +80,8 @@ namespace Hash17.Programs
 
         public void ShowHelp()
         {
-            Alias.Term.BeginIdentation();
             Alias.Term.ShowText(Description);
             Alias.Term.ShowText(Usage, ident: true);
-            Alias.Term.EndIdentation();
         }
 
         protected bool ValidateUnknowParameters(bool shouldShowUsage)
@@ -145,7 +148,7 @@ namespace Hash17.Programs
             if (Running)
                 FinishExecution();
         }
-        
+
         #endregion
 
         #region Coroutine

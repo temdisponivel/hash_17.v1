@@ -12,5 +12,6 @@
         Cypher,
         Open,
         Timer,
+        Set,
     }
 }

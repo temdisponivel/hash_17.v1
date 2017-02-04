@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
@@ -6,6 +7,7 @@ using Hash17.Devices;
 using Hash17.Devices.Firewalls;
 using Hash17.Devices.Firewalls.Implementation;
 using Hash17.Files;
+using Hash17.MockSystem;
 using Hash17.Programs;
 using Hash17.Terminal_;
 using Hash17.Utils;
@@ -122,6 +124,12 @@ namespace Hash17.Blackboard_
 
         #endregion
 
+        #region System
+        
+        public readonly SystemVariables SystemVariable = new SystemVariables();
+
+        #endregion
+
         #endregion
 
         #region Unity events
@@ -143,6 +151,7 @@ namespace Hash17.Blackboard_
             LoadPrograms();
             LoadDeviceCollection();
             LoadFirewalls();
+            LoadSystemVariables();
         }
 
         private void LoadPrograms()
@@ -187,10 +196,15 @@ namespace Hash17.Blackboard_
                 GameConfiguration = Resources.LoadAll<GameConfiguration>("")[0];
         }
 
+        public void LoadSystemVariables()
+        {
+            SystemVariable[SystemVariableType.USERNAME] = "unknown";
+        }
+
         #endregion
 
         #region Helpers
-        
+
         private void AddFilesAndDirToList(Directory dir)
         {
             AllDirectories.Add(dir);

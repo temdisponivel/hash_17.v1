@@ -14,10 +14,5 @@ namespace FH.Util.Extensions
 			transform.localScale = Vector3.one;
 			return transform;
 		}
-
-	    public static string InLineFormat(this string format, params object[] args)
-	    {
-	        return string.Format(format, args);
-	    }
 	}
 }
