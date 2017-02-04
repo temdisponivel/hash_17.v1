@@ -67,7 +67,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         {
             Alias.Term.TreatInput = false;
             Alias.Term.ShowTextWhenNotTreatingInput = true;
-            Alias.Term.HideUserLocationLabel = true;
+            Alias.Term.ShowUserLocationLabel = false;
             Alias.Term.OnInputSubmited += InputSubmited;
         }
 
@@ -75,7 +75,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         {
             Alias.Term.TreatInput = true;
             Alias.Term.ShowTextWhenNotTreatingInput = false;
-            Alias.Term.HideUserLocationLabel = false;
+            Alias.Term.ShowUserLocationLabel = true;
             Alias.Term.OnInputSubmited -= InputSubmited;
         }
     }

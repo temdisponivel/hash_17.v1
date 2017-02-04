@@ -16,6 +16,7 @@ namespace Hash17.Terminal_
         public GameObject TextEntryPrefab;
         public UIScrollView TextScrollView;
         public UITable TextTable;
+        public UIWidget TextTableWidget;
         public UIInput Input;
         public UILabel LabelUserNameLocation;
         public UILabel CarrotLabel;
@@ -59,14 +60,31 @@ namespace Hash17.Terminal_
             set { _showTextWhenNotTreatingInput = value; }
         }
 
-        private bool _hideUserLocationLabel = false;
-        public bool HideUserLocationLabel
+        private bool _showUserLocationLabel = false;
+        public bool ShowUserLocationLabel
         {
-            get { return _hideUserLocationLabel; }
+            get { return _showUserLocationLabel; }
             set
             {
-                _hideUserLocationLabel = value;
-                LabelUserNameLocation.gameObject.SetActive(!_hideUserLocationLabel);
+                _showUserLocationLabel = value;
+
+                var previousPivot = TextTableWidget.pivot;
+                TextTableWidget.pivot = UIWidget.Pivot.Top;
+
+                if (_showUserLocationLabel)
+                {
+                    LabelUserNameLocation.AssumeNaturalSize();
+                    TextTableWidget.height -= (LabelUserNameLocation.height + 5);
+                }
+                else
+                {
+                    TextTableWidget.height += (LabelUserNameLocation.height + 5);
+                    LabelUserNameLocation.height = 0;
+                }
+
+                TextTableWidget.pivot = previousPivot;
+
+                RepositionText();   
             }
         }
 
@@ -256,6 +274,8 @@ namespace Hash17.Terminal_
 
         public void ShowText(string text, bool asNewLine = true, bool ident = false, bool showLocation = false)
         {
+            RepositionText();
+
             TextEntry entry;
             if (asNewLine)
             {
