@@ -56,13 +56,55 @@ public class Window : MonoBehaviour
         get { return new Vector2(Background.width, Background.height); }
         set
         {
-            Background.SetAnchor(null, 0, 0, 0, 0);
+            var rightResizerAnchors = GetAnchorPoints(RightResizer);
+            var leftResizerAnchors = GetAnchorPoints(LeftResizer);
+            var bottomResizerAnchors = GetAnchorPoints(BottomResizer);
+            var topResizerAnchors = GetAnchorPoints(TopResizer);
+            var backgroundAnchors = GetAnchorPoints(Background);
+
+            var rightResizerSize = RightResizer.Size();
+            var leftResizerSize = LeftResizer.Size();
+            var bottomResizerSize = BottomResizer.Size();
+            var topResizerSize = TopResizer.Size();
+
+            Background.SetAnchor((GameObject) null, 0, 0, 0, 0);
             RightResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
             LeftResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
-            TopResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
             BottomResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
+            TopResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
+
             Background.width = (int) value.x;
             Background.height = (int) value.y;
+
+            // Do this stuff in multiple frames because NGUI only
+            // update anchors in different frames (if we change anchors more than 1 time per frame, it will make no difference)
+            CoroutineHelper.Instance.WaitAndCallTimes((count) =>
+            {
+                if (count == 0)
+                {
+                    UpdateResizerAnchors();
+
+                    // Update only the side that matters accordinly to resizer
+                    rightResizerSize.y = RightResizer.Size().y;
+                    leftResizerSize.y = LeftResizer.Size().y;
+                    bottomResizerSize.x = BottomResizer.Size().x;
+                    topResizerSize.x = TopResizer.Size().x;
+                }
+                else if (count == 1)
+                {
+                    // Update all resizers anchors and size to what was before
+                    SetAnchorPoints(RightResizer, rightResizerAnchors, rightResizerSize);
+                    SetAnchorPoints(LeftResizer, leftResizerAnchors, leftResizerSize);
+                    SetAnchorPoints(BottomResizer, bottomResizerAnchors, bottomResizerSize);
+                    SetAnchorPoints(TopResizer, topResizerAnchors, topResizerSize);
+                    SetAnchorPoints(Background, backgroundAnchors, default(Vector2));
+                }
+                else if (count == 2)
+                {
+                    // Update resizer's anchors
+                    UpdateResizerAnchors();
+                }
+            }, 3, null, null);
         }
     }
     
@@ -352,6 +394,51 @@ public class Window : MonoBehaviour
                     OnUnfocus();
             }
         }
+    }
+
+    #endregion
+
+    #region Helpers
+
+    public List<UIRect.AnchorPoint> GetAnchorPoints(UIWidget widget)
+    {
+        var result = new List<UIRect.AnchorPoint>();
+        result.Add(widget.rightAnchor.Clone());
+        result.Add(widget.leftAnchor.Clone());
+        result.Add(widget.bottomAnchor.Clone());
+        result.Add(widget.topAnchor.Clone());
+        return result;
+    }
+
+    public void SetAnchorPoints(UIWidget widget, List<UIRect.AnchorPoint> anchorPoints, Vector2 size)
+    {
+        widget.rightAnchor.target = anchorPoints[0].target;
+        widget.rightAnchor.relative = anchorPoints[0].relative;
+        widget.rightAnchor.absolute = anchorPoints[0].absolute;
+
+        widget.leftAnchor.target = anchorPoints[1].target;
+        widget.leftAnchor.relative = anchorPoints[1].relative;
+        widget.leftAnchor.absolute = anchorPoints[1].absolute;
+
+        widget.bottomAnchor.target = anchorPoints[2].target;
+        widget.bottomAnchor.relative = anchorPoints[2].relative;
+        widget.bottomAnchor.absolute = anchorPoints[2].absolute;
+
+        widget.topAnchor.target = anchorPoints[3].target;
+        widget.topAnchor.relative = anchorPoints[3].relative;
+        widget.topAnchor.absolute = anchorPoints[3].absolute;
+
+        if (size != default(Vector2))
+            widget.Size(size);
+    }
+
+    public void UpdateResizerAnchors()
+    {
+        Background.ResetAndUpdateAnchors();
+        RightResizer.ResetAndUpdateAnchors();
+        LeftResizer.ResetAndUpdateAnchors();
+        BottomResizer.ResetAndUpdateAnchors();
+        TopResizer.ResetAndUpdateAnchors();
     }
 
     #endregion

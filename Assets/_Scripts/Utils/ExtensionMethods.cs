@@ -198,6 +198,34 @@ namespace Hash17.Utils
 
         #endregion
 
+        #region Anchor Point
+
+        public static UIRect.AnchorPoint Clone(this UIRect.AnchorPoint anchor)
+        {
+            var result = new UIRect.AnchorPoint();
+            result.target = anchor.target;
+            result.relative = anchor.relative;
+            result.absolute = anchor.absolute;
+            return result;
+        }
+
+        #endregion
+
+        #region Widget
+
+        public static Vector2 Size(this UIWidget widget)
+        {
+            return new Vector2(widget.width, widget.height);
+        }
+
+        public static void Size(this UIWidget widget, Vector2 size)
+        {
+            widget.width = (int) size.x;
+            widget.height = (int) size.y;
+        }
+
+        #endregion
+
         #endregion
     }
 }

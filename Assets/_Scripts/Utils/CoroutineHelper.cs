@@ -22,16 +22,21 @@ namespace Hash17.Utils
                 callback();
         }
 
-        public Coroutine WaitAndCallTimes(Action<int> callback, int timesToCall, float interval, Action finishCallback)
+        public Coroutine WaitAndCallTimes(Action<int> callback, int timesToCall, YieldInstruction instruction, Action finishCallback)
         {
-            return ((MonoBehaviour) this).StartCoroutine(InnerWaitAndCallTimes(callback, timesToCall, interval, finishCallback));
+            return StartCoroutine(InnerWaitAndCallTimes(callback, timesToCall, instruction, finishCallback));
         }
 
-        private IEnumerator InnerWaitAndCallTimes(Action<int> callback, int timestoCall, float interval, Action finishCallback)
+        public Coroutine WaitAndCallTimes(Action<int> callback, int timesToCall, float interval, Action finishCallback)
+        {
+            return StartCoroutine(InnerWaitAndCallTimes(callback, timesToCall, new WaitForSeconds(interval), finishCallback));
+        }
+
+        private IEnumerator InnerWaitAndCallTimes(Action<int> callback, int timestoCall, YieldInstruction instruction, Action finishCallback)
         {
             for (int i = 0; i < timestoCall; i++)
             {
-                yield return new WaitForSeconds(interval);
+                yield return instruction;
                 if (callback != null)
                     callback(i);
             }
