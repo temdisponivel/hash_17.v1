@@ -18,6 +18,8 @@ namespace Hash17.Utils
         public Color TextColor;
         public int TextSize;
         public string CarrotChar;
+        public int MaxEntriesCount;
+        public int EntriesCountToRemoveWhenMaxed;
 
         #endregion
 

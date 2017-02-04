@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Hash17.Terminal_;
+﻿using System.Collections;
 using Hash17.Utils;
-using UnityEngine;
 
 namespace Hash17.Programs.Implementation
 {
@@ -17,25 +11,8 @@ namespace Hash17.Programs.Implementation
             {
                 yield break;
             }
-            
-            ProgramParameter.Param param;
-            if (Parameters.TryGetParam("C", out param))
-            {
-                int quant = 0;
-                if (int.TryParse(param.Value, out quant) && quant > 0)
-                {
-                    Alias.Term.Clear(quant);
-                }
-                else
-                {
-                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("Invalid value for parameter -C.\n{0}", Usage)));
-                }
-            }
-            else
-            {
-                Alias.Term.ClearAll();
-            }
 
+            Alias.Term.ClearAll();
             yield break;
         }
     }

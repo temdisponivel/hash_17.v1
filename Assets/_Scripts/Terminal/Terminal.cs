@@ -161,27 +161,38 @@ namespace Hash17.Terminal_
 
         public void InputValueChange()
         {
-            if (OnInputValueChange != null)
-                OnInputValueChange();
+            if (Input.value.Contains("\n"))
+            {
+                OnInputSubmit();
+            }
+            else
+            {
+                if (OnInputValueChange != null)
+                    OnInputValueChange();
+            }
         }
 
         public void OnInputSubmit()
         {
             string value = Input.value.Trim();
-
-            if (TreatInput)
+            value = value.Replace("\n", string.Empty);
+            if (!string.IsNullOrEmpty(value))
             {
-                TreatInputText(Input.value);
-
-                ClearInput();
-
-                value = value.Replace("\n", string.Empty);
-                if (!string.IsNullOrEmpty(value))
+                if (TreatInput)
+                {
+                    TreatInputText(value);
+                    ClearInput();
                     AllCommandsTyped.Insert(0, value);
+                }
+                else if (ShowTextWhenNotTreatingInput)
+                {
+                    ShowText(value);
+                    ClearInput();
+                }
             }
-            else if (ShowTextWhenNotTreatingInput)
+            else
             {
-                DontTreatInputText(Input.value);
+                ShowText(string.Empty);
                 ClearInput();
             }
 
@@ -190,18 +201,10 @@ namespace Hash17.Terminal_
             if (OnInputSubmited != null)
                 OnInputSubmited(value);
         }
-
-        private void DontTreatInputText(string text)
-        {
-            text = text.Replace("\n", string.Empty);
-            ShowText(text);
-        }
-
+        
         private void TreatInputText(string text)
         {
-            text = text.Replace("\n", string.Empty);
             ShowText(text, showLocation: true);
-
             string programName, programParams;
             Interpreter.GetProgram(text, out programName, out programParams);
             Program program;
@@ -274,7 +277,6 @@ namespace Hash17.Terminal_
 
         public void ShowText(string text, bool asNewLine = true, bool ident = false, bool showLocation = false)
         {
-            Debug.Log("TEXT TO SHOW: " + text, this);
             RepositionText();
 
             TextEntry entry;
@@ -311,6 +313,8 @@ namespace Hash17.Terminal_
 
             if (ident)
                 EndIdentation();
+
+            ValidaMaxEntries();
 
             RepositionText();
         }
@@ -378,7 +382,7 @@ namespace Hash17.Terminal_
 
         public void ClearAll()
         {
-            Clear(TextTable.GetChildList().Count);
+            Clear(TextTable.transform.childCount);
         }
 
         public void Clear(int quantity)
@@ -386,12 +390,16 @@ namespace Hash17.Terminal_
             if (quantity == 0)
                 return;
 
-            for (int i = 0; quantity > 0 && i < TextTable.GetChildList().Count; i++)
+            quantity = Mathf.Min(TextTable.transform.childCount, quantity);
+
+            for (int i = TextTable.GetChildList().Count - 1; i >= 0 && quantity > 0; i--)
             {
                 quantity--;
-                
+
                 if (TextTable.GetChildList()[i])
-                    Destroy(TextTable.GetChildList()[i].gameObject);
+                {
+                    Destroy(TextTable.transform.GetChild(i).gameObject);
+                }
             }
 
             TextTable.Reposition();
@@ -417,6 +425,14 @@ namespace Hash17.Terminal_
         {
             TextTable.Reposition();
             TextScrollView.ResetPosition();
+        }
+
+        public void ValidaMaxEntries()
+        {
+            if (TextTable.transform.childCount > Alias.GameConfig.MaxEntriesCount)
+            {
+                Clear(Alias.GameConfig.EntriesCountToRemoveWhenMaxed);
+            }
         }
         
         #endregion

@@ -14,18 +14,18 @@ public class Window : MonoBehaviour
 
     #region References
 
+    public UIScrollView ContentScrollView;
     public UILabel TitleLabel;
     public UISprite Topbar;
     public UISprite Background;
     public UIDragObject DragObject;
-    public UIDragObject LeftResizer;
-    public UIDragObject RightResizer;
-    public UIDragObject TopResizer;
-    public UIDragObject BottomResizer;
+    public UIWidget LeftResizer;
+    public UIWidget RightResizer;
+    public UIWidget TopResizer;
+    public UIWidget BottomResizer;
     public UIPanel MainPanel;
     public UIPanel ContentPanel;
     public GameObject CloseButton;
-    public GameObject MaximizeButton;
 
     #endregion
 
@@ -35,14 +35,13 @@ public class Window : MonoBehaviour
     public float TransitionTime;
     public float OnFocusAlpha;
     public float OutOfFocusAlpha;
+    public int TopBarHeight;
 
     #endregion
 
     #region State
 
     private UIWidget _content;
-    private bool _isMaximized;
-    private Rect _rectBeforeMaximize;
     private Vector3 _initialScale;
     private Tweener _focusTweener;
 
@@ -51,44 +50,22 @@ public class Window : MonoBehaviour
     #region Controls
 
     public string Title { get { return TitleLabel.text; } set { TitleLabel.text = value; } }
-
-    public Vector2 Position
-    {
-        get { return MainPanel.transform.position; }
-        set { MainPanel.transform.localPosition = value; }
-    }
-
+    
     public Vector2 Size
     {
         get { return new Vector2(Background.width, Background.height); }
         set
         {
-            var rightPosition = new Vector3();
-            rightPosition.z = RightResizer.transform.localPosition.z;
-            rightPosition.y = RightResizer.transform.localPosition.y;
-            rightPosition.x = LeftResizer.transform.localPosition.x + value.x;
-            RightResizer.transform.localPosition = rightPosition;
-
-            var bottomPosition = new Vector3();
-            bottomPosition.z = BottomResizer.transform.localPosition.z;
-            bottomPosition.x = BottomResizer.transform.localPosition.x;
-            bottomPosition.y = TopResizer.transform.localPosition.y - value.y - Topbar.height;
-            BottomResizer.transform.localPosition = bottomPosition;
+            Background.SetAnchor(null, 0, 0, 0, 0);
+            RightResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
+            LeftResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
+            TopResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
+            BottomResizer.SetAnchor(Background.gameObject, 0, 0, 0, 0);
+            Background.width = (int) value.x;
+            Background.height = (int) value.y;
         }
     }
-
-    [SerializeField]
-    private bool _positionLocked;
-    public bool PositionLocked
-    {
-        get { return _positionLocked; }
-        set
-        {
-            _positionLocked = value;
-            DragObject.enabled = !_positionLocked;
-        }
-    }
-
+    
     [SerializeField]
     private bool _sizeLocked;
     public bool SizeLocked
@@ -101,7 +78,6 @@ public class Window : MonoBehaviour
             RightResizer.enabled = !_sizeLocked;
             TopResizer.enabled = !_sizeLocked;
             BottomResizer.enabled = !_sizeLocked;
-            ShowMaximizeButton &= !_positionLocked;
         }
     }
 
@@ -114,18 +90,6 @@ public class Window : MonoBehaviour
         {
             _showCloseButton = value;
             CloseButton.SetActive(_showCloseButton);
-        }
-    }
-
-    [SerializeField]
-    private bool _showMaximizeButton;
-    public bool ShowMaximizeButton
-    {
-        get { return _showMaximizeButton; }
-        set
-        {
-            _showMaximizeButton = value;
-            MaximizeButton.SetActive(_showMaximizeButton);
         }
     }
 
@@ -255,8 +219,6 @@ public class Window : MonoBehaviour
     {
         Title = title;
         ShowCloseButton = showCloseButtons;
-        ShowMaximizeButton = showMaximizeButton;
-        PositionLocked = lockPosition;
         if (startClosed)
             transform.localScale = Vector3.zero;
         ShowObject(content);
@@ -264,6 +226,7 @@ public class Window : MonoBehaviour
 
     public void Destroy()
     {
+        _allOpenedWindows.Remove(this);
         DestroyImmediate(gameObject);
     }
 
@@ -281,6 +244,8 @@ public class Window : MonoBehaviour
         {
             if (callback != null)
                 callback();
+
+            UpdateScrolls();
         });
         gameObject.SetActive(true);
     }
@@ -298,41 +263,12 @@ public class Window : MonoBehaviour
             if (destroyAfter)
                 Destroy();
 
-            _allOpenedWindows.Remove(this);
+            UpdateScrolls();
         });
     }
 
     #endregion
-
-    #region Maximize
-
-    public void ToggleMaximize()
-    {
-        if (_isMaximized)
-            Restore();
-        else
-            Maximize();
-
-        _isMaximized = !_isMaximized;
-    }
-
-    public void Maximize()
-    {
-        _rectBeforeMaximize = new Rect(Position, Size);
-        var rootSize = Alias.Term.RootPanel.GetViewSize();
-        Size = rootSize;
-        Position = Vector2.zero;
-        Alias.Term.RootPanel.ConstrainTargetToBounds(MainPanel.transform, true);
-    }
-
-    public void Restore()
-    {
-        Size = new Vector2(_rectBeforeMaximize.width, _rectBeforeMaximize.height);
-        Position = _rectBeforeMaximize.position;
-    }
-
-    #endregion
-
+    
     #region Stack
 
     public void BringToFront()
@@ -359,18 +295,28 @@ public class Window : MonoBehaviour
 
     public void ShowObject(UIWidget content)
     {
+        UpdateScrolls();
+
         if (_content != null)
             HideObject();
 
         content.transform.SetParent(ContentPanel.transform);
         content.transform.Reset();
         _content = content;
+        Size = new Vector2(_content.width, _content.height + TopBarHeight);
+
+        UpdateScrolls();
     }
 
     public void HideObject()
     {
         _content.transform.SetParent(null);
         _content = null;
+    }
+
+    private void UpdateScrolls()
+    {
+        ContentScrollView.ResetPosition();
     }
 
     #endregion

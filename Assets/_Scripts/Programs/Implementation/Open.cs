@@ -44,11 +44,6 @@ namespace Hash17.Programs.Implementation
             {
                 UIWidget content;
 
-                var rootPanelSize = Alias.Term.RootPanel.GetViewSize();
-
-                var windowWidth = (rootPanelSize.x / 3) *2;
-                var windowHeight = rootPanelSize.y/2;
-
                 var window = Window.Create();
                 
                 if (file.CanBeRead && file.FileType == FileType.Image)
@@ -59,8 +54,6 @@ namespace Hash17.Programs.Implementation
                     content = image;
                     image.width = texture.width;
                     image.height = texture.height;
-                    windowWidth = texture.width;
-                    windowHeight = texture.height;
 
                     content.rightAnchor.target = window.ContentPanel.transform;
                     content.leftAnchor.target = window.ContentPanel.transform;
@@ -76,7 +69,6 @@ namespace Hash17.Programs.Implementation
                     label.rightAnchor.target = window.ContentPanel.transform;
                     label.leftAnchor.target = window.ContentPanel.transform;
                     content = label;
-                    windowWidth = label.width;
                 }
 
                 window.LosesFocus = true;
@@ -85,7 +77,6 @@ namespace Hash17.Programs.Implementation
                     content,
                     showMaximizeButton: false,
                     startClosed: true);
-                window.Size = new Vector2(windowWidth, windowHeight);
             }
             else
             {
