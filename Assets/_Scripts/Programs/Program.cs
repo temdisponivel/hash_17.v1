@@ -21,6 +21,7 @@ namespace Hash17.Programs
         public string[] KnownParametersAndOptions;
         public bool Global = true;
         public virtual string AditionalData { get; set; }
+        public virtual bool ManuallyFinished { get; set; }
 
         public ProgramParameter Parameters { get; set; }
         public bool Running { get; private set; }
@@ -48,7 +49,9 @@ namespace Hash17.Programs
 
             Running = true;
             ExecCoroutine = StartCoroutine(InnerExecute());
-            StartCoroutine(WaitToFinish());
+
+            if (!ManuallyFinished)
+                StartCoroutine(WaitToFinish());
 
             if (OnStart != null)
                 OnStart(this);

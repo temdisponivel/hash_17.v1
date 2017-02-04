@@ -13,6 +13,12 @@ namespace Hash17.Programs.Implementation
 {
     public class Connect : Program
     {
+        public override bool ManuallyFinished
+        {
+            get { return true; }
+            set { }
+        }
+
         protected override IEnumerator InnerExecute()
         {
             if (HelpOrUnknownParameters(true))
@@ -27,14 +33,20 @@ namespace Hash17.Programs.Implementation
                     var deviceName = Alias.Board.Devices[i].Name;
                     Alias.Term.ShowText(string.Format("ID: {0} | NAME: {1}", deviceId, deviceName));
                 }
+
+                FinishExecution();
+                yield break;
             }
-            else if (Parameters.TryGetParam("c", out param) || Parameters.TryGetParam("", out param))
+
+            if (Parameters.TryGetParam("c", out param) || Parameters.TryGetParam("", out param))
             {
                 var deviceId = param.Value;
                 Device device;
                 if (!Alias.Board.DevicesById.TryGetValue(deviceId, out device))
                 {
                     Alias.Term.ShowText(TextBuilder.WarningText("Device not found."));
+
+                    FinishExecution();
                 }
                 else
                 {
@@ -51,13 +63,17 @@ namespace Hash17.Programs.Implementation
                         {
                             Alias.Term.ShowText(TextBuilder.ErrorText("Access denied."));
                         }
+
+                        FinishExecution();
                     });
                 }
+
+                yield break;
             }
-            else
-            {
-                ShowHelp();
-            }
+
+            ShowHelp();
+
+            FinishExecution();
         }
     }
 }

@@ -274,6 +274,7 @@ namespace Hash17.Terminal_
 
         public void ShowText(string text, bool asNewLine = true, bool ident = false, bool showLocation = false)
         {
+            Debug.Log("TEXT TO SHOW: " + text, this);
             RepositionText();
 
             TextEntry entry;
