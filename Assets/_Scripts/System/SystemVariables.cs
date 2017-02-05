@@ -4,24 +4,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Hash17.Utils;
+using UnityEngine;
 
 namespace Hash17.MockSystem
 {
     public class SystemVariables
     {
-        #region Events
+        #region Properties
+
+        private readonly Dictionary<SystemVariableType, string> _innerdiDictionary = new Dictionary<SystemVariableType, string>();
 
         public event Action<SystemVariableType> OnSystemVariableChange;
 
         #endregion
-
-        private readonly Dictionary<SystemVariableType, string> _innerdiDictionary = new Dictionary<SystemVariableType, string>();
 
         #region IDictionary
         
         public void Add(KeyValuePair<SystemVariableType, string> item)
         {
             _innerdiDictionary.Add(item.Key, item.Value);
+            PlayerPrefs.SetString(item.Key.ToString(), item.Value);
             if (OnSystemVariableChange != null)
                 OnSystemVariableChange(item.Key);
         }
@@ -68,10 +70,16 @@ namespace Hash17.MockSystem
 
         public string this[SystemVariableType key]
         {
-            get { return _innerdiDictionary[key]; }
+            get
+            {
+                if (!_innerdiDictionary.ContainsKey(key))
+                    this[key] = PlayerPrefs.GetString(key.ToString(), "default");
+                return _innerdiDictionary[key];
+            }
             set
             {
                 _innerdiDictionary[key] = value;
+                PlayerPrefs.SetString(key.ToString(), value);
                 if (OnSystemVariableChange != null)
                     OnSystemVariableChange(key);
             }

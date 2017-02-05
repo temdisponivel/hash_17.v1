@@ -25,7 +25,7 @@ namespace Hash17.Utils
 
         public static string BuildText(string text, Color color)
         {
-            return string.Format("[{1}]{0}[-]", text, color.ToRGBHex());
+            return text.Colorize(color);
         }
 
         public static string ToRGBHex(this Color color)

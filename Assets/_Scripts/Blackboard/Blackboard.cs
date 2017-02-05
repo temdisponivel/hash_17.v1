@@ -146,7 +146,6 @@ namespace Hash17.Blackboard_
             LoadPrograms();
             LoadDeviceCollection();
             LoadFirewalls();
-            LoadSystemVariables();
         }
 
         private void LoadPrograms()
@@ -189,11 +188,6 @@ namespace Hash17.Blackboard_
         {
             if (GameConfiguration == null)
                 GameConfiguration = Resources.LoadAll<GameConfiguration>("")[0];
-        }
-
-        public void LoadSystemVariables()
-        {
-            SystemVariable[SystemVariableType.USERNAME] = "unknown";
         }
 
         #endregion

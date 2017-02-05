@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
@@ -199,14 +200,55 @@ namespace Hash17.Utils
 
         #endregion
 
-        #region System Variable
+        #region Input
 
         public static string ClearInput(this string text)
         {
             return text.Trim().Replace("\n", string.Empty);
         }
 
+        #endregion
+
+        #region System Variable
+
         public static string HandleSystemVariables(this string text)
+        {
+            if (!text.Contains(Alias.GameConfig.CharToConsiderSystemVariable))
+                return text;
+
+            var toReplace = new Dictionary<string, string>();
+            var occurencies = text.MultipleIndexOf(Alias.GameConfig.CharToConsiderSystemVariable, StringComparison.OrdinalIgnoreCase);
+            for (int i = 0; i < occurencies.Count - 1; i++, i++)
+            {
+                var startIndex = occurencies[i];
+                var endIndex = occurencies[i + 1];
+
+                var variable = text.Substring(startIndex + 1, endIndex - startIndex - 1);
+
+                if (Enum.IsDefined(typeof(SystemVariableType), variable))
+                {
+                    var variableType = (SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable);
+
+                    string value;
+                    if (Alias.Board.SystemVariable.TryGetValue(variableType, out value))
+                        toReplace[variable] = value.ColorizeSystemVariable(variableType);
+                }
+            }
+
+            if (toReplace.Count > 0)
+            {
+                var builder = new StringBuilder(text);
+                foreach (var entry in toReplace)
+                {
+                    builder.Replace("{0}{1}{0}".InLineFormat(Alias.GameConfig.CharToConsiderSystemVariable, entry.Key), entry.Value);
+                }
+                text = builder.ToString();
+            }
+
+            return text;
+        }
+
+        public static string HandleCampaignState(this string text)
         {
             if (!text.Contains(Alias.GameConfig.CharToConsiderSystemVariable))
                 return text;
@@ -241,6 +283,92 @@ namespace Hash17.Utils
             }
 
             return text;
+        }
+
+        public static string ColorizeSystemVariable(this string text, SystemVariableType type)
+        {
+            switch (type)
+            {
+                case SystemVariableType.USERNAME:
+                    return TextBuilder.BuildText(text, Alias.GameConfig.UserNameColor);
+            }
+
+            return text;
+        }
+
+        #endregion
+
+        #region Color
+
+        public static string Colorize(this string text, Color color)
+        {
+            return string.Format("[{1}]{0}[-]", text, color.ToRGBHex());
+        }
+
+        #endregion
+
+        #region Timing
+
+        public static List<Tuple<string, float>> GetStringAndTime(this string text)
+        {
+            const int lookingForTime = 0;
+            const int readingTime = 1;
+
+
+            var currentState = lookingForTime;
+            var builder = new StringBuilder();
+            var currentTuple = new Tuple<string, float>();
+            var result = new List<Tuple<string, float>>();
+            for (int i = 0; i < text.Length; i++)
+            {
+                var currentChar = text[i];
+
+                if (currentState == lookingForTime)
+                {
+                    if (currentChar == Alias.GameConfig.CharToConsiderTime)
+                    {
+                        currentTuple.Key = builder.ToString();
+                        builder.Remove(0, builder.Length);
+                        currentState = readingTime;
+                    }
+                    else
+                    {
+                        builder.Append(currentChar);
+                    }
+                }
+                else if (currentState == readingTime)
+                {
+                    if (currentChar == Alias.GameConfig.CharToConsiderTime)
+                    {
+                        float time;
+                        if (float.TryParse(builder.ToString(), out time))
+                        {
+                            currentState = lookingForTime;
+                            builder.Remove(0, builder.Length);
+                            currentTuple.Value = time;
+                            result.Add(currentTuple);
+
+                            currentTuple = new Tuple<string, float>();
+                        }
+                        else
+                        {
+                            Debug.LogError("INVALID TIMED STRING AT {0}".InLineFormat(i));
+                        }
+                    }
+                    else
+                    {
+                        builder.Append(currentChar);
+                    }
+                }
+            }
+
+            result.Add(new Tuple<string, float>()
+            {
+                Key = builder.ToString(),
+                Value = 0,
+            });
+
+            return result;
         }
 
         #endregion

@@ -1,1 +1,10 @@
-    [D0FFB0FF]Connect[-] to VP. There's a file for you there. Use your [D0FFB0FF]password[-] to bypass the firewall.
+STARTING OS$.1$.$.1$.$.1$.
+LOADING DRIVERS$.1$.$.1$.$.1$.
+DRIVER LOADED: SOUND
+DRIVER LOADED: KEYBOARD
+PROGRAMS LOADING$.1$.$.1$.$.1$.
+$1$
+
+THIS SYSTEM IS RECOMMENDED FOR ADVANCED USERS, BE AWARE.
+
+WEAlCOME %USERNAME%.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
@@ -42,7 +43,7 @@ namespace Hash17.Terminal_
             set
             {
                 _blockInput = value;
-                Input.enabled = !_blockInput;
+                Input.gameObject.SetActive(!_blockInput);
             }
         }
 
@@ -85,6 +86,17 @@ namespace Hash17.Terminal_
                 TextTableWidget.pivot = previousPivot;
 
                 RepositionText();
+            }
+        }
+
+        private bool _showInputCarrot = false;
+        public bool ShowInputCarrot
+        {
+            get { return _showInputCarrot; }
+            set
+            {
+                _showInputCarrot = value;
+                CarrotLabel.gameObject.SetActive(_showInputCarrot);
             }
         }
 
@@ -296,6 +308,10 @@ namespace Hash17.Terminal_
 
         #region Interface
 
+        #region Show Text
+
+        #region Simple
+
         public void ShowText(string text, bool asNewLine = true, bool ident = false, bool showLocation = false)
         {
             RepositionText();
@@ -339,6 +355,10 @@ namespace Hash17.Terminal_
 
             RepositionText();
         }
+
+        #endregion
+
+        #region Type writer
 
         public Coroutine ShowTypeWriterTextWithCancel(string text, float intervalBetweenChars = .02f,
             bool startOnNewLine = false, Action callback = null)
@@ -401,6 +421,35 @@ namespace Hash17.Terminal_
             }, text.Length, intervalBetweenChars, callback);
         }
 
+        #endregion
+
+        #region Timed text
+
+        public Coroutine ShowTimedText(List<Tuple<string, float>> text, float intervalBetweenChars = .02f,
+            bool startOnNewLine = false, Action callback = null)
+        {
+            return StartCoroutine(InnerShowTimedText(text, intervalBetweenChars, startOnNewLine, callback));
+        }
+
+        public IEnumerator InnerShowTimedText(List<Tuple<string, float>> text, float intervalBetweenChars = .02f,
+            bool startOnNewLine = false, Action callback = null)
+        {
+            for (int i = 0; i < text.Count; i++)
+            {
+                yield return ShowTypeWriterTextWithCancel(text[i].Key);
+                yield return new WaitForSeconds(text[i].Value);
+            }
+
+            if (callback != null)
+                callback();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Clear
+
         public void ClearAll()
         {
             Clear(TextTable.transform.childCount);
@@ -426,6 +475,10 @@ namespace Hash17.Terminal_
             TextTable.Reposition();
         }
 
+        #endregion
+
+        #region Identation
+
         public void BeginIdentation(int quantity = 4)
         {
             for (int i = 0; i < quantity; i++)
@@ -442,6 +495,10 @@ namespace Hash17.Terminal_
                 _identationBuilder.Remove(0, _identationBuilder.Length - 1);
         }
 
+        #endregion
+
+        #region Table/Scroll
+
         public void RepositionText()
         {
             TextTable.Reposition();
@@ -455,6 +512,8 @@ namespace Hash17.Terminal_
                 Clear(Alias.GameConfig.EntriesCountToRemoveWhenMaxed);
             }
         }
+
+        #endregion
 
         #endregion
 

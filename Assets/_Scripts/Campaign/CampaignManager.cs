@@ -21,6 +21,7 @@ namespace Hash17.Campaign
 
         public void OnGameStarted()
         {
+            HasSetUserName = Alias.Board.SystemVariable.ContainsKey(SystemVariableType.USERNAME);
             Alias.Board.SystemVariable.OnSystemVariableChange += OnSystemVariableChanged;
         }
 

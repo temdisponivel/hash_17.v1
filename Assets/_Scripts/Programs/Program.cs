@@ -129,12 +129,14 @@ namespace Hash17.Programs
         {
             Alias.Term.BlockInput = true;
             Alias.Term.TreatInput = false;
+            Alias.Term.ShowInputCarrot = false;
         }
 
         protected void UnblockInput()
         {
             Alias.Term.BlockInput = false;
             Alias.Term.TreatInput = true;
+            Alias.Term.ShowInputCarrot = true;
         }
 
         protected void FinishExecution()

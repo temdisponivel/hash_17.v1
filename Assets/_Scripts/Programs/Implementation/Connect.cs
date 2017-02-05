@@ -13,16 +13,12 @@ namespace Hash17.Programs.Implementation
 {
     public class Connect : Program
     {
-        public override bool ManuallyFinished
-        {
-            get { return true; }
-            set { }
-        }
-
         protected override IEnumerator InnerExecute()
         {
             if (HelpOrUnknownParameters(true))
                 yield break;
+
+            ManuallyFinished = true;
 
             ProgramParameter.Param param;
             if (Parameters.ContainParam("s"))

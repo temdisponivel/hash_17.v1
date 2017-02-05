@@ -21,6 +21,7 @@ namespace Hash17.Utils
         public int MaxEntriesCount;
         public int EntriesCountToRemoveWhenMaxed;
         public string CharToConsiderSystemVariable;
+        public char CharToConsiderTime;
 
         #endregion
 
