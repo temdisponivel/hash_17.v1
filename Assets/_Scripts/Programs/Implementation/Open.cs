@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using Hash17.Files;
 using Hash17.FilesSystem.Files;
-using Hash17.Terminal_;
+using Hash17.MockSystem;
+using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
 
@@ -24,6 +25,9 @@ namespace Hash17.Programs.Implementation
         public string LabelPrefabPath;
         public string TexturePrefabPath;
 
+        private Window _windowOpened;
+        private Object _resourceLoaded;
+
         protected override IEnumerator InnerExecute()
         {
             if (HelpOrUnknownParameters(true))
@@ -40,7 +44,7 @@ namespace Hash17.Programs.Implementation
             var fileName = param.Value;
 
             File file;
-            if (Alias.Board.FileSystem.FindFileByPath(fileName, out file) == FileSystem.OperationResult.Ok)
+            if (DeviceCollection.FileSystem.FindFileByPath(fileName, out file) == FileSystem.OperationResult.Ok)
             {
                 UIWidget content;
 
@@ -50,6 +54,7 @@ namespace Hash17.Programs.Implementation
                 {
                     var image = Object.Instantiate(Resources.Load<GameObject>(TexturePrefabPath)).GetComponent<UITexture>();
                     var texture = Resources.Load<Texture>(file.Content);
+                    _resourceLoaded = texture;
                     image.mainTexture = texture;
                     content = image;
                     image.width = texture.width;
@@ -77,12 +82,25 @@ namespace Hash17.Programs.Implementation
                     content,
                     showMaximizeButton: false,
                     startClosed: true);
+
+                window.OnClose += OnWindowClose;
+                _windowOpened = window;
+
+                file.Open();
             }
             else
             {
                 Alias.Term.ShowText(TextBuilder.ErrorText("File not found. Use 'cd' or 'search' programs to find a file."));
                 yield break;
             }
+        }
+
+        private void OnWindowClose()
+        {
+            _windowOpened.OnClose -= OnWindowClose;
+
+            if (_resourceLoaded != null)
+                Resources.UnloadAsset(_resourceLoaded);
         }
     }
 }

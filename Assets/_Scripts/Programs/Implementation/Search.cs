@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hash17.Files;
 using Hash17.FilesSystem.Files;
+using Hash17.MockSystem;
 using Hash17.Utils;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -41,11 +42,11 @@ namespace Hash17.Programs.Implementation
             List<File> files;
             if (any)
             {
-                files = Alias.Board.CurrentDevice.FileSystem.AllFiles;
+                files = DeviceCollection.CurrentDevice.FileSystem.AllFiles;
             }
             else
             {
-                files = Alias.Board.FileSystem.CurrentDirectory.Files;
+                files = DeviceCollection.FileSystem.CurrentDirectory.Files;
             }
             var filesToShow = new List<File>();
             var programsToShow = new List<Program>();
@@ -66,7 +67,7 @@ namespace Hash17.Programs.Implementation
                 filesToShow.Add(currentFile);
             }
             
-            foreach (var program in Alias.Board.ProgramsByCommand)
+            foreach (var program in Alias.Programs.ProgramsByCommand)
             {
                 var prog = program.Value;
                 if (Validate(terms, prog.Command.ToLower(), only) || Validate(terms, prog.Description.ToLower(), only))

@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Hash17.Blackboard_;
+using Hash17.Data;
 using Hash17.Files;
-using Hash17.Terminal_;
+using Hash17.MockSystem;
+using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ namespace Hash17.Programs.Implementation
             if (HelpOrUnknownParameters(true))
                 yield break;
 
-            var fileSystem = Alias.Board.FileSystem;
+            var fileSystem = DeviceCollection.FileSystem;
 
             ProgramParameter.Param param;
             if (Parameters.TryGetParam("c", out param))
@@ -70,7 +71,19 @@ namespace Hash17.Programs.Implementation
 
                 for (int i = 0; i < dir.Files.Count; i++)
                 {
-                    var fileState = (dir.Files[i].IsProtected ? "Encrypted".PadRight(namePad) : "Normal".PadRight(statusPad));
+                    string status;
+                    if (dir.Files[i].IsProtected)
+                    {
+                        if (dir.Files[i].CanBeRead)
+                            status = "Descrypted";
+                        else
+                            status = "Encrypted";
+                    }
+                    else
+                    {
+                        status = "Normal";
+                    }
+                    var fileState = status.PadRight(statusPad);
                     Alias.Term.ShowText("{0}{1}{2}".InLineFormat("FILE:".PadRight(typePad), dir.Files[i].PrettyName.PadRight(namePad), fileState));
                 }
 

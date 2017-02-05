@@ -12,6 +12,10 @@ namespace Hash17.Utils
         public string CollectionsSavePath;
         public string CollectionLoadPath;
 
+        public string CampaignSavePath;
+
+        public string DefaultUserName;
+
         #region Text
 
         public UIFont TextFont;

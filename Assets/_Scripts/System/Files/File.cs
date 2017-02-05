@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Hash17.Blackboard_;
 using Hash17.FilesSystem.Files;
 using Hash17.Utils;
 using Newtonsoft.Json;
@@ -13,6 +9,8 @@ namespace Hash17.Files
     [Serializable]
     public class File
     {
+        #region Properties
+
         public int UniqueId { get; set; }
         public string Name { get; set; }
         public FileType FileType { get; set; }
@@ -32,7 +30,7 @@ namespace Hash17.Files
                 if (!IsProtected)
                     return _content;
                 
-                if (Alias.Board.CampaignManager.UnlockedFiles.Contains(UniqueId))
+                if (Alias.Campaign.Info.CrackedFiles.Contains(UniqueId))
                     return _content;
                 
                 return _content.Encrypt(Password);
@@ -44,7 +42,7 @@ namespace Hash17.Files
 
         public bool CanBeRead
         {
-            get { return !IsProtected || Alias.Board.CampaignManager.UnlockedFiles.Contains(UniqueId); }
+            get { return Application.isPlaying && (!IsProtected || Alias.Campaign.Info.CrackedFiles.Contains(UniqueId)); }
         }
 
         [JsonIgnore]
@@ -52,11 +50,11 @@ namespace Hash17.Files
         {
             get
             {
-                Color color = Alias.GameConfig.FileColor;
+                Color color = Alias.Config.FileColor;
                 if (!CanBeRead)
-                    color = Alias.GameConfig.LockedFileColor;
+                    color = Alias.Config.LockedFileColor;
                 else if (IsProtected)
-                    color = Alias.GameConfig.SecureFileColor;
+                    color = Alias.Config.SecureFileColor;
                 return TextBuilder.BuildText(Name, color);
             }
         }
@@ -66,5 +64,23 @@ namespace Hash17.Files
         {
             get { return string.Format("{0}{1}", Directory.Path, Name); }
         }
+
+        #endregion
+
+        #region Events
+
+        public static event Action<File> OnFileOpened;
+
+        #endregion
+
+        #region Methods
+
+        public void Open()
+        {
+            if (OnFileOpened != null)
+                OnFileOpened(this);
+        }
+
+        #endregion
     }
 }

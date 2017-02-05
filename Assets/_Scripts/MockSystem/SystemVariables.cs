@@ -23,7 +23,6 @@ namespace Hash17.MockSystem
         public void Add(KeyValuePair<SystemVariableType, string> item)
         {
             _innerdiDictionary.Add(item.Key, item.Value);
-            PlayerPrefs.SetString(item.Key.ToString(), item.Value);
             if (OnSystemVariableChange != null)
                 OnSystemVariableChange(item.Key);
         }
@@ -79,7 +78,6 @@ namespace Hash17.MockSystem
             set
             {
                 _innerdiDictionary[key] = value;
-                PlayerPrefs.SetString(key.ToString(), value);
                 if (OnSystemVariableChange != null)
                     OnSystemVariableChange(key);
             }

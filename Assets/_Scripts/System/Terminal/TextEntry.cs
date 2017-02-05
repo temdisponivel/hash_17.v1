@@ -2,7 +2,7 @@
 using System.Collections;
 using Hash17.Utils;
 
-namespace Hash17.Terminal_
+namespace MockSystem.Term
 {
     public class TextEntry : MonoBehaviour
     {

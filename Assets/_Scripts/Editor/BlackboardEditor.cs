@@ -1,16 +1,16 @@
-﻿using Hash17.Blackboard_;
+﻿using Hash17.Data;
 using UnityEditor;
 using UnityEngine;
 
 namespace Hash17.Editor
 {
-    [CustomEditor(typeof(Blackboard))]
+    [CustomEditor(typeof(DataHolder))]
     public class BlackboardEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            var black = target as Blackboard;
+            var black = target as DataHolder;
             if (GUILayout.Button("Bake"))
             {
                 black.Bake();

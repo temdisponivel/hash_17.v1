@@ -213,11 +213,11 @@ namespace Hash17.Utils
 
         public static string HandleSystemVariables(this string text)
         {
-            if (!text.Contains(Alias.GameConfig.CharToConsiderSystemVariable))
+            if (!text.Contains(Alias.Config.CharToConsiderSystemVariable))
                 return text;
 
             var toReplace = new Dictionary<string, string>();
-            var occurencies = text.MultipleIndexOf(Alias.GameConfig.CharToConsiderSystemVariable, StringComparison.OrdinalIgnoreCase);
+            var occurencies = text.MultipleIndexOf(Alias.Config.CharToConsiderSystemVariable, StringComparison.OrdinalIgnoreCase);
             for (int i = 0; i < occurencies.Count - 1; i++, i++)
             {
                 var startIndex = occurencies[i];
@@ -230,7 +230,7 @@ namespace Hash17.Utils
                     var variableType = (SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable);
 
                     string value;
-                    if (Alias.Board.SystemVariable.TryGetValue(variableType, out value))
+                    if (Alias.SysVariables.TryGetValue(variableType, out value))
                         toReplace[variable] = value.ColorizeSystemVariable(variableType);
                 }
             }
@@ -240,7 +240,7 @@ namespace Hash17.Utils
                 var builder = new StringBuilder(text);
                 foreach (var entry in toReplace)
                 {
-                    builder.Replace("{0}{1}{0}".InLineFormat(Alias.GameConfig.CharToConsiderSystemVariable, entry.Key), entry.Value);
+                    builder.Replace("{0}{1}{0}".InLineFormat(Alias.Config.CharToConsiderSystemVariable, entry.Key), entry.Value);
                 }
                 text = builder.ToString();
             }
@@ -250,11 +250,11 @@ namespace Hash17.Utils
 
         public static string HandleCampaignState(this string text)
         {
-            if (!text.Contains(Alias.GameConfig.CharToConsiderSystemVariable))
+            if (!text.Contains(Alias.Config.CharToConsiderSystemVariable))
                 return text;
 
             var toReplace = new Dictionary<string, string>();
-            var occurencies = text.MultipleIndexOf(Alias.GameConfig.CharToConsiderSystemVariable, StringComparison.OrdinalIgnoreCase);
+            var occurencies = text.MultipleIndexOf(Alias.Config.CharToConsiderSystemVariable, StringComparison.OrdinalIgnoreCase);
             for (int i = 0; i < occurencies.Count - 1; i++, i++)
             {
                 var startIndex = occurencies[i];
@@ -267,7 +267,7 @@ namespace Hash17.Utils
                     var variableType = (SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable);
 
                     string value;
-                    if (Alias.Board.SystemVariable.TryGetValue(variableType, out value))
+                    if (Alias.SysVariables.TryGetValue(variableType, out value))
                         toReplace[variable] = value;
                 }
             }
@@ -277,7 +277,7 @@ namespace Hash17.Utils
                 var builder = new StringBuilder(text);
                 foreach (var entry in toReplace)
                 {
-                    builder.Replace("{0}{1}{0}".InLineFormat(Alias.GameConfig.CharToConsiderSystemVariable, entry.Key), entry.Value);
+                    builder.Replace("{0}{1}{0}".InLineFormat(Alias.Config.CharToConsiderSystemVariable, entry.Key), entry.Value);
                 }
                 text = builder.ToString();
             }
@@ -290,7 +290,7 @@ namespace Hash17.Utils
             switch (type)
             {
                 case SystemVariableType.USERNAME:
-                    return TextBuilder.BuildText(text, Alias.GameConfig.UserNameColor);
+                    return TextBuilder.BuildText(text, Alias.Config.UserNameColor);
             }
 
             return text;
@@ -325,7 +325,7 @@ namespace Hash17.Utils
 
                 if (currentState == lookingForTime)
                 {
-                    if (currentChar == Alias.GameConfig.CharToConsiderTime)
+                    if (currentChar == Alias.Config.CharToConsiderTime)
                     {
                         currentTuple.Key = builder.ToString();
                         builder.Remove(0, builder.Length);
@@ -338,7 +338,7 @@ namespace Hash17.Utils
                 }
                 else if (currentState == readingTime)
                 {
-                    if (currentChar == Alias.GameConfig.CharToConsiderTime)
+                    if (currentChar == Alias.Config.CharToConsiderTime)
                     {
                         float time;
                         if (float.TryParse(builder.ToString(), out time))
@@ -381,9 +381,9 @@ namespace Hash17.Utils
 
         public static void SetupWithHash17Settings(this UILabel label)
         {
-            label.fontSize = Alias.GameConfig.TextSize;
-            label.color = Alias.GameConfig.TextColor;
-            label.bitmapFont = Alias.GameConfig.TextFont;
+            label.fontSize = Alias.Config.TextSize;
+            label.color = Alias.Config.TextColor;
+            label.bitmapFont = Alias.Config.TextFont;
         }
 
         #endregion

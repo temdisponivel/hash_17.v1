@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Policy;
-using Hash17.Blackboard_;
+using Hash17.Data;
+using Hash17.Files;
 using Hash17.Utils;
 using Newtonsoft.Json;
 
-namespace Hash17.Files
+namespace Hash17.MockSystem
 {
     [Serializable]
     public class FileSystem : Directory
     {
-        public static FileSystem Instance
-        {
-            get { return Alias.Board.CurrentDevice.FileSystem; }
-        }
-
         #region Inner types
 
         public enum OperationResult
@@ -29,7 +24,7 @@ namespace Hash17.Files
 
         #region Properties
 
-        public event Action OnChangeCurrentDirectory;
+        public static event Action OnChangeCurrentDirectory;
 
         [JsonIgnore]
         private Directory _currentDirectory;
@@ -56,13 +51,11 @@ namespace Hash17.Files
         {
             get { return '/'; }
         }
-
         public override string Name
         {
             get { return "/"; }
             set { }
         }
-        
         public List<File> AllFiles
         {
             get
@@ -70,6 +63,7 @@ namespace Hash17.Files
                 return GetFilesInDirectoriesAndChilds(new List<File>());
             }
         }
+        public List<File> AvailableFiles { get; set; }
 
         #endregion
 
@@ -152,8 +146,6 @@ namespace Hash17.Files
                 Name = name,
                 Content = string.Empty,
             });
-
-            Blackboard.Instance.AllFiles.Add(file);
 
             return OperationResult.Ok;
         }
@@ -403,7 +395,7 @@ namespace Hash17.Files
                     parent = currentDir;
                     continue;
                 }
-                
+
                 var result = CreateDiretory(parent, current, out dir);
 
                 parent = dir;
@@ -443,11 +435,6 @@ namespace Hash17.Files
                 Files = new List<File>(),
                 Parent = parent,
             });
-
-            if (Blackboard.Instance.AllDirectories == null)
-                Blackboard.Instance.AllDirectories = new List<Directory>();
-
-            Blackboard.Instance.AllDirectories.Add(dir);
 
             return OperationResult.Ok;
         }

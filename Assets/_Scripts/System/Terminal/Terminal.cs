@@ -7,9 +7,9 @@ using Hash17.MockSystem;
 using Hash17.Programs;
 using Hash17.Utils;
 
-namespace Hash17.Terminal_
+namespace MockSystem.Term
 {
-    public class Terminal : PersistentSingleton<Terminal>
+    public class Terminal : Singleton<Terminal>
     {
         #region Properties
 
@@ -109,10 +109,10 @@ namespace Hash17.Terminal_
 
         public string CurrentUserName
         {
-            get { return Alias.Board.SystemVariable[SystemVariableType.USERNAME]; }
+            get { return Alias.Campaign.Info.PlayerName; }
             set
             {
-                Alias.Board.SystemVariable[SystemVariableType.USERNAME] = value;
+                Alias.SysVariables[SystemVariableType.USERNAME] = value;
                 UpdateUserNameLocation();
             }
         }
@@ -121,9 +121,9 @@ namespace Hash17.Terminal_
         {
             get
             {
-                var userName = TextBuilder.BuildText(CurrentUserName, Alias.GameConfig.UserNameColor);
-                var deviceId = TextBuilder.BuildText(Alias.Board.CurrentDevice.UniqueId, Alias.GameConfig.DeviceIdColor);
-                var currentDir = TextBuilder.BuildText(Alias.Board.FileSystem.CurrentDirectory.Path, Alias.GameConfig.DirectoryColor);
+                var userName = TextBuilder.BuildText(CurrentUserName, Alias.Config.UserNameColor);
+                var deviceId = TextBuilder.BuildText(DeviceCollection.CurrentDevice.UniqueId, Alias.Config.DeviceIdColor);
+                var currentDir = TextBuilder.BuildText(DeviceCollection.FileSystem.CurrentDirectory.Path, Alias.Config.DirectoryColor);
 
                 return string.Format("{0} @ {1} : {2}", userName, deviceId, currentDir);
             }
@@ -160,15 +160,19 @@ namespace Hash17.Terminal_
 
         protected void Start()
         {
-            Alias.Board.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
-            Alias.Board.SystemVariable.OnSystemVariableChange += OnSystemVariableChange;
-            RunProgram(Alias.Board.SpecialPrograms[ProgramId.Init], string.Empty, true);
+            Alias.Devices.OnCurrentDeviceChange += OnCurrentDeviceChange;
+            FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
+            Alias.SysVariables.OnSystemVariableChange += OnSystemVariableChange;
+
             Input.label.SetupWithHash17Settings();
             LabelUserNameLocation.SetupWithHash17Settings();
             CarrotLabel.SetupWithHash17Settings();
-            CarrotLabel.text = Alias.GameConfig.CarrotChar;
+
+            CarrotLabel.text = Alias.Config.CarrotChar;
+
             UpdateUserNameLocation();
-            Alias.Board.CampaignManager.OnGameStarted();
+
+            RunProgram(Alias.Programs.SpecialPrograms[ProgramId.Init], string.Empty, true);
         }
 
         #endregion
@@ -227,7 +231,7 @@ namespace Hash17.Terminal_
             string programName, programParams;
             Interpreter.GetProgram(text, out programName, out programParams);
             Program program;
-            if (!Alias.Board.ProgramsByCommand.TryGetValue(programName, out program))
+            if (!Alias.Programs.ProgramsByCommand.TryGetValue(programName, out program))
             {
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
@@ -236,12 +240,12 @@ namespace Hash17.Terminal_
                 return;
             }
 
-            var device = Alias.Board.CurrentDevice;
+            var device = DeviceCollection.CurrentDevice;
             var deviceProgramId = 0;
             if (device.SpecialPrograms.TryGetValue(program.Id, out deviceProgramId))
             {
                 var progBkp = program;
-                if (!Alias.Board.ProgramDefinitionByUniqueId.TryGetValue(deviceProgramId, out program))
+                if (!Alias.Programs.ProgramsById.TryGetValue(deviceProgramId, out program))
                 {
                     program = progBkp;
 
@@ -271,7 +275,7 @@ namespace Hash17.Terminal_
             if (!bypassCampaign)
             {
                 string message = null;
-                if (!Alias.Board.CampaignManager.CanRunProgram(program.Id, param, out message))
+                if (!Alias.Campaign.CanRunProgram(program.Id, param, out message))
                 {
                     ShowText(TextBuilder.WarningText(message));
                     return null;
@@ -346,7 +350,7 @@ namespace Hash17.Terminal_
             if (ident)
                 BeginIdentation();
 
-            entry.Setup(showLocation ? Alias.GameConfig.CarrotChar : string.Empty, _identationBuilder + text, TextTable.transform);
+            entry.Setup(showLocation ? Alias.Config.CarrotChar : string.Empty, _identationBuilder + text, TextTable.transform);
 
             if (ident)
                 EndIdentation();
@@ -507,9 +511,9 @@ namespace Hash17.Terminal_
 
         public void ValidaMaxEntries()
         {
-            if (TextTable.transform.childCount > Alias.GameConfig.MaxEntriesCount)
+            if (TextTable.transform.childCount > Alias.Config.MaxEntriesCount)
             {
-                Clear(Alias.GameConfig.EntriesCountToRemoveWhenMaxed);
+                Clear(Alias.Config.EntriesCountToRemoveWhenMaxed);
             }
         }
 
@@ -561,6 +565,11 @@ namespace Hash17.Terminal_
                     UpdateUserNameLocation();
                     break;
             }
+        }
+
+        public void OnCurrentDeviceChange()
+        {
+            UpdateUserNameLocation();
         }
 
         #endregion

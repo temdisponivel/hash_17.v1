@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Hash17.Terminal_;
+using MockSystem;
 using Hash17.Utils;
+using MockSystem.Term;
 using UnityEditor;
 
 [CustomEditor(typeof(InputHelper))]

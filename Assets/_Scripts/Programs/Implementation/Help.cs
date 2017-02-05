@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Hash17.Blackboard_;
-using Hash17.Terminal_;
+using Hash17.Data;
+using Hash17.MockSystem;
+using MockSystem;
 using Hash17.Utils;
 
 namespace Hash17.Programs.Implementation
@@ -15,14 +16,14 @@ namespace Hash17.Programs.Implementation
         {
             BlockInput();
 
-            var programs = Alias.Board.ProgramsByCommand;
+            var programs = Alias.Programs.ProgramsByCommand;
 
             foreach (var program in programs)
             {
                 int id;
-                if (Alias.Board.CurrentDevice.SpecialPrograms.TryGetValue(program.Value.Id, out id))
+                if (DeviceCollection.CurrentDevice.SpecialPrograms.TryGetValue(program.Value.Id, out id))
                 {
-                    var prog = Alias.Board.ProgramDefinitionByUniqueId[id];
+                    var prog = Alias.Programs.ProgramsById[id];
                     if (prog != null)
                     {
                         Alias.Term.ShowText("Program command: {0} ".InLineFormat(prog.PrettyCommand));
@@ -41,7 +42,7 @@ namespace Hash17.Programs.Implementation
             }
 
             var message = TextBuilder.WarningText("You can see more about a program using the command '{0} -h'.\n Eg. 'open -h'."
-                .InLineFormat(TextBuilder.BuildText("<program_command>", Alias.GameConfig.ProgramColor)));
+                .InLineFormat(TextBuilder.BuildText("<program_command>", Alias.Config.ProgramColor)));
             Alias.Term.ShowText(message);
 
             UnblockInput();

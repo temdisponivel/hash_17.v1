@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Hash17.Utils;
 
-namespace Hash17.Terminal_
+namespace MockSystem.Term
 {
     public class InputHelper : MonoBehaviour
     {

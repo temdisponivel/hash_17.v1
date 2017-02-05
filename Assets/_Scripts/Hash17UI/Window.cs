@@ -56,6 +56,8 @@ public class Window : MonoBehaviour
         get { return new Vector2(Background.width, Background.height); }
         set
         {
+            value = Vector2.Min(MainPanel.GetViewSize() / 3, value);
+
             var rightResizerAnchors = GetAnchorPoints(RightResizer);
             var leftResizerAnchors = GetAnchorPoints(LeftResizer);
             var bottomResizerAnchors = GetAnchorPoints(BottomResizer);
@@ -104,7 +106,11 @@ public class Window : MonoBehaviour
                     // Update resizer's anchors
                     UpdateResizerAnchors();
                 }
-            }, 3, null, null);
+                else if (count == 3)
+                {
+                    UpdateScrolls();
+                }
+            }, 4, null, null);
         }
     }
     
@@ -158,8 +164,8 @@ public class Window : MonoBehaviour
 
     #region Events
 
-    public Action OnOpen;
-    public Action OnClose;
+    public event Action OnOpen;
+    public event Action OnClose;
 
     #endregion
 
@@ -167,7 +173,7 @@ public class Window : MonoBehaviour
 
     public static Window Create()
     {
-        var windowPrefab = Alias.GameConfig.WindowPrefab;
+        var windowPrefab = Alias.Config.WindowPrefab;
         var windowIntance = NGUITools.AddChild(Alias.Term.RootPanel.gameObject, windowPrefab).GetComponent<Window>();
 
         windowIntance.StartDepth = _currentWindowQueue;

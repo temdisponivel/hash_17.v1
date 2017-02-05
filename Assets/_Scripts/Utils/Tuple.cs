@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Hash17.Terminal_;
+using MockSystem;
 using UnityEngine;
 
 namespace Hash17.Utils

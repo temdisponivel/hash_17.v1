@@ -11,7 +11,8 @@ namespace Hash17.Files
     [Serializable]
     public class Directory
     {
-        
+        #region Properties
+
         public virtual string Name { get; set; }
         public virtual Directory Parent { get; set; }
 
@@ -54,8 +55,12 @@ namespace Hash17.Files
         [JsonIgnore]
         public virtual string PrettyName
         {
-            get { return TextBuilder.BuildText(Name, Alias.GameConfig.DirectoryColor); }
+            get { return TextBuilder.BuildText(Name, Alias.Config.DirectoryColor); }
         }
+
+        #endregion
+
+        #region Childs and files
 
         public Directory()
         {
@@ -82,5 +87,7 @@ namespace Hash17.Files
             }
             return toAdd;
         }
+
+        #endregion
     }
 }

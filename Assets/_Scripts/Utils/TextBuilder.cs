@@ -10,17 +10,17 @@ namespace Hash17.Utils
     {
         public static string WarningText(string text)
         {
-            return BuildText(text, Alias.GameConfig.WarningMessageColor);
+            return BuildText(text, Alias.Config.WarningMessageColor);
         }
 
         public static string ErrorText(string text)
         {
-            return BuildText(text, Alias.GameConfig.ErrorMessageColor);
+            return BuildText(text, Alias.Config.ErrorMessageColor);
         }
 
         public static string MessageText(string text)
         {
-            return BuildText(text, Alias.GameConfig.CommonMessageColor);
+            return BuildText(text, Alias.Config.CommonMessageColor);
         }
 
         public static string BuildText(string text, Color color)

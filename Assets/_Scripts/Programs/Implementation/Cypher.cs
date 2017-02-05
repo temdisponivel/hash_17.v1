@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Text;
 using DG.Tweening;
-using Hash17.Blackboard_;
+using Hash17.Data;
+using Hash17.Devices;
 using Hash17.Files;
-using Hash17.Terminal_;
+using Hash17.MockSystem;
+using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
 
@@ -35,7 +37,7 @@ namespace Hash17.Programs.Implementation
                 var passWord = parts[1];
 
                 File file;
-                Alias.Board.FileSystem.FindFileByPath(filePath, out file);
+                DeviceCollection.FileSystem.FindFileByPath(filePath, out file);
                 if (file == null)
                 {
                     Alias.Term.ShowText(TextBuilder.WarningText(string.Format("File '{0}' not found.", filePath)));
@@ -51,12 +53,6 @@ namespace Hash17.Programs.Implementation
                         Alias.Term.ShowText("Invalid password.");
                         yield break;
                     }
-
-                    Alias.Term.ShowText("Decrypting file");
-                }
-                else
-                {
-                    Alias.Term.ShowText("Encrypting file");
                 }
 
                 var textToShow = new StringBuilder();
@@ -72,8 +68,8 @@ namespace Hash17.Programs.Implementation
 
         protected void OnFinishDecryptingCallback(File file, string passWord)
         {
-            if (!Alias.Campaign.UnlockedFiles.Contains(file.UniqueId))
-                Alias.Campaign.UnlockedFiles.Add(file.UniqueId);
+            if (!Alias.Campaign.Info.CrackedFiles.Contains(file.UniqueId))
+                Alias.Campaign.Info.CrackedFiles.Add(file.UniqueId);
 
             if (file.IsProtected)
             {

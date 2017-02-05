@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Hash17.Blackboard_;
+using Hash17.Data;
 using Hash17.Devices;
-using Hash17.Terminal_;
+using Hash17.MockSystem;
+using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
 
@@ -23,10 +24,10 @@ namespace Hash17.Programs.Implementation
             ProgramParameter.Param param;
             if (Parameters.ContainParam("s"))
             {
-                for (int i = 0; i < Alias.Board.Devices.Count; i++)
+                for (int i = 0; i < Alias.Devices.Count; i++)
                 {
-                    var deviceId = TextBuilder.BuildText(Alias.Board.Devices[i].UniqueId, Alias.GameConfig.DeviceIdColor);
-                    var deviceName = Alias.Board.Devices[i].Name;
+                    var deviceId = TextBuilder.BuildText(Alias.Devices[i].UniqueId, Alias.Config.DeviceIdColor);
+                    var deviceName = Alias.Devices[i].Name;
                     Alias.Term.ShowText(string.Format("ID: {0} | NAME: {1}", deviceId.PadRight(10), deviceName));
                 }
 
@@ -38,7 +39,7 @@ namespace Hash17.Programs.Implementation
             {
                 var deviceId = param.Value;
                 Device device;
-                if (!Alias.Board.DevicesById.TryGetValue(deviceId, out device))
+                if (!Alias.Devices.DevicesById.TryGetValue(deviceId.GetHashCode(), out device))
                 {
                     Alias.Term.ShowText(TextBuilder.WarningText("Device not found."));
 
@@ -53,7 +54,7 @@ namespace Hash17.Programs.Implementation
                             Alias.Term.ShowText(
                                 TextBuilder.MessageText(string.Format("Access granted. You are now on {0}.",
                                     device1.UniqueId)));
-                            Alias.Board.CurrentDevice = device1;
+                            Alias.Devices.ChangeCurrentDevice(device1);
                         }
                         else
                         {

@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace Hash17.Utils
 {
     public class PersistentSingleton<T> : Singleton<T>
         where T : PersistentSingleton<T>
     {
-        protected virtual void Awake()
+        public virtual void Awake()
         {
-            DontDestroyOnLoad(this);
+            if (Application.isPlaying)
+                DontDestroyOnLoad(gameObject);
         }
     }
 }

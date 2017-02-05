@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using Hash17.Blackboard_;
-using Hash17.Terminal_;
+using Hash17.Data;
+using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
 
@@ -18,7 +18,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         {
             yield return null;
 
-            if (Alias.Campaign.UnlockedDevices.Contains(device.UniqueId))
+            if (Alias.Campaign.Info.CrackedDevices.Contains(device.Id))
                 callback(true, device);
 
             BlockTerminal();
@@ -38,7 +38,7 @@ namespace Hash17.Devices.Firewalls.Implementation
                 if (result)
                 {
                     UnblockTerminal();
-                    Alias.Campaign.UnlockedDevices.Add(Device.UniqueId);
+                    Alias.Campaign.Info.CrackedDevices.Add(Device.Id);
                     Callback(true, Device);
                 }
                 else

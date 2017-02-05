@@ -8,12 +8,12 @@ using Hash17.Devices.Firewalls;
 using Hash17.Files;
 using Hash17.FilesSystem.Files;
 using Hash17.Programs;
-using Hash17.Programs.Implementation;
+using Hash17.MockSystem;
 using LitJson;
 using Newtonsoft.Json;
 using UnityEngine;
-using Help = Hash17.Programs.Implementation.Help;
 using DeviceType = Hash17.Devices.DeviceType;
+using Hash17.Game;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -61,7 +61,7 @@ namespace Hash17.Utils
                             TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
                         });
 
-            CreateFile(Alias.GameConfig.CollectionsSavePath, "ProgramCollectionData.txt", serializedData);
+            CreateFile(Alias.Config.CollectionsSavePath, "ProgramCollectionData.txt", serializedData);
 
             AssetDatabase.Refresh();
             AssetDatabase.SaveAssets();
@@ -131,7 +131,7 @@ namespace Hash17.Utils
 
             prog.Id = programId;
             prog.Command = com;
-            prog.UnitqueId = uniqueId;
+            prog.UniqueId = uniqueId;
             prog.Description = desc;
             prog.Usage = usage;
             prog.Global = availableGame;
@@ -206,7 +206,7 @@ namespace Hash17.Utils
                             TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
                         });
 
-            CreateFile(Alias.GameConfig.CollectionsSavePath, "DeviceCollectionData.txt", serializedData);
+            CreateFile(Alias.Config.CollectionsSavePath, "DeviceCollectionData.txt", serializedData);
 
             AssetDatabase.Refresh();
             AssetDatabase.SaveAssets();

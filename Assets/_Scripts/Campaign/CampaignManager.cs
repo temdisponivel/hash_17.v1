@@ -1,19 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using Hash17.Files;
+using Hash17.Game;
 using Hash17.MockSystem;
 using Hash17.Programs;
-using Hash17.Terminal_;
+using MockSystem;
 using Hash17.Utils;
+using Newtonsoft.Json;
+using UnityEngine;
+using File = System.IO.File;
 
 namespace Hash17.Campaign
 {
     public class CampaignManager : NonUnitySingleton<CampaignManager>
     {
+        #region Inner Types
+
+        public class CampaignInfo
+        {
+            [JsonProperty("PN")]
+            public string PlayerName { get; set; }
+
+            [JsonProperty("CD")]
+            public HashSet<int> CrackedDevices { get; set; }
+
+            [JsonProperty("CF")]
+            public HashSet<int> CrackedFiles { get; set; }
+
+            public CampaignInfo()
+            {
+                CrackedDevices = new HashSet<int>();
+                CrackedFiles = new HashSet<int>();
+            }
+        }
+
+        #endregion
+
         #region Properties
 
-        public bool HasSetUserName { get; set; }
-        public HashSet<int> UnlockedFiles = new HashSet<int>();
-        public HashSet<string> UnlockedDevices = new HashSet<string>();
+        public bool IsFirstTimeInGame { get; set; }
+        public CampaignInfo Info { get; protected set; }
+
+        public string SavePath
+        {
+            get { return "{0}{1}".InLineFormat(Application.persistentDataPath, Alias.Config.CampaignSavePath); }
+        }
 
         #endregion
 
@@ -21,8 +52,33 @@ namespace Hash17.Campaign
 
         public void OnGameStarted()
         {
-            HasSetUserName = Alias.Board.SystemVariable.ContainsKey(SystemVariableType.USERNAME);
-            Alias.Board.SystemVariable.OnSystemVariableChange += OnSystemVariableChanged;
+            LoadProgress();
+            Alias.SysVariables.OnSystemVariableChange += OnSystemVariableChanged;
+        }
+
+        public void SaveProgress()
+        {
+            File.WriteAllText(SavePath, JsonConvert.SerializeObject(Info));
+        }
+
+        public void LoadProgress()
+        {
+            if (!File.Exists(SavePath))
+            {
+                IsFirstTimeInGame = true;
+                SaveProgress();
+            }
+
+            var content = File.ReadAllText(SavePath);
+            Info = JsonConvert.DeserializeObject<CampaignInfo>(content);
+
+            if (Info.CrackedFiles == null)
+                Info.CrackedFiles = new HashSet<int>();
+
+            if (Info.CrackedDevices == null)
+                Info.CrackedDevices = new HashSet<int>();
+
+            Alias.SysVariables.Add(SystemVariableType.USERNAME, Info.PlayerName);
         }
 
         #endregion
@@ -35,21 +91,24 @@ namespace Hash17.Campaign
             if (program == ProgramId.Set && parameters.Contains(SystemVariableType.USERNAME.ToString()))
                 return true;
 
-            if (HasSetUserName)
+            if (IsFirstTimeInGame)
                 return true;
 
             message = "You must set your user name before using another program.\nUse 'set USERNAME <user_name>' to set your user name.";
-            return HasSetUserName;
+            return IsFirstTimeInGame;
         }
 
         #endregion
 
         #region Callbacks
         
-        public void OnSystemVariableChanged(SystemVariableType variable)
+        private void OnSystemVariableChanged(SystemVariableType variable)
         {
             if (variable == SystemVariableType.USERNAME)
-                HasSetUserName = true;
+            {
+                IsFirstTimeInGame = true;
+                Info.PlayerName = Alias.SysVariables[SystemVariableType.USERNAME];
+            }
         }
 
         #endregion

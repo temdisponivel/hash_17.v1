@@ -64,7 +64,7 @@ namespace Hash17.Programs.Implementation
                 yield break;
             }
 
-            Alias.Board.SystemVariable[(SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable)] = value;
+            Alias.SysVariables[(SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable)] = value;
         }
     }
 }

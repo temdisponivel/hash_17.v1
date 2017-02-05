@@ -2,6 +2,7 @@
 using FH.Util.Extensions;
 using Hash17.Files;
 using Hash17.FilesSystem.Files;
+using Hash17.MockSystem;
 using Hash17.Utils;
 
 namespace Hash17.Programs.Implementation
@@ -20,7 +21,7 @@ namespace Hash17.Programs.Implementation
 
                 var filePath = param.Value;
                 File file;
-                Alias.Board.FileSystem.FindFileByPath(filePath, out file);
+                DeviceCollection.FileSystem.FindFileByPath(filePath, out file);
 
                 if (file != null)
                 {

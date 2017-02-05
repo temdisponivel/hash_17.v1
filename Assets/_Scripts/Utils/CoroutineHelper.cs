@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Hash17.Utils
 {
     [ExecuteInEditMode]
-    public class CoroutineHelper : PersistentSingleton<CoroutineHelper>
+    public class CoroutineHelper : Singleton<CoroutineHelper>
     {
         public Coroutine WaitAndCall(Action callback, float secondsToWait)
         {

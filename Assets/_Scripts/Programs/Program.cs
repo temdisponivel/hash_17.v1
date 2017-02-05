@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Hash17.Blackboard_;
-using Hash17.Terminal_;
+using Hash17.Data;
+using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
 
 namespace Hash17.Programs
 {
     [Serializable]
-    public class Program
+    public class Program : IEquatable<int>
     {
         #region Properties
 
         public ProgramId Id;
-        public int UnitqueId;
+        public int UniqueId;
         public string Command;
-        public string PrettyCommand {get { return TextBuilder.BuildText(Command, Alias.GameConfig.ProgramColor); } }
+        public string PrettyCommand {get { return TextBuilder.BuildText(Command, Alias.Config.ProgramColor); } }
         public string Description;
         public string Usage;
         public string[] KnownParametersAndOptions;
@@ -167,6 +167,15 @@ namespace Hash17.Programs
         protected void StopCoroutine(Coroutine coroutine)
         {
             CoroutineHelper.Instance.StopCoroutine(coroutine);
+        }
+
+        #endregion
+
+        #region IEquatable
+
+        public bool Equals(int other)
+        {
+            return other == UniqueId;
         }
 
         #endregion
