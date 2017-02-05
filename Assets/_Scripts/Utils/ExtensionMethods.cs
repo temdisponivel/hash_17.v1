@@ -7,6 +7,8 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography;
 using System.Text;
+using DarkTonic.MasterAudio;
+using Hash17.MockSystem;
 
 namespace Hash17.Utils
 {
@@ -120,7 +122,7 @@ namespace Hash17.Utils
 
                 if (String.IsNullOrEmpty(current))
                     continue;
-                
+
                 indexOfs[current] = text.MultipleIndexOf(current, StringComparison.OrdinalIgnoreCase);
             }
 
@@ -129,7 +131,7 @@ namespace Hash17.Utils
             {
                 return entry.Value;
             }).ToList();
-            
+
             var maxIndexReached = 0;
             for (int i = 0; i < orderedIndexes.Count; i++)
             {
@@ -197,6 +199,52 @@ namespace Hash17.Utils
 
         #endregion
 
+        #region System Variable
+
+        public static string ClearInput(this string text)
+        {
+            return text.Trim().Replace("\n", string.Empty);
+        }
+
+        public static string HandleSystemVariables(this string text)
+        {
+            if (!text.Contains(Alias.GameConfig.CharToConsiderSystemVariable))
+                return text;
+
+            var toReplace = new Dictionary<string, string>();
+            var occurencies = text.MultipleIndexOf(Alias.GameConfig.CharToConsiderSystemVariable, StringComparison.OrdinalIgnoreCase);
+            for (int i = 0; i < occurencies.Count - 1; i++, i++)
+            {
+                var startIndex = occurencies[i];
+                var endIndex = occurencies[i + 1];
+
+                var variable = text.Substring(startIndex + 1, endIndex - startIndex - 1);
+
+                if (Enum.IsDefined(typeof(SystemVariableType), variable))
+                {
+                    var variableType = (SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable);
+
+                    string value;
+                    if (Alias.Board.SystemVariable.TryGetValue(variableType, out value))
+                        toReplace[variable] = value;
+                }
+            }
+
+            if (toReplace.Count > 0)
+            {
+                var builder = new StringBuilder(text);
+                foreach (var entry in toReplace)
+                {
+                    builder.Replace("{0}{1}{0}".InLineFormat(Alias.GameConfig.CharToConsiderSystemVariable, entry.Key), entry.Value);
+                }
+                text = builder.ToString();
+            }
+
+            return text;
+        }
+
+        #endregion
+
         #endregion
 
         #region NGUI
@@ -234,8 +282,8 @@ namespace Hash17.Utils
 
         public static void Size(this UIWidget widget, Vector2 size)
         {
-            widget.width = (int) size.x;
-            widget.height = (int) size.y;
+            widget.width = (int)size.x;
+            widget.height = (int)size.y;
         }
 
         #endregion

@@ -7,6 +7,7 @@
 #define MOBILE
 #endif
 
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
@@ -913,7 +914,7 @@ public class UIInput : MonoBehaviour
 
 		var shift = ((ev.modifiers & EventModifiers.Shift) != 0);
 
-		switch (ev.keyCode)
+        switch (ev.keyCode)
 		{
 			case KeyCode.Backspace:
 			{
@@ -944,7 +945,16 @@ public class UIInput : MonoBehaviour
 
 				if (!string.IsNullOrEmpty(mValue))
 				{
-					mSelectionEnd = Mathf.Max(mSelectionEnd - 1, 0);
+                    var toRemove = 0;
+                    if (ctrl)
+				    {
+				        var currentSelection = Mathf.Min(mSelectionEnd, mValue.Length);
+                        while (currentSelection > 0 && char.IsLetterOrDigit(mValue[--currentSelection]))
+				            toRemove++;
+				    }
+                    if (toRemove == 0)
+				        toRemove++;
+					mSelectionEnd = Mathf.Max(mSelectionEnd - toRemove, 0);
 					if (!shift) mSelectionStart = mSelectionEnd;
 					UpdateLabel();
 				}
@@ -957,7 +967,16 @@ public class UIInput : MonoBehaviour
 
 				if (!string.IsNullOrEmpty(mValue))
 				{
-					mSelectionEnd = Mathf.Min(mSelectionEnd + 1, mValue.Length);
+                    var toSum = 0;
+                    if (ctrl)
+                    {
+                        var currentSelection = Mathf.Min(mSelectionEnd, mValue.Length); ;
+                        while (currentSelection < mValue.Length - 1 && char.IsLetterOrDigit(mValue[++currentSelection]))
+                            toSum++;
+                    }
+                    if (toSum == 0)
+				        toSum++;
+                    mSelectionEnd = Mathf.Min(mSelectionEnd + toSum, mValue.Length);
 					if (!shift) mSelectionStart = mSelectionEnd;
 					UpdateLabel();
 				}

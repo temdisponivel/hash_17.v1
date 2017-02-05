@@ -9,6 +9,7 @@ namespace Hash17.Utils
 
         void OnClick()
         {
+            InputToFocusOn.selectAllTextOnFocus = false;
             InputToFocusOn.isSelected = true;
         }
     }

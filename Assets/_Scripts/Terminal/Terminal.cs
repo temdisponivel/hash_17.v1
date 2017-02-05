@@ -84,14 +84,17 @@ namespace Hash17.Terminal_
 
                 TextTableWidget.pivot = previousPivot;
 
-                RepositionText();   
+                RepositionText();
             }
         }
+
+        private bool _handleSystemVariables = true;
+        public bool HandleSystemVariables { get { return _handleSystemVariables; } set { _handleSystemVariables = value; } }
 
         #endregion
 
         #region User name
-        
+
         public string CurrentUserName
         {
             get { return Alias.Board.SystemVariable[SystemVariableType.USERNAME]; }
@@ -175,8 +178,11 @@ namespace Hash17.Terminal_
 
         public void OnInputSubmit()
         {
-            string value = Input.value.Trim();
-            value = value.Replace("\n", string.Empty);
+            var value = Input.value.ClearInput();
+
+            if (HandleSystemVariables)
+                value = value.HandleSystemVariables();
+
             if (!string.IsNullOrEmpty(value))
             {
                 if (TreatInput)
@@ -202,7 +208,7 @@ namespace Hash17.Terminal_
             if (OnInputSubmited != null)
                 OnInputSubmited(value);
         }
-        
+
         private void TreatInputText(string text)
         {
             ShowText(text, showLocation: true);
@@ -214,6 +220,7 @@ namespace Hash17.Terminal_
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
                 ShowText(TextBuilder.WarningText(string.Format("Use \"search\" to search for {0} in all files.", text)));
+                ShowText(string.Empty);
                 return;
             }
 
@@ -235,7 +242,7 @@ namespace Hash17.Terminal_
                     }
                 }
             }
-            
+
             var programInstance = RunProgram(program, programParams);
 
             if (programInstance == null)
@@ -448,7 +455,7 @@ namespace Hash17.Terminal_
                 Clear(Alias.GameConfig.EntriesCountToRemoveWhenMaxed);
             }
         }
-        
+
         #endregion
 
         #region Callbacks
@@ -496,7 +503,7 @@ namespace Hash17.Terminal_
                     break;
             }
         }
-        
+
         #endregion
     }
 }

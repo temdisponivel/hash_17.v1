@@ -20,6 +20,7 @@ namespace Hash17.Utils
         public string CarrotChar;
         public int MaxEntriesCount;
         public int EntriesCountToRemoveWhenMaxed;
+        public string CharToConsiderSystemVariable;
 
         #endregion
 
