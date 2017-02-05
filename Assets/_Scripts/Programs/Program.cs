@@ -16,6 +16,7 @@ namespace Hash17.Programs
         public ProgramId Id;
         public int UnitqueId;
         public string Command;
+        public string PrettyCommand {get { return TextBuilder.BuildText(Command, Alias.GameConfig.ProgramColor); } }
         public string Description;
         public string Usage;
         public string[] KnownParametersAndOptions;

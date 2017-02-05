@@ -183,6 +183,20 @@ namespace Hash17.Utils
 
         #endregion
 
+        #region Highlight
+
+        public static string HighlightTerms(this string text, params string[] terms)
+        {
+            var builder = new StringBuilder(text);
+            for (int i = 0; i < terms.Length; i++)
+            {
+                builder.Replace(terms[i], string.Format("[b][i]{0}[/i][/b]", terms[i])); ;
+            }
+            return builder.ToString();
+        }
+
+        #endregion
+
         #endregion
 
         #region NGUI

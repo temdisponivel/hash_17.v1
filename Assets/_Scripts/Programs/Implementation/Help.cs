@@ -25,7 +25,7 @@ namespace Hash17.Programs.Implementation
                     var prog = Alias.Board.ProgramDefinitionByUniqueId[id];
                     if (prog != null)
                     {
-                        Alias.Term.ShowText("Program command: {0} ".InLineFormat(TextBuilder.BuildText(prog.Command, Alias.GameConfig.ProgramColor)));
+                        Alias.Term.ShowText("Program command: {0} ".InLineFormat(prog.PrettyCommand));
                         Alias.Term.ShowText(prog.Description, ident: true);
                         yield return null;
                         continue;
@@ -35,7 +35,7 @@ namespace Hash17.Programs.Implementation
                 if (!program.Value.Global)
                     continue;
 
-                Alias.Term.ShowText("Program command: {0} ".InLineFormat(TextBuilder.BuildText(program.Key, Alias.GameConfig.ProgramColor)));
+                Alias.Term.ShowText("Program command: {0} ".InLineFormat(program.Value.PrettyCommand));
                 Alias.Term.ShowText(program.Value.Description, ident: true);
                 yield return null;
             }

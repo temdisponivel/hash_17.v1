@@ -5,6 +5,8 @@ using System.Linq;
 using Hash17.Files;
 using Hash17.FilesSystem.Files;
 using Hash17.Utils;
+using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Hash17.Programs.Implementation
 {
@@ -45,91 +47,85 @@ namespace Hash17.Programs.Implementation
             {
                 files = Alias.Board.FileSystem.CurrentDirectory.Files;
             }
-
-            Alias.Term.ShowText("Files found - use 'open' program to open them:");
-
-            Alias.Term.BeginIdentation();
+            var filesToShow = new List<File>();
+            var programsToShow = new List<Program>();
 
             bool hasFiles = false;
             for (int i = 0; i < files.Count; i++)
             {
                 var currentFile = files[i];
-                
                 var content = currentFile.Content.ToLower();
 
-                var nameValidated = false;
                 if (currentFile.FileType != FileType.Text || !Validate(terms, content, only))
                 {
-                    content = currentFile.Name;
+                    content = currentFile.Name.ToLower();
                     if (!Validate(terms, content, only))
                         continue;
-
-                    nameValidated = true;
                 }
 
-                hasFiles = true;
-
-                content = currentFile.Content.SubString(15, 15, terms);
-                string name = currentFile.Name;
-
-                for (int j = 0; j < terms.Length; j++)
-                {
-                    if (nameValidated)
-                        name = name.Replace(terms[j], string.Format("[b][i]{0}[/i][/b]", terms[j]));
-                    else
-                        content = content.Replace(terms[j], string.Format("[b][i]{0}[/i][/b]", terms[j]));
-                }
-
-                Alias.Term.ShowText(string.Format("Name: {0} | Path: {1}", name, files[i].Path));
-                if (!nameValidated)
-                {
-                    Alias.Term.ShowText("Content:");
-                    Alias.Term.ShowText(content, ident: true);
-                }
-
-                Alias.Term.ShowText("-----------------------------------");
+                filesToShow.Add(currentFile);
             }
-
-            if (!hasFiles)
-            {
-                Alias.Term.ShowText("None.");
-            }
-
-            Alias.Term.EndIdentation();
-
-            Alias.Term.ShowText("Programs found:");
-
-            Alias.Term.BeginIdentation();
-            bool hasProgram = false;
+            
             foreach (var program in Alias.Board.ProgramsByCommand)
             {
                 var prog = program.Value;
                 if (Validate(terms, prog.Command.ToLower(), only) || Validate(terms, prog.Description.ToLower(), only))
                 {
-                    hasProgram = true;
-
-                    string name = prog.Command;
-                    var content = prog.Description;
-
-                    for (int j = 0; j < terms.Length; j++)
-                    {
-                        content = content.Replace(terms[j], string.Format("[b][i]{0}[/i][/b]", terms[j]));
-                        name = name.Replace(terms[j], string.Format("[b][i]{0}[/i][/b]", terms[j]));
-                    }
-
-                    Alias.Term.ShowText(name);
-                    Alias.Term.ShowText(content, ident: true);
-
-                    Alias.Term.ShowText("-----------------------------------");
+                    programsToShow.Add(prog);
                 }
             }
 
-            if (!hasProgram)
+            Alias.Term.ShowText(TextBuilder.MessageText("Files that constains (in name or content) the terms: {0}".InLineFormat(param.Value)));
+            Alias.Term.ShowText(string.Empty);
+
             {
-                Alias.Term.ShowText("None.");
+                const int namePad = 30;
+                const int total = namePad + namePad;
+
+                Alias.Term.ShowText("{0}{1}".InLineFormat("NAME".PadRight(namePad), "PATH"));
+                Alias.Term.ShowText("".PadRight(total, '-'));
+
+                for (int i = 0; i < filesToShow.Count; i++)
+                {
+                    var unusedCharsCount = 0;
+                    var finalName = filesToShow[i].PrettyName.HighlightTerms(terms);
+                    var originalName = filesToShow[i].Name;
+                    unusedCharsCount = finalName.Length - originalName.Length;
+                    var name = finalName.PadRight(namePad + unusedCharsCount);
+                    var path = filesToShow[i].Path.HighlightTerms(terms);
+                    Alias.Term.ShowText("{0}{1}".InLineFormat(name, path));
+                }
+            }
+            
+            Alias.Term.ShowText(string.Empty);
+            Alias.Term.ShowText(string.Empty);
+
+            Alias.Term.ShowText(TextBuilder.MessageText("Programs that constains (in name or description) the terms: {0}".InLineFormat(param.Value)));
+            Alias.Term.ShowText(string.Empty);
+
+            {
+                const int commandPad = 30;
+                const int total = commandPad + commandPad;
+
+                Alias.Term.ShowText("{0}{1}".InLineFormat("COMMAND".PadRight(commandPad), "DESCRIPTION"));
+                Alias.Term.ShowText("".PadRight(total, '-'));
+
+                for (int i = 0; i < programsToShow.Count; i++)
+                {
+                    var unusedCharsCount = 0;
+                    var finalName = programsToShow[i].PrettyCommand.HighlightTerms(terms);
+                    var originalName = programsToShow[i].Command;
+                    unusedCharsCount = finalName.Length - originalName.Length;
+
+                    var name = finalName.PadRight(commandPad + unusedCharsCount);
+                    var desc = programsToShow[i].Description.HighlightTerms(terms);
+                    Alias.Term.ShowText("{0}{1}".InLineFormat(name, desc));
+                }
             }
 
-            Alias.Term.EndIdentation();
+            yield return 0;
+
+            Alias.Term.RepositionText();
         }
 
         private bool Validate(string[] terms, string toValidate, bool only)
