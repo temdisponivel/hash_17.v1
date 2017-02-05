@@ -54,16 +54,29 @@ namespace Hash17.Programs.Implementation
             }
             else if (param == null)
             {
+                const int typePad = 6;
+                const int namePad = 50;
+                const int statusPad = 10;
+                const int colorTagSize = 11;
+                const int total = typePad + namePad + statusPad - colorTagSize;
+                Alias.Term.ShowText("{0}{1}{2}".InLineFormat("TYPE".PadRight(typePad), "NAME".PadRight(namePad - colorTagSize), "STATUS".PadRight(statusPad)));
+                Alias.Term.ShowText("".PadRight(total, '-'));
+
                 var dir = fileSystem.CurrentDirectory;
                 for (int i = 0; i < dir.Childs.Count; i++)
                 {
-                    Alias.Term.ShowText(dir.Childs[i].PrettyName);
+                    Alias.Term.ShowText("{0}{1}".InLineFormat("DIR:".PadRight(typePad), dir.Childs[i].PrettyName));
                 }
 
                 for (int i = 0; i < dir.Files.Count; i++)
                 {
-                    Alias.Term.ShowText(dir.Files[i].PrettyName);
+                    var fileState = (dir.Files[i].IsProtected ? "Encrypted".PadRight(namePad) : "Normal".PadRight(statusPad));
+                    Alias.Term.ShowText("{0}{1}{2}".InLineFormat("FILE:".PadRight(typePad), dir.Files[i].PrettyName.PadRight(namePad), fileState));
                 }
+
+                yield return 0;
+
+                Alias.Term.RepositionText();
             }
         }
     }

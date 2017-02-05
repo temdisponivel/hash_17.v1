@@ -18,7 +18,7 @@ namespace Hash17.Devices.Firewalls.Implementation
         {
             yield return null;
 
-            if (Alias.Board.UnlockedDevices.Contains(device.UniqueId))
+            if (Alias.Campaign.UnlockedDevices.Contains(device.UniqueId))
                 callback(true, device);
 
             BlockTerminal();
@@ -38,7 +38,7 @@ namespace Hash17.Devices.Firewalls.Implementation
                 if (result)
                 {
                     UnblockTerminal();
-                    Alias.Board.UnlockedDevices.Add(Device.UniqueId);
+                    Alias.Campaign.UnlockedDevices.Add(Device.UniqueId);
                     Callback(true, Device);
                 }
                 else

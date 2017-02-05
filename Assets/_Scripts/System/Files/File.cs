@@ -32,7 +32,7 @@ namespace Hash17.Files
                 if (!IsProtected)
                     return _content;
                 
-                if (Alias.Board.UnlockedFiles.Contains(UniqueId))
+                if (Alias.Board.CampaignManager.UnlockedFiles.Contains(UniqueId))
                     return _content;
                 
                 return _content.Encrypt(Password);
@@ -44,7 +44,7 @@ namespace Hash17.Files
 
         public bool CanBeRead
         {
-            get { return !IsProtected || Alias.Board.UnlockedFiles.Contains(UniqueId); }
+            get { return !IsProtected || Alias.Board.CampaignManager.UnlockedFiles.Contains(UniqueId); }
         }
 
         [JsonIgnore]

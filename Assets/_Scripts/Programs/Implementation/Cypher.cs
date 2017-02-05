@@ -25,7 +25,7 @@ namespace Hash17.Programs.Implementation
 
                 if (parts.Length < 2)
                 {
-                    Alias.Term.ShowText(TextBuilder.WarningText("Invalid number of parameters."));
+                    Alias.Term.ShowText(TextBuilder.WarningText("You should supply a password for encryption/decryption."));
                     ShowHelp();
                     UnblockInput();
                     yield break;
@@ -38,7 +38,7 @@ namespace Hash17.Programs.Implementation
                 Alias.Board.FileSystem.FindFileByPath(filePath, out file);
                 if (file == null)
                 {
-                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("File {0} not found.", filePath)));
+                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("File '{0}' not found.", filePath)));
                     UnblockInput();
                     yield break;
                 }
@@ -66,18 +66,18 @@ namespace Hash17.Programs.Implementation
                     textToShow.Append(".");
                 }
 
-                Alias.Term.ShowTypeWriterText(textToShow.ToString(), .5f/30f, callback: () => OnFinishDecryptingCallback(file, passWord));
+                Alias.Term.ShowTypeWriterText(textToShow.ToString(), callback: () => OnFinishDecryptingCallback(file, passWord));
             }
         }
 
         protected void OnFinishDecryptingCallback(File file, string passWord)
         {
-            if (!Alias.Board.UnlockedFiles.Contains(file.UniqueId))
-                Alias.Board.UnlockedFiles.Add(file.UniqueId);
+            if (!Alias.Campaign.UnlockedFiles.Contains(file.UniqueId))
+                Alias.Campaign.UnlockedFiles.Add(file.UniqueId);
 
             if (file.IsProtected)
             {
-                Alias.Term.ShowText("File decrypted. You can read this file now.");
+                Alias.Term.ShowText("File decrypted. You can open this file now.");
             }
             else
             {

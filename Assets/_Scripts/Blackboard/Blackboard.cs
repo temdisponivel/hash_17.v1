@@ -9,6 +9,7 @@ using Hash17.Devices.Firewalls.Implementation;
 using Hash17.Files;
 using Hash17.MockSystem;
 using Hash17.Programs;
+using Hash17.Campaign;
 using Hash17.Terminal_;
 using Hash17.Utils;
 using Newtonsoft.Json;
@@ -96,14 +97,7 @@ namespace Hash17.Blackboard_
         }
 
         #endregion
-
-        #region Unlocks
-
-        public HashSet<int> UnlockedFiles = new HashSet<int>();
-        public HashSet<string> UnlockedDevices = new HashSet<string>();
-
-        #endregion
-
+        
         #region Files
 
         public FileSystem FileSystem
@@ -127,6 +121,7 @@ namespace Hash17.Blackboard_
         #region System
         
         public readonly SystemVariables SystemVariable = new SystemVariables();
+        public readonly CampaignManager CampaignManager = new CampaignManager();
 
         #endregion
 

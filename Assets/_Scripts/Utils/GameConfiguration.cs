@@ -30,6 +30,8 @@ namespace Hash17.Utils
         public Color SecureFileColor;
         public Color DirectoryColor;
 
+        public Color ProgramColor;
+
         public Color DeviceIdColor;
         public Color UserNameColor;
 

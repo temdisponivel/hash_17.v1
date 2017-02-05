@@ -28,7 +28,7 @@ namespace Hash17.Utils
                 throw new ArgumentException("Cannot encrypt using an empty key. Please supply an encryption key.");
             }
 
-            return String.Format("Encrypted data: \n {0}", BitConverter.ToString(Encoding.ASCII.GetBytes(text)));
+            return String.Format("This file is encrypted. The following is its data encrypted: \n {0}", BitConverter.ToString(Encoding.ASCII.GetBytes(text)));
 
 
             CspParameters cspp = new CspParameters();

@@ -17,7 +17,7 @@ namespace Hash17.Programs.Implementation
             bool any = Parameters.TryGetParam("any", out param);
             bool only = Parameters.TryGetParam("only", out param);
 
-            if (!(any || only || Parameters.TryGetParam("", out param)))
+            if (!(any | only | (any = Parameters.TryGetParam("", out param))))
             {
                 ShowHelp();
                 yield break;
@@ -46,7 +46,7 @@ namespace Hash17.Programs.Implementation
                 files = Alias.Board.FileSystem.CurrentDirectory.Files;
             }
 
-            Alias.Term.ShowText("Files found - (use 'open <file_path>' to open one of them):");
+            Alias.Term.ShowText("Files found - use 'open' program to open them:");
 
             Alias.Term.BeginIdentation();
 

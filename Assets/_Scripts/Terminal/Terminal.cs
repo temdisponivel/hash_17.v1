@@ -147,12 +147,13 @@ namespace Hash17.Terminal_
         {
             Alias.Board.FileSystem.OnChangeCurrentDirectory += OnCurrentDirChanged;
             Alias.Board.SystemVariable.OnSystemVariableChange += OnSystemVariableChange;
-            RunProgram(Alias.Board.SpecialPrograms[ProgramId.Init], string.Empty);
+            RunProgram(Alias.Board.SpecialPrograms[ProgramId.Init], string.Empty, true);
             Input.label.SetupWithHash17Settings();
             LabelUserNameLocation.SetupWithHash17Settings();
             CarrotLabel.SetupWithHash17Settings();
             CarrotLabel.text = Alias.GameConfig.CarrotChar;
             UpdateUserNameLocation();
+            Alias.Board.CampaignManager.OnGameStarted();
         }
 
         #endregion
@@ -212,7 +213,7 @@ namespace Hash17.Terminal_
             {
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
-                ShowText(TextBuilder.WarningText(string.Format("Use 'search -all {0}' to search for {0} in all files.", text)));
+                ShowText(TextBuilder.WarningText(string.Format("Use \"search\" to search for {0} in all files.", text)));
                 return;
             }
 
@@ -237,14 +238,27 @@ namespace Hash17.Terminal_
             
             var programInstance = RunProgram(program, programParams);
 
+            if (programInstance == null)
+                return;
+
             if (OnProgramExecuted != null)
                 OnProgramExecuted(programInstance);
 
             programInstance.OnFinish += ProgramFinished;
         }
 
-        public Program RunProgram(Program program, string param)
+        public Program RunProgram(Program program, string param, bool bypassCampaign = false)
         {
+            if (!bypassCampaign)
+            {
+                string message = null;
+                if (!Alias.Board.CampaignManager.CanRunProgram(program.Id, param, out message))
+                {
+                    ShowText(TextBuilder.WarningText(message));
+                    return null;
+                }
+            }
+
             var programInstance = program.Clone();
             RunningPrograms.Add(programInstance);
             programInstance.Execute(param);

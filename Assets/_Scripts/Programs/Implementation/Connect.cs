@@ -31,7 +31,7 @@ namespace Hash17.Programs.Implementation
                 {
                     var deviceId = TextBuilder.BuildText(Alias.Board.Devices[i].UniqueId, Alias.GameConfig.DeviceIdColor);
                     var deviceName = Alias.Board.Devices[i].Name;
-                    Alias.Term.ShowText(string.Format("ID: {0} | NAME: {1}", deviceId, deviceName));
+                    Alias.Term.ShowText(string.Format("ID: {0} | NAME: {1}", deviceId.PadRight(10), deviceName));
                 }
 
                 FinishExecution();
