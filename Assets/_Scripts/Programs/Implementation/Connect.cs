@@ -26,7 +26,7 @@ namespace Hash17.Programs.Implementation
             {
                 for (int i = 0; i < Alias.Devices.Count; i++)
                 {
-                    var deviceId = TextBuilder.BuildText(Alias.Devices[i].UniqueId, Alias.Config.DeviceIdColor);
+                    var deviceId = TextBuilder.BuildText(Alias.Devices[i].Id, Alias.Config.DeviceIdColor);
                     var deviceName = Alias.Devices[i].Name;
                     Alias.Term.ShowText(string.Format("ID: {0} | NAME: {1}", deviceId.PadRight(10), deviceName));
                 }
@@ -39,7 +39,7 @@ namespace Hash17.Programs.Implementation
             {
                 var deviceId = param.Value;
                 Device device;
-                if (!Alias.Devices.DevicesById.TryGetValue(deviceId.GetHashCode(), out device))
+                if (!Alias.Devices.GetDeviceById(deviceId.GetHashCode(), out device))
                 {
                     Alias.Term.ShowText(TextBuilder.WarningText("Device not found."));
 

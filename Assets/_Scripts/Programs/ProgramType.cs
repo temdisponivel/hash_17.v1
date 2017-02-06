@@ -1,6 +1,6 @@
 ﻿namespace Hash17.Programs
 {
-    public enum ProgramId
+    public enum ProgramType
     {
         Clear,
         Cd,

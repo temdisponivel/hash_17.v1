@@ -11,9 +11,7 @@ namespace Hash17.MockSystem
         public static Device CurrentDevice { get; private set; }
         public static FileSystem FileSystem { get { return CurrentDevice.FileSystem; } }
         public event Action OnCurrentDeviceChange;
-
-        public readonly Dictionary<int, Device> DevicesById = new Dictionary<int, Device>();
-
+        
         #endregion
 
         #region Current Device
@@ -27,14 +25,15 @@ namespace Hash17.MockSystem
 
         #endregion
 
-        #region Overrides
+        #region Helper
 
-        public override void Add(Device item)
+        public bool GetDeviceById(int id, out Device device)
         {
-            DevicesById[item.Id] = item;
-            base.Add(item);
+            device = _all.Find(d => d.UniqueId == id);
+            return device != null && device.IsAvailable;
         }
 
         #endregion
+
     }
 }

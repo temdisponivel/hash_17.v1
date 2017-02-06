@@ -88,7 +88,7 @@ namespace Hash17.MockSystem
 
         public List<File> GetFilesInDirectory(Directory dir)
         {
-            return new List<File>(dir.Files);
+            return new List<File>(dir.GetAvailableFiles());
         }
 
         public OperationResult FindFileByPath(string pfilePathAndNameath, out File fileFound)
@@ -140,7 +140,7 @@ namespace Hash17.MockSystem
                 return OperationResult.DuplicatedName;
             }
 
-            parent.Files.Add(file = new File()
+            parent.GetAllFiles().Add(file = new File()
             {
                 Directory = parent,
                 Name = name,
@@ -160,7 +160,7 @@ namespace Hash17.MockSystem
 
         public OperationResult AddFileWithoutValidation(Directory parent, File fileToAdd)
         {
-            parent.Files.Add(fileToAdd);
+            parent.GetAllFiles().Add(fileToAdd);
             fileToAdd.Directory = parent;
             return OperationResult.Ok;
         }
@@ -182,7 +182,7 @@ namespace Hash17.MockSystem
             if (file == null)
                 return OperationResult.NotFound;
 
-            parent.Files.Remove(file);
+            parent.GetAllFiles().Remove(file);
             return OperationResult.Ok;
         }
 
@@ -290,9 +290,9 @@ namespace Hash17.MockSystem
             var newDir = FindDirectory(newDirectory);
             if (newDir == null)
                 return OperationResult.NotFound;
-
-            newDir.Files.Add(file);
-            dir.Files.Remove(file);
+            
+            newDir.GetAllFiles().Add(file);
+            dir.GetAllFiles().Remove(file);
 
             file.Directory = newDir;
 
@@ -324,7 +324,7 @@ namespace Hash17.MockSystem
             if (directory == null)
                 return null;
 
-            return new List<Directory>(directory.Childs);
+            return new List<Directory>(directory.GetAvailableChilds());
         }
 
         public Directory FindDirectory(string path, bool navigateToResult = false)
@@ -429,10 +429,9 @@ namespace Hash17.MockSystem
                 return OperationResult.DuplicatedName;
             }
 
-            parent.Childs.Add(dir = new Directory()
+            parent.GetAllChilds().Add(dir = new Directory()
             {
                 Name = name,
-                Files = new List<File>(),
                 Parent = parent,
             });
 

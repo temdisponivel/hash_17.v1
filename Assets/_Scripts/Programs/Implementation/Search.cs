@@ -46,7 +46,7 @@ namespace Hash17.Programs.Implementation
             }
             else
             {
-                files = DeviceCollection.FileSystem.CurrentDirectory.Files;
+                files = DeviceCollection.FileSystem.CurrentDirectory.GetAvailableFiles();
             }
             var filesToShow = new List<File>();
             var programsToShow = new List<Program>();
@@ -66,10 +66,11 @@ namespace Hash17.Programs.Implementation
 
                 filesToShow.Add(currentFile);
             }
-            
-            foreach (var program in Alias.Programs.ProgramsByCommand)
+
+            var programs = Alias.Programs.GetAvailablePrograms();
+            for (int i = 0; i < programs.Count; i++)
             {
-                var prog = program.Value;
+                var prog = programs[i];
                 if (Validate(terms, prog.Command.ToLower(), only) || Validate(terms, prog.Description.ToLower(), only))
                 {
                     programsToShow.Add(prog);

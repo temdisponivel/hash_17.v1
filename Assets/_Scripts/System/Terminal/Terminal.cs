@@ -122,7 +122,7 @@ namespace MockSystem.Term
             get
             {
                 var userName = TextBuilder.BuildText(CurrentUserName, Alias.Config.UserNameColor);
-                var deviceId = TextBuilder.BuildText(DeviceCollection.CurrentDevice.UniqueId, Alias.Config.DeviceIdColor);
+                var deviceId = TextBuilder.BuildText(DeviceCollection.CurrentDevice.Id, Alias.Config.DeviceIdColor);
                 var currentDir = TextBuilder.BuildText(DeviceCollection.FileSystem.CurrentDirectory.Path, Alias.Config.DirectoryColor);
 
                 return string.Format("{0} @ {1} : {2}", userName, deviceId, currentDir);
@@ -172,7 +172,13 @@ namespace MockSystem.Term
 
             UpdateUserNameLocation();
 
-            RunProgram(Alias.Programs.SpecialPrograms[ProgramId.Init], string.Empty, true);
+            Program specialProgram;
+            if (!Alias.Programs.GetSpecialProgramByType(ProgramType.Init, out specialProgram))
+            {
+                Debug.LogError("ERROR TRYING TO GET {0} SPECIAL PROGRAM".InLineFormat(ProgramType.Init));
+            }
+
+            RunProgram(specialProgram, string.Empty);
         }
 
         #endregion
@@ -228,10 +234,11 @@ namespace MockSystem.Term
         private void TreatInputText(string text)
         {
             ShowText(text, showLocation: true);
-            string programName, programParams;
-            Interpreter.GetProgram(text, out programName, out programParams);
+            string programParams;
             Program program;
-            if (!Alias.Programs.ProgramsByCommand.TryGetValue(programName, out program))
+            var result = Alias.Programs.GetProgramAndParameters(text, out program, out programParams);
+
+            if (result == ProgramCollection.ProgramRequestResult.NonExisting)
             {
                 ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
                 ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
@@ -240,23 +247,12 @@ namespace MockSystem.Term
                 return;
             }
 
-            var device = DeviceCollection.CurrentDevice;
-            var deviceProgramId = 0;
-            if (device.SpecialPrograms.TryGetValue(program.Id, out deviceProgramId))
+            if (result == ProgramCollection.ProgramRequestResult.NonGlobal)
             {
-                var progBkp = program;
-                if (!Alias.Programs.ProgramsById.TryGetValue(deviceProgramId, out program))
-                {
-                    program = progBkp;
-
-                    // if the program is not global and current device don't have it, error
-                    if (!program.Global)
-                    {
-                        ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
-                        ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
-                        return;
-                    }
-                }
+                ShowText(TextBuilder.WarningText(string.Format("Unknow command \"{0}\"", text)));
+                ShowText(TextBuilder.WarningText("Type \"help\" to get some help"));
+                ShowText(string.Empty);
+                return;
             }
 
             var programInstance = RunProgram(program, programParams);
@@ -270,18 +266,8 @@ namespace MockSystem.Term
             programInstance.OnFinish += ProgramFinished;
         }
 
-        public Program RunProgram(Program program, string param, bool bypassCampaign = false)
+        public Program RunProgram(Program program, string param)
         {
-            if (!bypassCampaign)
-            {
-                string message = null;
-                if (!Alias.Campaign.CanRunProgram(program.Id, param, out message))
-                {
-                    ShowText(TextBuilder.WarningText(message));
-                    return null;
-                }
-            }
-
             var programInstance = program.Clone();
             RunningPrograms.Add(programInstance);
             programInstance.Execute(param);

@@ -64,17 +64,19 @@ namespace Hash17.Programs.Implementation
                 Alias.Term.ShowText("".PadRight(total, '-'));
 
                 var dir = fileSystem.CurrentDirectory;
-                for (int i = 0; i < dir.Childs.Count; i++)
+                var childs = dir.GetAvailableChilds();
+                for (int i = 0; i < childs.Count; i++)
                 {
-                    Alias.Term.ShowText("{0}{1}".InLineFormat("DIR:".PadRight(typePad), dir.Childs[i].PrettyName));
+                    Alias.Term.ShowText("{0}{1}".InLineFormat("DIR:".PadRight(typePad), childs[i].PrettyName));
                 }
 
-                for (int i = 0; i < dir.Files.Count; i++)
+                var files = dir.GetAvailableFiles();
+                for (int i = 0; i < files.Count; i++)
                 {
                     string status;
-                    if (dir.Files[i].IsProtected)
+                    if (files[i].IsProtected)
                     {
-                        if (dir.Files[i].CanBeRead)
+                        if (files[i].CanBeRead)
                             status = "Descrypted";
                         else
                             status = "Encrypted";
@@ -84,7 +86,7 @@ namespace Hash17.Programs.Implementation
                         status = "Normal";
                     }
                     var fileState = status.PadRight(statusPad);
-                    Alias.Term.ShowText("{0}{1}{2}".InLineFormat("FILE:".PadRight(typePad), dir.Files[i].PrettyName.PadRight(namePad), fileState));
+                    Alias.Term.ShowText("{0}{1}{2}".InLineFormat("FILE:".PadRight(typePad), files[i].PrettyName.PadRight(namePad), fileState));
                 }
 
                 yield return 0;

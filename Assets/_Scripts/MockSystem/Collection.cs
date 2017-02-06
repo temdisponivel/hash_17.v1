@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Hash17.MockSystem
 {
-    public class Collection<T> : NonUnitySingleton<Collection<T>>, ICollection<T>
+    public class Collection<T> : NonUnitySingleton<Collection<T>>
         where T : IEquatable<int>
     {
         #region Properties
@@ -44,27 +44,11 @@ namespace Hash17.MockSystem
         {
             return new List<T>(_availableItems);
         }
-
-        public virtual void AddItem(int uniqueId)
-        {
-            var item = _all.Find(i => i.Equals(uniqueId));
-            Add(item);
-        }
-
+        
         #endregion
 
         #region ICollection
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _availableItems.GetEnumerator();
-        }
-
-        public virtual IEnumerator<T> GetEnumerator()
-        {
-            return _availableItems.GetEnumerator();
-        }
-
+        
         public virtual void Add(T item)
         {
             if (item == null)
@@ -72,41 +56,22 @@ namespace Hash17.MockSystem
                 Debug.LogError("TRYING TO ADD A INVALID ITEM OF TYPE {0}.".InLineFormat(typeof(T).Name));
             }
 
+            _all.Add(item);
             _availableItems.Add(item);
             if (OnItemAdded != null)
                 OnItemAdded(item);
         }
-
-        public virtual void Clear()
-        {
-            _availableItems.Clear();
-        }
-
+        
         public virtual bool Contains(T item)
         {
             return _availableItems.Contains(item);
         }
-
-        public virtual void CopyTo(T[] array, int arrayIndex)
-        {
-            _availableItems.CopyTo(array, arrayIndex);
-        }
-
-        public virtual bool Remove(T item)
-        {
-            return _availableItems.Remove(item);
-        }
-
+        
         public virtual int Count
         {
             get { return _availableItems.Count; }
         }
-
-        public virtual bool IsReadOnly
-        {
-            get { return false; }
-        }
-
+        
         public T this[int index]
         {
             get { return _availableItems[index]; }

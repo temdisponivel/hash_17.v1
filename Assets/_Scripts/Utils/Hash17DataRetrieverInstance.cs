@@ -48,7 +48,7 @@ namespace Hash17.Utils
             for (var i = 0; i < _spreadSheetResults.Length; i++)
             {
                 var current = _spreadSheetResults[i];
-                var id = (ProgramId)Enum.Parse(typeof(ProgramId), current["Id"].ToString());
+                var id = (ProgramType)Enum.Parse(typeof(ProgramType), current["Id"].ToString());
                 var prog = GetProgramInstance(id, current);
                 results.Add(prog);
             }
@@ -70,7 +70,7 @@ namespace Hash17.Utils
             DestroyImmediate(gameObject);
         }
 
-        private Program GetProgramInstance(ProgramId id, JsonData current)
+        private Program GetProgramInstance(ProgramType type, JsonData current)
         {
             Program result = null;
             //switch (id)
@@ -109,17 +109,17 @@ namespace Hash17.Utils
             //        result = new Set();
             //        break;
             //}
-            var typeName = "Hash17.Programs.Implementation.{0}".InLineFormat(id.ToString());
+            var typeName = "Hash17.Programs.Implementation.{0}".InLineFormat(type.ToString());
             Debug.Log(typeName);
             var programType = Type.GetType(typeName);
             result = Activator.CreateInstance(programType) as Program;
 
-            SetProgramBaseProperties(id, result, current);
+            SetProgramBaseProperties(type, result, current);
 
             return result;
         }
 
-        private void SetProgramBaseProperties(ProgramId programId, Program prog, JsonData current)
+        private void SetProgramBaseProperties(ProgramType programType, Program prog, JsonData current)
         {
             var uniqueId = int.Parse(current["UniqueId"].ToString());
             var com = current["Command"].ToString();
@@ -129,7 +129,7 @@ namespace Hash17.Utils
             var availableGame = bool.Parse(current["Global"].ToString());
             var aditionalData = current["AditionalData"].ToString().Trim();
 
-            prog.Id = programId;
+            prog.Type = programType;
             prog.Command = com;
             prog.UniqueId = uniqueId;
             prog.Description = desc;
@@ -259,7 +259,7 @@ namespace Hash17.Utils
             var name = currentDevice["Name"].ToString();
             var firewallType = (FirewallType)Enum.Parse(typeof(FirewallType), currentDevice["FirewallType"].ToString());
             var specialPrograms = currentDevice["SpecialPrograms"].ToString().Trim();
-            var dicSpecialProgram = new Dictionary<ProgramId, int>();
+            var dicSpecialProgram = new Dictionary<ProgramType, int>();
             if (!string.IsNullOrEmpty(specialPrograms))
             {
                 var specialProgramsDef = currentDevice["SpecialPrograms"].ToString().Split(',');
@@ -267,13 +267,13 @@ namespace Hash17.Utils
                 {
                     var currentProg = specialProgramsDef[i];
                     var parts = currentProg.Split(';');
-                    var programId = (ProgramId)Enum.Parse(typeof(ProgramId), parts[0]);
+                    var programId = (ProgramType)Enum.Parse(typeof(ProgramType), parts[0]);
                     var programUniqueId = parts[1];
                     dicSpecialProgram[programId] = int.Parse(programUniqueId);
                 }
             }
 
-            prog.UniqueId = uniqueId;
+            prog.Id = uniqueId;
             prog.Name = name;
             prog.FirewallType = firewallType;
             prog.SpecialPrograms = dicSpecialProgram;

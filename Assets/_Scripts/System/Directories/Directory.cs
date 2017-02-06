@@ -13,25 +13,15 @@ namespace Hash17.Files
     {
         #region Properties
 
+        public int UniqueId { get; set; }
         public virtual string Name { get; set; }
         public virtual Directory Parent { get; set; }
-
-        [SerializeField]
         private List<Directory> _childs;
-
-        [SerializeField]
         private List<File> _files;
 
-        public List<Directory> Childs
+        public bool IsAvailable
         {
-            get { return _childs; }
-            set { _childs = value; }
-        }
-
-        public List<File> Files
-        {
-            get { return _files; }
-            set { _files = value; }
+            get { return Alias.Campaign.Info.UnlockedDirectories.Contains(UniqueId); }
         }
 
         [JsonIgnore]
@@ -60,7 +50,7 @@ namespace Hash17.Files
 
         #endregion
 
-        #region Childs and files
+        #region Contructor
 
         public Directory()
         {
@@ -68,25 +58,58 @@ namespace Hash17.Files
             _files = new List<File>();
         }
 
-        public virtual Directory FindDirectoryByName(string name)
-        {
-            return Childs.Find(d => String.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase));
-        }
+        #endregion
+
+        #region Childs and files
 
         public virtual File FindFileByName(string name)
         {
-            return Files.Find(d => String.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase));
+            return _files.Find(d => String.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase));
         }
 
         public List<File> GetFilesInDirectoriesAndChilds(List<File> toAdd)
         {
-            toAdd.AddRange(Files);
-            for (int i = 0; i < Childs.Count; i++)
+            toAdd.AddRange(GetAvailableFiles());
+            var childs = GetAvailableChilds();
+            for (int i = 0; i < childs.Count; i++)
             {
-                toAdd = Childs[i].GetFilesInDirectoriesAndChilds(toAdd);
+                toAdd = childs[i].GetFilesInDirectoriesAndChilds(toAdd);
             }
             return toAdd;
         }
+
+        #region Childs
+
+        public virtual Directory FindDirectoryByName(string name)
+        {
+            return _childs.Find(d => String.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public List<Directory> GetAllChilds()
+        {
+            return _childs;
+        }
+
+        public List<Directory> GetAvailableChilds()
+        {
+            return _childs.FindAll(c => c.IsAvailable);
+        }
+
+        #endregion
+
+        #region Files
+
+        public List<File> GetAllFiles()
+        {
+            return _files;
+        }
+
+        public List<File> GetAvailableFiles()
+        {
+            return _files.FindAll(f => f.IsAvailable);
+        }
+
+        #endregion
 
         #endregion
     }

@@ -13,7 +13,7 @@ namespace Hash17.Programs
     {
         #region Properties
 
-        public ProgramId Id;
+        public ProgramType Type;
         public int UniqueId;
         public string Command;
         public string PrettyCommand {get { return TextBuilder.BuildText(Command, Alias.Config.ProgramColor); } }
@@ -23,6 +23,8 @@ namespace Hash17.Programs
         public bool Global = true;
         public virtual string AditionalData { get; set; }
         public virtual bool ManuallyFinished { get; set; }
+
+        public bool IsAvailable { get { return Alias.Campaign.Info.UnlockPrograms.Contains(UniqueId); } }
 
         public ProgramParameter Parameters { get; set; }
         public bool Running { get; private set; }

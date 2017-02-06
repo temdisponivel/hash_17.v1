@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Hash17.Campaign;
 using Hash17.Data;
+using Hash17.Devices;
 using Hash17.Devices.Firewalls;
 using Hash17.Devices.Firewalls.Implementation;
 using Hash17.MockSystem;
@@ -52,7 +53,13 @@ namespace Hash17.Game
             DeviceCollection.Load(DataHolder.DevicesSerializedData);
             ProgramCollection.Load(DataHolder.ProgramsSerializedData);
 
-            DeviceCollection.ChangeCurrentDevice(DeviceCollection.DevicesById[Alias.Config.OwnedDeviceId.GetHashCode()]);
+            Device owned;
+            if (!DeviceCollection.GetDeviceById(Alias.Config.OwnedDeviceId.GetHashCode(), out owned))
+            {
+                Debug.LogError("OWNED DEVICE NOT UNLOCKED OR INVALID");
+            }
+
+            DeviceCollection.ChangeCurrentDevice(owned);
 
             CampaignManager.OnGameStarted();
 

@@ -18,6 +18,11 @@ namespace Hash17.Files
         public bool IsProtected { get; set; }
         public string Password { get; set; }
 
+        public bool IsAvailable 
+        {
+            get { return Directory.IsAvailable && Alias.Campaign.Info.UnlockedFiles.Contains(UniqueId); }
+        }
+
         private string _content;
         public string Content
         {
@@ -42,7 +47,7 @@ namespace Hash17.Files
 
         public bool CanBeRead
         {
-            get { return Application.isPlaying && (!IsProtected || Alias.Campaign.Info.CrackedFiles.Contains(UniqueId)); }
+            get { return Application.isPlaying && IsAvailable && (!IsProtected || Alias.Campaign.Info.CrackedFiles.Contains(UniqueId)); }
         }
 
         [JsonIgnore]

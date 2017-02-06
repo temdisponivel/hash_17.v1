@@ -16,15 +16,16 @@ namespace Hash17.Programs.Implementation
         {
             BlockInput();
 
-            var programs = Alias.Programs.ProgramsByCommand;
+            var programs = Alias.Programs.GetAvailablePrograms();
 
-            foreach (var program in programs)
+            for (int i = 0; i < programs.Count; i++)
             {
+                var program = programs[i];
                 int id;
-                if (DeviceCollection.CurrentDevice.SpecialPrograms.TryGetValue(program.Value.Id, out id))
+                if (DeviceCollection.CurrentDevice.SpecialPrograms.TryGetValue(program.Type, out id))
                 {
-                    var prog = Alias.Programs.ProgramsById[id];
-                    if (prog != null)
+                    Program prog;
+                    if (Alias.Programs.GetProgramById(id, out prog))
                     {
                         Alias.Term.ShowText("Program command: {0} ".InLineFormat(prog.PrettyCommand));
                         Alias.Term.ShowText(prog.Description, ident: true);
@@ -33,11 +34,11 @@ namespace Hash17.Programs.Implementation
                     }
                 }
 
-                if (!program.Value.Global)
+                if (!program.Global)
                     continue;
 
-                Alias.Term.ShowText("Program command: {0} ".InLineFormat(program.Value.PrettyCommand));
-                Alias.Term.ShowText(program.Value.Description, ident: true);
+                Alias.Term.ShowText("Program command: {0} ".InLineFormat(program.PrettyCommand));
+                Alias.Term.ShowText(program.Description, ident: true);
                 yield return null;
             }
 
