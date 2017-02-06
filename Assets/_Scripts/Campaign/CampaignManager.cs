@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Hash17.Devices;
 using Hash17.Files;
-using Hash17.Game;
 using Hash17.MockSystem;
 using Hash17.Programs;
-using MockSystem;
 using Hash17.Utils;
-using MockSystem.Term;
 using Newtonsoft.Json;
 using UnityEngine;
-using File = System.IO.File;
 
 namespace Hash17.Campaign
 {
@@ -24,30 +20,30 @@ namespace Hash17.Campaign
             public string PlayerName { get; set; }
 
             [JsonProperty("CD")]
-            public HashSet<int> CrackedDevices { get; set; }
+            public Hash17HashSet<int> CrackedDevices { get; set; }
 
             [JsonProperty("CF")]
-            public HashSet<int> CrackedFiles { get; set; }
+            public Hash17HashSet<int> CrackedFiles { get; set; }
 
             [JsonProperty("UD")]
-            public HashSet<int> UnlockedDirectories { get; set; }
+            public Hash17HashSet<int> UnlockedDirectories { get; set; }
 
             [JsonProperty("UF")]
-            public HashSet<int> UnlockedFiles { get; set; }
+            public Hash17HashSet<int> UnlockedFiles { get; set; }
 
             [JsonProperty("UDV")]
-            public HashSet<int> UnlockedDevices { get; set; }
-            
+            public Hash17HashSet<int> UnlockedDevices { get; set; }
+
             [JsonProperty("CCI")]
-            public List<int> CompletedCampaignItems { get; set; }
+            public Hash17HashSet<int> CompletedCampaignItems { get; set; }
 
             [JsonProperty("UP")]
-            public List<int> UnlockPrograms { get; set; }
+            public Hash17HashSet<int> UnlockPrograms { get; set; }
 
             public CampaignInfo()
             {
-                CrackedDevices = new HashSet<int>();
-                CrackedFiles = new HashSet<int>();
+                CrackedDevices = new Hash17HashSet<int>();
+                CrackedFiles = new Hash17HashSet<int>();
             }
         }
 
@@ -56,7 +52,42 @@ namespace Hash17.Campaign
         #region Properties
 
         public bool IsFirstTimeInGame { get; set; }
-        public CampaignInfo Info { get; protected set; }
+
+        private CampaignInfo _info;
+
+        public CampaignInfo Info
+        {
+            get
+            {
+                return _info;
+            }
+            private set
+            {
+                var previous = _info;
+                if (previous != null)
+                {
+                    previous.CrackedFiles.OnItemAdded -= OnFileDecrypted;
+                    previous.CrackedDevices.OnItemAdded -= OnDeviceCracked;
+                    previous.UnlockedDevices.OnItemAdded -= OnDeviceUnlocked;
+                    previous.UnlockedFiles.OnItemAdded -= OnFileUnlocked;
+                    previous.UnlockedDirectories.OnItemAdded -= OnDirUnlocked;
+                    previous.UnlockPrograms.OnItemAdded -= OnProgramUnlocked;
+                    previous.CompletedCampaignItems.OnItemAdded -= OnCampaignItemCompletedTrigget;
+                }
+
+                _info = value;
+                if (_info != null)
+                {
+                    _info.CrackedFiles.OnItemAdded += OnFileDecrypted;
+                    _info.CrackedDevices.OnItemAdded += OnDeviceCracked;
+                    _info.UnlockedDevices.OnItemAdded += OnDeviceUnlocked;
+                    _info.UnlockedFiles.OnItemAdded += OnFileUnlocked;
+                    _info.UnlockedDirectories.OnItemAdded += OnDirUnlocked;
+                    _info.UnlockPrograms.OnItemAdded += OnProgramUnlocked;
+                    _info.CompletedCampaignItems.OnItemAdded += OnCampaignItemCompletedTrigget;
+                }
+            }
+        }
 
         public List<CampaignItem> AllCampaignItems { get; set; }
         public List<CampaignItem> UncompletedCampaignItems { get; set; }
@@ -67,7 +98,7 @@ namespace Hash17.Campaign
             get { return "{0}{1}".InLineFormat(Application.persistentDataPath, Alias.Config.CampaignSavePath); }
         }
 
-        public Action<CampaignItem> OnCampaignItemCompleted { get; set; }
+        public event Action<CampaignItem> OnCampaignItemCompleted;
 
         #endregion
 
@@ -77,35 +108,37 @@ namespace Hash17.Campaign
         {
             LoadProgress();
             Alias.SysVariables.OnSystemVariableChange += OnSystemVariableChanged;
+            File.OnFileOpened += OnFileOpened;
+            Alias.Devices.OnCurrentDeviceChange += OnDeviceConnected;
         }
 
         public void SaveProgress()
         {
-            File.WriteAllText(SavePath, JsonConvert.SerializeObject(Info));
+            System.IO.File.WriteAllText(SavePath, JsonConvert.SerializeObject(Info));
         }
 
         public void LoadProgress()
         {
-            if (!File.Exists(SavePath))
+            if (!System.IO.File.Exists(SavePath))
             {
                 IsFirstTimeInGame = true;
                 SaveProgress();
             }
 
-            var content = File.ReadAllText(SavePath);
+            var content = System.IO.File.ReadAllText(SavePath);
             Info = JsonConvert.DeserializeObject<CampaignInfo>(content);
 
             if (Info.CrackedFiles == null)
-                Info.CrackedFiles = new HashSet<int>();
+                Info.CrackedFiles = new Hash17HashSet<int>();
 
             if (Info.CrackedDevices == null)
-                Info.CrackedDevices = new HashSet<int>();
+                Info.CrackedDevices = new Hash17HashSet<int>();
 
             Alias.SysVariables.Add(SystemVariableType.USERNAME, Info.PlayerName);
         }
 
         #endregion
-        
+
         #region Callbacks
 
         private void OnSystemVariableChanged(SystemVariableType variable)
@@ -115,21 +148,85 @@ namespace Hash17.Campaign
                 IsFirstTimeInGame = true;
                 Info.PlayerName = Alias.SysVariables[SystemVariableType.USERNAME];
             }
+
+            ValidateCampaignItems(CampaignTriggetType.SystemVariableChange, variable);
+        }
+
+        private void OnFileOpened(File openedFile)
+        {
+            ValidateCampaignItems(CampaignTriggetType.FileOpened, openedFile.UniqueId);
+        }
+
+        private void OnFileDecrypted(int fileId)
+        {
+            ValidateCampaignItems(CampaignTriggetType.FileDecrypted, fileId);
+        }
+
+        private void OnDeviceConnected()
+        {
+            ValidateCampaignItems(CampaignTriggetType.DeviceConnect, DeviceCollection.CurrentDevice.UniqueId);
+        }
+
+        private void OnDeviceCracked(int deviceCracked)
+        {
+            ValidateCampaignItems(CampaignTriggetType.DeviceCracked, deviceCracked);
+        }
+
+        private void OnDirUnlocked(int dirId)
+        {
+            ValidateCampaignItems(CampaignTriggetType.DirUnlocked, dirId);
+        }
+
+        private void OnFileUnlocked(int fileUnlocked)
+        {
+            ValidateCampaignItems(CampaignTriggetType.FileUnlocked, fileUnlocked);
+        }
+
+        private void OnProgramUnlocked(int programUnlocked)
+        {
+            ValidateCampaignItems(CampaignTriggetType.ProgramUnlocked, programUnlocked);
+        }
+
+        private void OnDeviceUnlocked(int programUnlocked)
+        {
+            ValidateCampaignItems(CampaignTriggetType.DeviceUnlocked, programUnlocked);
+        }
+
+        private void OnCampaignItemCompletedTrigget(int campaignItemCompleted)
+        {
+            ValidateCampaignItems(CampaignTriggetType.CampaignItemCompleted, campaignItemCompleted);
         }
 
         #endregion
 
         #region Campaign Items
 
+        #region Load
+
+        public void LoadCampaignItems(TextAsset serializedData)
+        {
+            var content = serializedData.text;
+            AllCampaignItems = JsonConvert.DeserializeObject<List<CampaignItem>>(content);
+
+            UncompletedCampaignItems = new List<CampaignItem>(AllCampaignItems);
+            UncompletedCampaignItems.RemoveAll(i => !Info.CompletedCampaignItems.Contains(i.Id));
+
+            CompletedCampaignItems = new List<CampaignItem>(AllCampaignItems);
+            CompletedCampaignItems.RemoveAll(i => Info.CompletedCampaignItems.Contains(i.Id));
+        }
+
+        #endregion
+
         #region Validations
 
-        public void ValidateCampaignItems(CampaignTriggetType typeToValidate)
+        public void ValidateCampaignItems(CampaignTriggetType typeToValidate, object data)
         {
             var itemsToValidate = UncompletedCampaignItems.FindAll(i => i.Type == typeToValidate);
             for (int i = 0; i < itemsToValidate.Count; i++)
             {
                 var item = itemsToValidate[i];
-                if (!item.Dependecies.TrueForAll(id => CompletedCampaignItems.Exists(complete => complete.Id == id)))
+
+                if (!ValidateCampaignItem(item, data))
                     continue;
 
                 ExecuteCampignItem(item);
@@ -142,6 +239,56 @@ namespace Hash17.Campaign
             }
         }
 
+        public bool ValidateCampaignItem(CampaignItem item, object data)
+        {
+            var result = !ValidateDependencies(item);
+            switch (item.Type)
+            {
+                case CampaignTriggetType.FileOpened:
+                case CampaignTriggetType.DeviceConnect:
+                case CampaignTriggetType.FileDecrypted:
+                case CampaignTriggetType.DeviceCracked:
+                case CampaignTriggetType.FileUnlocked:
+                case CampaignTriggetType.DirUnlocked:
+                case CampaignTriggetType.ProgramUnlocked:
+                case CampaignTriggetType.DeviceUnlocked:
+                case CampaignTriggetType.CampaignItemCompleted:
+                    result &= ValidateIntItem(item, data);
+                    break;
+                case CampaignTriggetType.SystemVariableChange:
+                    result &= ValidateSystemVariableChange(item, data);
+                    break;
+            }
+            
+            return result;
+        }
+
+        public bool ValidateDependencies(CampaignItem item)
+        {
+            return item.Dependecies.TrueForAll(id => CompletedCampaignItems.Exists(complete => complete.Id == id));
+        }
+
+        public bool ValidateIntItem(CampaignItem item, object openFileId)
+        {
+            int fileId = 0;
+            if (!int.TryParse(item.ActionAditionalData, out fileId))
+            {
+                Debug.LogError("ERROR TRYING TO VALIDATE CAMPAIGN ITEM {0}. DATA {1}: ".InLineFormat(item.Id, item.ActionAditionalData));
+            }
+
+            return (int) openFileId == fileId;
+        }
+        
+        public bool ValidateSystemVariableChange(CampaignItem item, object systemVariable)
+        {
+            if (!Enum.IsDefined(typeof(SystemVariableType), item.ActionAditionalData))
+            {
+                Debug.LogError("ERROR TRYING TO VALIDATE CAMPAIGN ITEM {0}. SYSTEM VARIABLE NOT PARSED: {1}".InLineFormat(item.Id, item.ActionAditionalData));
+            }
+
+            return (SystemVariableType)Enum.Parse(typeof(SystemVariableType), item.ActionAditionalData) == (SystemVariableType)systemVariable;
+        }
+        
         #endregion
 
         #region Execution
@@ -169,7 +316,7 @@ namespace Hash17.Campaign
         {
             Program program;
             var parameters = string.Empty;
-            var result = Alias.Programs.GetProgramAndParameters(item.AditionalData, out program, out parameters);
+            var result = Alias.Programs.GetProgramAndParameters(item.ActionAditionalData, out program, out parameters);
             if (result != ProgramCollection.ProgramRequestResult.Ok)
             {
                 Debug.LogError("ERROR TRYING TO EXECUTE CAMPAIGN ITEM {0}. PROGRAM QUERY RETURNED {1}".InLineFormat(item.Id, result));
@@ -181,7 +328,7 @@ namespace Hash17.Campaign
 
         public void ExecuteUnlockDeviceCampaignItem(CampaignItem item)
         {
-            var devices = item.AditionalData.Split(',');
+            var devices = item.ActionAditionalData.Split(',');
             for (int i = 0; i < devices.Length; i++)
             {
                 int deviceId;
@@ -196,7 +343,7 @@ namespace Hash17.Campaign
 
         public void ExecuteUnlockFileCampaignItem(CampaignItem item)
         {
-            var files = item.AditionalData.Split(',');
+            var files = item.ActionAditionalData.Split(',');
             for (int i = 0; i < files.Length; i++)
             {
                 int fileId;
@@ -211,7 +358,7 @@ namespace Hash17.Campaign
 
         public void ExecuteUnlockDirCampaignItem(CampaignItem item)
         {
-            var dir = item.AditionalData.Split(',');
+            var dir = item.ActionAditionalData.Split(',');
             for (int i = 0; i < dir.Length; i++)
             {
                 int dirId;
@@ -222,22 +369,6 @@ namespace Hash17.Campaign
 
                 Info.UnlockedDirectories.Add(dirId);
             }
-        }
-
-        #endregion
-
-        #region Load
-
-        public void LoadCampaignItems(TextAsset serializedData)
-        {
-            var content = serializedData.text;
-            AllCampaignItems = JsonConvert.DeserializeObject<List<CampaignItem>>(content);
-
-            UncompletedCampaignItems = new List<CampaignItem>(AllCampaignItems);
-            UncompletedCampaignItems.RemoveAll(i => !Info.CompletedCampaignItems.Contains(i.Id));
-
-            CompletedCampaignItems = new List<CampaignItem>(AllCampaignItems);
-            CompletedCampaignItems.RemoveAll(i => Info.CompletedCampaignItems.Contains(i.Id));
         }
 
         #endregion

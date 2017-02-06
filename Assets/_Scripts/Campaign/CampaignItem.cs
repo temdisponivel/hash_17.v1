@@ -12,6 +12,7 @@ namespace Hash17.Campaign
         public CampaignActionType Action;
         public List<int> Dependecies;
         public int EntityId;
-        public string AditionalData;
+        public string TriggerAditionalData;
+        public string ActionAditionalData;
     }
 }

@@ -23,5 +23,12 @@ namespace Hash17.Utils
         public string TextAssetsSpreadSheetId;
 
         #endregion
+
+        #region Campaign
+
+        public string CampaignItemsSpreedSheetId;
+        public string DefaultCampaignInfoSpreedSheetId;
+
+        #endregion
     }
 }
