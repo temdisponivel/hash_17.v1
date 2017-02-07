@@ -43,7 +43,10 @@ namespace Hash17.MockSystem
         {
             base.Add(item);
             if (item.StartUnlocked)
+            {
                 Alias.Campaign.Info.UnlockedDevices.Add(item.UniqueId);
+                item.FileSystem.UnlockAvailables();
+            }
         }
 
         #endregion

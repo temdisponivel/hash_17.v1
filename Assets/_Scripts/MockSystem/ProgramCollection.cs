@@ -29,23 +29,28 @@ namespace Hash17.MockSystem
             if (!Alias.Programs.GetProgramByCommand(programName, out program))
                 return ProgramRequestResult.NonExisting;
 
-            var deviceProgramId = 0;
             var device = DeviceCollection.CurrentDevice;
 
-            // If the program exists, validate if the current device has a 
-            // specific version of it
-            if (device.SpecialPrograms.TryGetValue(program.Type, out deviceProgramId))
+            // validation needed bcause this method can be called from the game start (where there's no current device)
+            if (device != null)
             {
-                var progBkp = program;
+                var deviceProgramId = 0;
 
-                // if it doesn't, set the old version of the program again
-                if (!Alias.Programs.GetProgramById(deviceProgramId, out program))
+                // If the program exists, validate if the current device has a 
+                // specific version of it
+                if (device.SpecialPrograms.TryGetValue(program.Type, out deviceProgramId))
                 {
-                    program = progBkp;
+                    var progBkp = program;
 
-                    // if the program is not global and current device don't have it, error
-                    if (!program.Global)
-                        return ProgramRequestResult.NonGlobal;
+                    // if it doesn't, set the old version of the program again
+                    if (!Alias.Programs.GetProgramById(deviceProgramId, out program))
+                    {
+                        program = progBkp;
+
+                        // if the program is not global and current device don't have it, error
+                        if (!program.Global)
+                            return ProgramRequestResult.NonGlobal;
+                    }
                 }
             }
 

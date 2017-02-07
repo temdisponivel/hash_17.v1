@@ -6,6 +6,7 @@ using Hash17.Files;
 using Hash17.MockSystem;
 using Hash17.Programs;
 using Hash17.Utils;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Hash17.Devices
@@ -22,22 +23,14 @@ namespace Hash17.Devices
         public Dictionary<ProgramType, int> SpecialPrograms;
         public bool StartUnlocked { get; set; }
 
+        [JsonIgnore]
         public bool IsAvailable { get { return Application.isPlaying && Alias.Campaign.Info.UnlockedDevices.Contains(UniqueId); } }
 
         public virtual IEnumerator TryAccess(Action<bool, Device> callback)
         {
             yield return Alias.Game.Firewalls[FirewallType].Clone().Access(callback, this);
         }
-
-        public void OnLoad()
-        {
-            if (StartUnlocked)
-            {
-                Alias.Campaign.Info.UnlockedDevices.Add(UniqueId);
-                FileSystem.UnlockAvailables();
-            }
-        }
-
+        
         #region IEquatable
 
         public bool Equals(int other)

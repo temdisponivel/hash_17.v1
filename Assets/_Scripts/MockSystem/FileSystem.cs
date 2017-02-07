@@ -47,15 +47,19 @@ namespace Hash17.MockSystem
             }
         }
 
+        [JsonIgnore]
         public char DirectorySeparator
         {
             get { return '/'; }
         }
+        
         public override string Name
         {
             get { return "/"; }
             set { }
         }
+
+        [JsonIgnore]
         public List<File> AllFiles
         {
             get
@@ -63,8 +67,7 @@ namespace Hash17.MockSystem
                 return GetFilesInDirectoriesAndChilds(new List<File>());
             }
         }
-        public List<File> AvailableFiles { get; set; }
-
+        
         #endregion
 
         #region Files

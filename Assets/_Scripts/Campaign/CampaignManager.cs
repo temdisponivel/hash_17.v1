@@ -25,9 +25,6 @@ namespace Hash17.Campaign
             [JsonProperty("CF")]
             public Hash17HashSet<int> CrackedFiles { get; set; }
 
-            [JsonProperty("UD")]
-            public Hash17HashSet<int> UnlockedDirectories { get; set; }
-
             [JsonProperty("UF")]
             public Hash17HashSet<int> UnlockedFiles { get; set; }
 
@@ -51,8 +48,6 @@ namespace Hash17.Campaign
                     CrackedDevices = new Hash17HashSet<int>();
                 if (CrackedFiles == null)
                     CrackedFiles = new Hash17HashSet<int>();
-                if (UnlockedDirectories == null)
-                    UnlockedDirectories = new Hash17HashSet<int>();
                 if (UnlockedFiles == null)
                     UnlockedFiles = new Hash17HashSet<int>();
                 if (UnlockedDevices == null)
@@ -87,7 +82,6 @@ namespace Hash17.Campaign
                     previous.CrackedDevices.OnItemAdded -= OnDeviceCracked;
                     previous.UnlockedDevices.OnItemAdded -= OnDeviceUnlocked;
                     previous.UnlockedFiles.OnItemAdded -= OnFileUnlocked;
-                    previous.UnlockedDirectories.OnItemAdded -= OnDirUnlocked;
                     previous.UnlockPrograms.OnItemAdded -= OnProgramUnlocked;
                     previous.CompletedCampaignItems.OnItemAdded -= OnCampaignItemCompletedTrigget;
                 }
@@ -99,7 +93,6 @@ namespace Hash17.Campaign
                     _info.CrackedDevices.OnItemAdded += OnDeviceCracked;
                     _info.UnlockedDevices.OnItemAdded += OnDeviceUnlocked;
                     _info.UnlockedFiles.OnItemAdded += OnFileUnlocked;
-                    _info.UnlockedDirectories.OnItemAdded += OnDirUnlocked;
                     _info.UnlockPrograms.OnItemAdded += OnProgramUnlocked;
                     _info.CompletedCampaignItems.OnItemAdded += OnCampaignItemCompletedTrigget;
                 }
@@ -123,8 +116,6 @@ namespace Hash17.Campaign
 
         public void OnGameStarted()
         {
-            LoadProgress();
-            LoadCampaignItems(Alias.DataHolder.CampaignItemsSerializedData);
             Alias.SysVariables.OnSystemVariableChange += OnSystemVariableChanged;
             File.OnFileOpened += OnFileOpened;
             Alias.Devices.OnCurrentDeviceChange += OnDeviceConnected;
@@ -133,11 +124,17 @@ namespace Hash17.Campaign
                 ValidateCampaignItems(CampaignTriggerType.NewGameStarted, null);
         }
 
+        public void LoadStuff()
+        {
+            LoadProgress();
+            LoadCampaignItems(Alias.DataHolder.CampaignItemsSerializedData);
+        }
+
         public void SaveProgress()
         {
             System.IO.File.WriteAllText(SavePath, JsonConvert.SerializeObject(Info));
         }
-        
+
         public void LoadProgress()
         {
             CampaignInfo info;
@@ -190,11 +187,6 @@ namespace Hash17.Campaign
         private void OnDeviceCracked(int deviceCracked)
         {
             ValidateCampaignItems(CampaignTriggerType.DeviceCracked, deviceCracked);
-        }
-
-        private void OnDirUnlocked(int dirId)
-        {
-            ValidateCampaignItems(CampaignTriggerType.DirUnlocked, dirId);
         }
 
         private void OnFileUnlocked(int fileUnlocked)
@@ -274,11 +266,9 @@ namespace Hash17.Campaign
             switch (item.Trigger)
             {
                 case CampaignTriggerType.FileOpened:
-                case CampaignTriggerType.DeviceConnect:
                 case CampaignTriggerType.FileDecrypted:
                 case CampaignTriggerType.DeviceCracked:
                 case CampaignTriggerType.FileUnlocked:
-                case CampaignTriggerType.DirUnlocked:
                 case CampaignTriggerType.ProgramUnlocked:
                 case CampaignTriggerType.DeviceUnlocked:
                 case CampaignTriggerType.CampaignItemCompleted:
@@ -290,8 +280,11 @@ namespace Hash17.Campaign
                 case CampaignTriggerType.NewGameStarted:
                     result &= IsFirstTimeInGame;
                     break;
+                case CampaignTriggerType.DeviceConnect:
+                    result &= ValidateStringItem(item, data);
+                    break;
             }
-            
+
             return result;
         }
 
@@ -308,9 +301,9 @@ namespace Hash17.Campaign
                 Debug.LogError("ERROR TRYING TO VALIDATE CAMPAIGN ITEM {0}. DATA {1}: ".InLineFormat(item.Id, item.ActionAditionalData));
             }
 
-            return (int) openFileId == fileId;
+            return (int)openFileId == fileId;
         }
-        
+
         public bool ValidateSystemVariableChange(CampaignItem item, object systemVariable)
         {
             if (!Enum.IsDefined(typeof(SystemVariableType), item.TriggerAditionalData))
@@ -320,7 +313,12 @@ namespace Hash17.Campaign
 
             return (SystemVariableType)Enum.Parse(typeof(SystemVariableType), item.TriggerAditionalData) == (SystemVariableType)systemVariable;
         }
-        
+
+        public bool ValidateStringItem(CampaignItem item, object systemVariable)
+        {
+            return item.TriggerAditionalData == systemVariable.ToString();
+        }
+
         #endregion
 
         #region Execution
@@ -336,13 +334,10 @@ namespace Hash17.Campaign
                     ExecuteUnlockDeviceCampaignItem(item);
                     break;
                 case CampaignActionType.UnlockFile:
-                    ExecuteUnlockDirCampaignItem(item);
-                    break;
-                case CampaignActionType.UnlockDirectory:
-                    ExecuteUnlockDirCampaignItem(item);
+                    ExecuteUnlockFileCampaignItem(item);
                     break;
                 case CampaignActionType.UnlockProgram:
-                    ExecuteUnlockDirCampaignItem(item);
+                    ExecuteUnlockProgram(item);
                     break;
             }
         }
@@ -382,21 +377,6 @@ namespace Hash17.Campaign
                 }
 
                 Info.UnlockedFiles.Add(fileId);
-            }
-        }
-
-        public void ExecuteUnlockDirCampaignItem(CampaignItem item)
-        {
-            var dir = item.ActionAditionalData.Split(',');
-            for (int i = 0; i < dir.Length; i++)
-            {
-                int dirId;
-                if (!int.TryParse(dir[i], out dirId))
-                {
-                    Debug.LogError("ERROR PARSING ADITIONAL DATA {0} WHEN UNLOCK DIRECTORY FROM CAMPAIGN ITEM ID {1}".InLineFormat(dir[i], item.Id));
-                }
-
-                Info.UnlockedDirectories.Add(dirId);
             }
         }
 

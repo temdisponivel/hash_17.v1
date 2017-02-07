@@ -26,7 +26,7 @@ namespace Hash17.Devices.Firewalls.Implementation
             Callback = callback;
             Device = device;
 
-            Alias.Term.ShowText(TextBuilder.MessageText(string.Format("Password for {0}:", device.UniqueId)));
+            Alias.Term.ShowText(TextBuilder.MessageText(string.Format("Password for {0}:", device.Id)));
         }
 
         void InputSubmited(string input)

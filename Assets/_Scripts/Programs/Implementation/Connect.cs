@@ -53,7 +53,7 @@ namespace Hash17.Programs.Implementation
                         {
                             Alias.Term.ShowText(
                                 TextBuilder.MessageText(string.Format("Access granted. You are now on {0}.",
-                                    device1.UniqueId)));
+                                    device1.Id)));
                             Alias.Devices.ChangeCurrentDevice(device1);
                         }
                         else

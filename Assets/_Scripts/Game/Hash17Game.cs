@@ -52,10 +52,12 @@ namespace Hash17.Game
 
             LoadFirewalls();
 
-            CampaignManager.OnGameStarted();
+            CampaignManager.LoadStuff();
 
             DeviceCollection.Load(DataHolder.DevicesSerializedData);
             ProgramCollection.Load(DataHolder.ProgramsSerializedData);
+
+            CampaignManager.OnGameStarted();
 
             if (CampaignManager.IsFirstTimeInGame)
                 SystemVariables[SystemVariableType.USERNAME] = Alias.Config.DefaultUserName;

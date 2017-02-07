@@ -16,11 +16,17 @@ namespace Hash17.Files
         public int UniqueId { get; set; }
         public virtual string Name { get; set; }
         public virtual Directory Parent { get; set; }
-        private List<Directory> _childs;
-        private List<File> _files;
+        
+        [JsonProperty("_c")]
+        private readonly List<Directory> _childs;
+
+        [JsonProperty("_f")]
+        private readonly List<File> _files;
+
+        [JsonIgnore]
         public bool IsAvailable
         {
-            get { return Application.isPlaying && _files.TrueForAll(f => f.IsAvailable) &&  Alias.Campaign.Info.UnlockedDirectories.Contains(UniqueId); }
+            get { return Application.isPlaying && _files.Any(f => f.IsAvailable); }
         }
 
         [JsonIgnore]
@@ -35,8 +41,6 @@ namespace Hash17.Files
                     builder = builder.Insert(0, string.Format("{0}/", parent.Name.Replace("/", "")));
                     parent = parent.Parent;
                 }
-                //if (builder.Length > 1)
-                //    builder.Remove(builder.Length - 1, 1);
                 return builder.ToString();
             }
         }
@@ -79,8 +83,8 @@ namespace Hash17.Files
 
         private List<File> GetFilesRecursively(List<File> toAdd)
         {
-            toAdd.AddRange(GetAvailableFiles());
-            var childs = GetAvailableChilds();
+            toAdd.AddRange(GetAllFiles());
+            var childs = GetAllChilds();
             for (int i = 0; i < childs.Count; i++)
             {
                 toAdd = childs[i].GetFilesInDirectoriesAndChilds(toAdd);

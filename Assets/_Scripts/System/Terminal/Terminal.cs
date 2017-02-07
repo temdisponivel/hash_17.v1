@@ -170,15 +170,7 @@ namespace MockSystem.Term
 
             CarrotLabel.text = Alias.Config.CarrotChar;
 
-            UpdateUserNameLocation();
-
-            //Program specialProgram;
-            //if (!Alias.Programs.GetSpecialProgramByType(ProgramType.Init, out specialProgram))
-            //{
-            //    Debug.LogError("ERROR TRYING TO GET {0} SPECIAL PROGRAM".InLineFormat(ProgramType.Init));
-            //}
-
-            //RunProgram(specialProgram, string.Empty);
+            //UpdateUserNameLocation();
         }
 
         #endregion

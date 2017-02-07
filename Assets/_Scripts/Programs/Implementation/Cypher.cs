@@ -68,19 +68,15 @@ namespace Hash17.Programs.Implementation
 
         protected void OnFinishDecryptingCallback(File file, string passWord)
         {
-            if (!Alias.Campaign.Info.CrackedFiles.Contains(file.UniqueId))
-                Alias.Campaign.Info.CrackedFiles.Add(file.UniqueId);
+            Alias.Campaign.Info.CrackedFiles.Add(file.UniqueId);
 
             if (file.IsProtected)
-            {
                 Alias.Term.ShowText("File decrypted. You can open this file now.");
-            }
             else
-            {
-                file.IsProtected = true;
-                file.Password = passWord;
                 Alias.Term.ShowText("File encrypted. You can open the file, but other people can't (unless they have the password).");
-            }
+
+            //file.IsProtected = !file.IsProtected;
+            file.Password = passWord;
 
             UnblockInput();
         }

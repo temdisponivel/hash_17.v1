@@ -18,23 +18,21 @@ namespace Hash17.Files
         public bool IsProtected { get; set; }
         public string Password { get; set; }
         public bool StartUnlocked { get; set; }
+
+        [JsonIgnore]
         public bool IsAvailable 
         {
             get { return Application.isPlaying && Alias.Campaign.Info.UnlockedFiles.Contains(UniqueId); }
         }
 
+        [JsonProperty("_c")]
         private string _content;
+
+        [JsonIgnore]
         public string Content
         {
             get
             {
-                // To prevent JSON to serialize wrong data
-                if (!Application.isPlaying)
-                    return _content;
-
-                if (!IsProtected)
-                    return _content;
-                
                 if (Alias.Campaign.Info.CrackedFiles.Contains(UniqueId))
                     return _content;
                 
@@ -45,6 +43,7 @@ namespace Hash17.Files
 
         public string PathString { get; set; }
 
+        [JsonIgnore]
         public bool CanBeRead
         {
             get { return IsAvailable && (!IsProtected || Alias.Campaign.Info.CrackedFiles.Contains(UniqueId)); }
