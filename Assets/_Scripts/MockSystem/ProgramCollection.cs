@@ -75,6 +75,13 @@ namespace Hash17.MockSystem
             return program != null && program.Global && program.IsAvailable;
         }
 
+        public override void Add(Program item)
+        {
+            base.Add(item);
+            if (item.StartUnlocked)
+                Alias.Campaign.Info.UnlockPrograms.Add(item.UniqueId);
+        }
+
         #endregion
     }
 }

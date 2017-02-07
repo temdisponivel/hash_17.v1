@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Hash17.Editor
 {
     [CustomEditor(typeof(DataHolder))]
-    public class BlackboardEditor : UnityEditor.Editor
+    public class DataHolderEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

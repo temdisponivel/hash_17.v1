@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hash17.Devices;
+using Hash17.Utils;
 
 namespace Hash17.MockSystem
 {
@@ -27,10 +28,22 @@ namespace Hash17.MockSystem
 
         #region Helper
 
-        public bool GetDeviceById(int id, out Device device)
+        public bool GetDeviceByIdForced(int id, out Device device)
         {
             device = _all.Find(d => d.UniqueId == id);
-            return device != null && device.IsAvailable;
+            return device != null;
+        }
+
+        public bool GetDeviceById(int id, out Device device)
+        {
+            return GetDeviceByIdForced(id, out device) && device.IsAvailable;
+        }
+
+        public override void Add(Device item)
+        {
+            base.Add(item);
+            if (item.StartUnlocked)
+                Alias.Campaign.Info.UnlockedDevices.Add(item.UniqueId);
         }
 
         #endregion

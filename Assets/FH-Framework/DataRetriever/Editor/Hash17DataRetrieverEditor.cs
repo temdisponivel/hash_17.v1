@@ -15,7 +15,7 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
 
         var config = (Hash17DataRetriever)target;
 
-        if (NGUIEditorTools.DrawHeader("ProgramsByCommand"))
+        if (NGUIEditorTools.DrawHeader("Programs"))
         {
             NGUIEditorTools.BeginContents();
             config.ProgramsSpreadSheetId = EditorGUILayout.TextField("ProgramsByCommand Sheet Id", config.ProgramsSpreadSheetId);
@@ -30,6 +30,15 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
             config.DevicesSpreadSheetId = EditorGUILayout.TextField("Devices Sheet Id", config.DevicesSpreadSheetId);
             if (GUILayout.Button("Fetch all devices data"))
                 Hash17DataRetrieverInstance.Instance.FetchDeviceInfo(config.DevicesSpreadSheetId);
+            NGUIEditorTools.EndContents();
+        }
+
+        if (NGUIEditorTools.DrawHeader("Campaign Items"))
+        {
+            NGUIEditorTools.BeginContents();
+            config.CampaignItemsSpreedSheetId = EditorGUILayout.TextField("Campaign Items Sheet Id", config.CampaignItemsSpreedSheetId);
+            if (GUILayout.Button("Fetch all Campaign Items data"))
+                Hash17DataRetrieverInstance.Instance.FetchCampaignItems(config.CampaignItemsSpreedSheetId);
             NGUIEditorTools.EndContents();
         }
 

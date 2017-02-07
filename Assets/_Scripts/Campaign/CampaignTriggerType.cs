@@ -1,6 +1,6 @@
 ﻿namespace Hash17.Campaign
 {
-    public enum CampaignTriggetType
+    public enum CampaignTriggerType
     {
         FileOpened = 20,
         DeviceConnect = 30,
@@ -12,5 +12,6 @@
         ProgramUnlocked = 90,
         DeviceUnlocked = 100,
         CampaignItemCompleted = 110,
+        NewGameStarted = 120,
     }
 }

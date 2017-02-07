@@ -8,10 +8,9 @@ namespace Hash17.Campaign
     public class CampaignItem
     {
         public int Id;
-        public CampaignTriggetType Type;
+        public CampaignTriggerType Trigger;
         public CampaignActionType Action;
         public List<int> Dependecies;
-        public int EntityId;
         public string TriggerAditionalData;
         public string ActionAditionalData;
     }

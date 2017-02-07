@@ -17,10 +17,10 @@ namespace Hash17.Files
         public Directory Directory { get; set; }
         public bool IsProtected { get; set; }
         public string Password { get; set; }
-
+        public bool StartUnlocked { get; set; }
         public bool IsAvailable 
         {
-            get { return Directory.IsAvailable && Alias.Campaign.Info.UnlockedFiles.Contains(UniqueId); }
+            get { return Application.isPlaying && Alias.Campaign.Info.UnlockedFiles.Contains(UniqueId); }
         }
 
         private string _content;
@@ -47,7 +47,7 @@ namespace Hash17.Files
 
         public bool CanBeRead
         {
-            get { return Application.isPlaying && IsAvailable && (!IsProtected || Alias.Campaign.Info.CrackedFiles.Contains(UniqueId)); }
+            get { return IsAvailable && (!IsProtected || Alias.Campaign.Info.CrackedFiles.Contains(UniqueId)); }
         }
 
         [JsonIgnore]

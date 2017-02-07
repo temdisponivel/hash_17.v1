@@ -14,6 +14,15 @@ namespace Hash17.Utils
 
         #endregion
 
+        #region Contructor
+
+        public Hash17HashSet()
+        {
+            _hash = new HashSet<T>();
+        } 
+
+        #endregion
+
         #region Accessors
 
         public void Add(T item)

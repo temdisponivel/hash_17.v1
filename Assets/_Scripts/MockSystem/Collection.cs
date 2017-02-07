@@ -38,15 +38,6 @@ namespace Hash17.MockSystem
 
         #endregion
 
-        #region Accessors
-
-        public virtual List<T> GetAvailableItems()
-        {
-            return new List<T>(_availableItems);
-        }
-        
-        #endregion
-
         #region ICollection
         
         public virtual void Add(T item)

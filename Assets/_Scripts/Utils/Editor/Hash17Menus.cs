@@ -25,5 +25,11 @@ namespace Hash17.Utils
             AssetDatabase.CreateAsset(asset, uniquePath);
             AssetDatabase.Refresh();
         }
+
+        [MenuItem("Hash17/Remove save file", false)]
+        public static void RemoveSaveFile()
+        {
+            System.IO.File.Delete("{0}{1}".InLineFormat(Application.persistentDataPath, Alias.Config.CampaignSavePath));
+        }
     }
 }

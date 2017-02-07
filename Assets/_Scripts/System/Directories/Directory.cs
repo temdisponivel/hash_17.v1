@@ -18,10 +18,9 @@ namespace Hash17.Files
         public virtual Directory Parent { get; set; }
         private List<Directory> _childs;
         private List<File> _files;
-
         public bool IsAvailable
         {
-            get { return Alias.Campaign.Info.UnlockedDirectories.Contains(UniqueId); }
+            get { return Application.isPlaying && _files.TrueForAll(f => f.IsAvailable) &&  Alias.Campaign.Info.UnlockedDirectories.Contains(UniqueId); }
         }
 
         [JsonIgnore]
@@ -78,6 +77,17 @@ namespace Hash17.Files
             return toAdd;
         }
 
+        private List<File> GetFilesRecursively(List<File> toAdd)
+        {
+            toAdd.AddRange(GetAvailableFiles());
+            var childs = GetAvailableChilds();
+            for (int i = 0; i < childs.Count; i++)
+            {
+                toAdd = childs[i].GetFilesInDirectoriesAndChilds(toAdd);
+            }
+            return toAdd;
+        }
+
         #region Childs
 
         public virtual Directory FindDirectoryByName(string name)
@@ -110,6 +120,20 @@ namespace Hash17.Files
         }
 
         #endregion
+
+        #endregion
+
+        #region Validate Availability
+
+        public void UnlockAvailables()
+        {
+            var allFiles = GetFilesRecursively(new List<File>());
+            for (int i = 0; i < allFiles.Count; i++)
+            {
+                if (allFiles[i].StartUnlocked)
+                    Alias.Campaign.Info.UnlockedFiles.Add(allFiles[i].UniqueId);
+            }
+        }
 
         #endregion
     }

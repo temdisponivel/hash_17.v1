@@ -48,27 +48,36 @@ namespace Hash17.Game
         [ContextMenu("START")]
         protected void Start()
         {
+            // This order is important - keep this way
+
             LoadFirewalls();
+
+            CampaignManager.OnGameStarted();
 
             DeviceCollection.Load(DataHolder.DevicesSerializedData);
             ProgramCollection.Load(DataHolder.ProgramsSerializedData);
 
-            Device owned;
-            if (!DeviceCollection.GetDeviceById(Alias.Config.OwnedDeviceId.GetHashCode(), out owned))
-            {
-                Debug.LogError("OWNED DEVICE NOT UNLOCKED OR INVALID");
-            }
-
-            DeviceCollection.ChangeCurrentDevice(owned);
-
-            CampaignManager.OnGameStarted();
-
             if (CampaignManager.IsFirstTimeInGame)
                 SystemVariables[SystemVariableType.USERNAME] = Alias.Config.DefaultUserName;
+
+            // ----------------------------------------
+            
+            //Device owned;
+            //if (!DeviceCollection.GetDeviceByIdForced(Alias.Config.OwnedDeviceId.GetHashCode(), out owned))
+            //{
+            //    Debug.LogError("OWNED DEVICE NOT UNLOCKED OR INVALID");
+            //    return;
+            //}
+
+            //Alias.Campaign.Info.UnlockedDevices.Add(owned.UniqueId);
+
+            //DeviceCollection.ChangeCurrentDevice(owned);
 
             ToEnableAfterStart.gameObject.SetActive(true);
 
             transform.DetachChildren();
+
+            //Alias.Campaign.Info.UnlockedDevices.Add(owned.UniqueId);
         }
 
         #endregion

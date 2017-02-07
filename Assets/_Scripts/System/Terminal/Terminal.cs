@@ -172,13 +172,13 @@ namespace MockSystem.Term
 
             UpdateUserNameLocation();
 
-            Program specialProgram;
-            if (!Alias.Programs.GetSpecialProgramByType(ProgramType.Init, out specialProgram))
-            {
-                Debug.LogError("ERROR TRYING TO GET {0} SPECIAL PROGRAM".InLineFormat(ProgramType.Init));
-            }
+            //Program specialProgram;
+            //if (!Alias.Programs.GetSpecialProgramByType(ProgramType.Init, out specialProgram))
+            //{
+            //    Debug.LogError("ERROR TRYING TO GET {0} SPECIAL PROGRAM".InLineFormat(ProgramType.Init));
+            //}
 
-            RunProgram(specialProgram, string.Empty);
+            //RunProgram(specialProgram, string.Empty);
         }
 
         #endregion

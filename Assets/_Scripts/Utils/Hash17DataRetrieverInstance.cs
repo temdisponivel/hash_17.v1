@@ -13,7 +13,7 @@ using LitJson;
 using Newtonsoft.Json;
 using UnityEngine;
 using DeviceType = Hash17.Devices.DeviceType;
-using Hash17.Game;
+using Hash17.Campaign;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -73,42 +73,6 @@ namespace Hash17.Utils
         private Program GetProgramInstance(ProgramType type, JsonData current)
         {
             Program result = null;
-            //switch (id)
-            //{
-            //    case ProgramId.Clear:
-            //        result = new Clear();
-            //        break;
-            //    case ProgramId.Cd:
-            //        result = new Cd();
-            //        break;
-            //    case ProgramId.Read:
-            //        result = new Read();
-            //        break;
-            //    case ProgramId.Search:
-            //        result = new Search();
-            //        break;
-            //    case ProgramId.Help:
-            //        result = new Help();
-            //        break;
-            //    case ProgramId.Init:
-            //        result = new Init();
-            //        break;
-            //    case ProgramId.Connect:
-            //        result = new Connect();
-            //        break;
-            //    case ProgramId.Cypher:
-            //        result = new Cypher();
-            //        break;
-            //    case ProgramId.Open:
-            //        result = new Open();
-            //        break;
-            //    case ProgramId.Timer:
-            //        result = new Timer();
-            //        break;
-            //    case ProgramId.Set:
-            //        result = new Set();
-            //        break;
-            //}
             var typeName = "Hash17.Programs.Implementation.{0}".InLineFormat(type.ToString());
             Debug.Log(typeName);
             var programType = Type.GetType(typeName);
@@ -128,6 +92,7 @@ namespace Hash17.Utils
             var knownParameters = current["KnownParametersAndOptions"].ToString();
             var availableGame = bool.Parse(current["Global"].ToString());
             var aditionalData = current["AditionalData"].ToString().Trim();
+            var startUnlocked = bool.Parse(current["StartUnlocked"].ToString());
 
             prog.Type = programType;
             prog.Command = com;
@@ -137,6 +102,7 @@ namespace Hash17.Utils
             prog.Global = availableGame;
             prog.AditionalData = aditionalData;
             prog.KnownParametersAndOptions = !knownParameters.StartsWith("--") ? knownParameters.Split(';') : new string[0];
+            prog.StartUnlocked = startUnlocked;
             for (int i = 0; i < prog.KnownParametersAndOptions.Length; i++)
             {
                 prog.KnownParametersAndOptions[i] = prog.KnownParametersAndOptions[i].Trim();
@@ -224,6 +190,7 @@ namespace Hash17.Utils
                 PathString = current["Path"].ToString(),
                 IsProtected = bool.Parse(current["IsProtected"].ToString()),
                 Password = current["Password"].ToString(),
+                StartUnlocked = bool.Parse(current["StartUnlocked"].ToString()),
             };
 
             var fileType = (FileType)Enum.Parse(typeof(FileType), current["FileType"].ToString());
@@ -260,6 +227,7 @@ namespace Hash17.Utils
             var firewallType = (FirewallType)Enum.Parse(typeof(FirewallType), currentDevice["FirewallType"].ToString());
             var specialPrograms = currentDevice["SpecialPrograms"].ToString().Trim();
             var dicSpecialProgram = new Dictionary<ProgramType, int>();
+            var startUnlocked = bool.Parse(currentDevice["StartUnlocked"].ToString());
             if (!string.IsNullOrEmpty(specialPrograms))
             {
                 var specialProgramsDef = currentDevice["SpecialPrograms"].ToString().Split(',');
@@ -274,9 +242,11 @@ namespace Hash17.Utils
             }
 
             prog.Id = uniqueId;
+            prog.UniqueId = prog.Id.GetHashCode();
             prog.Name = name;
             prog.FirewallType = firewallType;
             prog.SpecialPrograms = dicSpecialProgram;
+            prog.StartUnlocked = startUnlocked;
 
             FileSystem fileSystem = new FileSystem();
             prog.FileSystem = fileSystem;
@@ -337,8 +307,75 @@ namespace Hash17.Utils
 
         #endregion
 
-        #region Helpers
+        #region Fetch Campaign Items
 
+        public void FetchCampaignItems(string spreadSheetId)
+        {
+            StartCoroutine(RunFetchCampaignItems(spreadSheetId));
+        }
+
+        public IEnumerator RunFetchCampaignItems(string spreadSheetId)
+        {
+            yield return StartCoroutine(GetData(spreadSheetId, "CampaignItems"));
+
+            Debug.Log("FINISH RETRIEVING CAMPAIGN ITEMS FROM GOOGLE");
+
+            if (_spreadSheetResults == null)
+            {
+                Debug.Log("NULL RETURN - DESTROYING");
+                Destroy(gameObject);
+                yield break;
+            }
+
+            var items = new List<CampaignItem>();
+            for (var i = 0; i < _spreadSheetResults.Length; i++)
+            {
+                var current = _spreadSheetResults[i];
+                var campaignItem = new CampaignItem();
+
+                campaignItem.Id = int.Parse(current["Id"].ToString());
+                campaignItem.Trigger = (CampaignTriggerType) Enum.Parse(typeof (CampaignTriggerType), current["Trigger"].ToString());
+                campaignItem.Action = (CampaignActionType)Enum.Parse(typeof(CampaignActionType), current["Action"].ToString());
+
+                var dep = current["Dependencies"].ToString();
+                campaignItem.Dependecies = new List<int>();
+                if (dep != "--")
+                {
+                    var parts = dep.Split(',');
+                    for (int j = 0; j < parts.Length; j++)
+                    {
+                        var currentPart = parts[j];
+                        campaignItem.Dependecies.Add(int.Parse(currentPart));
+                    }
+                }
+
+                campaignItem.TriggerAditionalData = current["TriggerAditionalData"].ToString();
+                campaignItem.ActionAditionalData = current["ActionAditionalData"].ToString();
+
+                items.Add(campaignItem);
+            }
+
+            var serializedData = JsonConvert.SerializeObject(items,
+                        new JsonSerializerSettings()
+                        {
+                            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                            TypeNameHandling = TypeNameHandling.All,
+                            TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                        });
+
+            CreateFile(Alias.Config.CollectionsSavePath, "CampaignItemsData.txt", serializedData);
+
+            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
+
+            Debug.Log("Finished creating and configuring campaign items data!");
+            DestroyImmediate(gameObject);
+        }
+
+        #endregion
+
+        #region Helpers
+        
         public void CreateFile(string path, string name, string content)
         {
             if (System.IO.File.Exists(path))
