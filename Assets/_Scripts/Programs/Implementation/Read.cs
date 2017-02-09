@@ -33,6 +33,8 @@ namespace Hash17.Programs.Implementation
                     {
                         Alias.Term.BeginIdentation();
                         Alias.Term.ShowText(file.Content, ident: true);
+                        if (file.CanBeRead)
+                            file.Open();
                         Alias.Term.EndIdentation();
                     }
                 }

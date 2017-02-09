@@ -60,26 +60,13 @@ namespace Hash17.Game
             CampaignManager.OnGameStarted();
 
             if (CampaignManager.IsFirstTimeInGame)
-                SystemVariables[SystemVariableType.USERNAME] = Alias.Config.DefaultUserName;
+                SystemVariables[SystemVariables.USERNAME] = Alias.Config.DefaultUserName;
 
             // ----------------------------------------
-            
-            //Device owned;
-            //if (!DeviceCollection.GetDeviceByIdForced(Alias.Config.OwnedDeviceId.GetHashCode(), out owned))
-            //{
-            //    Debug.LogError("OWNED DEVICE NOT UNLOCKED OR INVALID");
-            //    return;
-            //}
-
-            //Alias.Campaign.Info.UnlockedDevices.Add(owned.UniqueId);
-
-            //DeviceCollection.ChangeCurrentDevice(owned);
 
             ToEnableAfterStart.gameObject.SetActive(true);
 
             transform.DetachChildren();
-
-            //Alias.Campaign.Info.UnlockedDevices.Add(owned.UniqueId);
         }
 
         #endregion

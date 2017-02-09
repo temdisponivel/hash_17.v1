@@ -33,7 +33,7 @@ namespace Hash17.Files
         {
             get
             {
-                if (Alias.Campaign.Info.CrackedFiles.Contains(UniqueId))
+                if (Alias.Campaign.Info.DecryptedFiles.Contains(UniqueId))
                     return _content;
                 
                 return _content.Encrypt(Password);
@@ -46,7 +46,7 @@ namespace Hash17.Files
         [JsonIgnore]
         public bool CanBeRead
         {
-            get { return IsAvailable && (!IsProtected || Alias.Campaign.Info.CrackedFiles.Contains(UniqueId)); }
+            get { return IsAvailable && (!IsProtected || Alias.Campaign.Info.DecryptedFiles.Contains(UniqueId)); }
         }
 
         [JsonIgnore]
@@ -74,6 +74,7 @@ namespace Hash17.Files
         #region Events
 
         public static event Action<File> OnFileOpened;
+        public static event Action<File> OnFileDecrypted;
 
         #endregion
 
@@ -83,6 +84,12 @@ namespace Hash17.Files
         {
             if (OnFileOpened != null)
                 OnFileOpened(this);
+        }
+
+        public void Decrypt()
+        {
+            if (OnFileDecrypted != null)
+                OnFileDecrypted(this);
         }
 
         #endregion

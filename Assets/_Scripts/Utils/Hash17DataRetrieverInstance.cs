@@ -327,35 +327,35 @@ namespace Hash17.Utils
                 yield break;
             }
 
-            var items = new List<CampaignItem>();
-            for (var i = 0; i < _spreadSheetResults.Length; i++)
-            {
-                var current = _spreadSheetResults[i];
-                var campaignItem = new CampaignItem();
+            //var items = new List<CampaignItem>();
+            //for (var i = 0; i < _spreadSheetResults.Length; i++)
+            //{
+            //    var current = _spreadSheetResults[i];
+            //    var campaignItem = new CampaignItem();
 
-                campaignItem.Id = int.Parse(current["Id"].ToString());
-                campaignItem.Trigger = (CampaignTriggerType) Enum.Parse(typeof (CampaignTriggerType), current["Trigger"].ToString());
-                campaignItem.Action = (CampaignActionType)Enum.Parse(typeof(CampaignActionType), current["Action"].ToString());
+            //    campaignItem.Id = int.Parse(current["Id"].ToString());
+            //    campaignItem.Trigger = (CampaignTriggerType) Enum.Parse(typeof (CampaignTriggerType), current["Trigger"].ToString());
+            //    campaignItem.Action = (CampaignActionType)Enum.Parse(typeof(CampaignActionType), current["Action"].ToString());
 
-                var dep = current["Dependencies"].ToString();
-                campaignItem.Dependecies = new List<int>();
-                if (dep != "--")
-                {
-                    var parts = dep.Split(',');
-                    for (int j = 0; j < parts.Length; j++)
-                    {
-                        var currentPart = parts[j];
-                        campaignItem.Dependecies.Add(int.Parse(currentPart));
-                    }
-                }
+            //    var dep = current["Dependencies"].ToString();
+            //    campaignItem.Dependecies = new List<int>();
+            //    if (dep != "--")
+            //    {
+            //        var parts = dep.Split(',');
+            //        for (int j = 0; j < parts.Length; j++)
+            //        {
+            //            var currentPart = parts[j];
+            //            campaignItem.Dependecies.Add(int.Parse(currentPart));
+            //        }
+            //    }
 
-                campaignItem.TriggerAditionalData = current["TriggerAditionalData"].ToString();
-                campaignItem.ActionAditionalData = current["ActionAditionalData"].ToString();
+            //    campaignItem.TriggerAditionalData = current["TriggerAditionalData"].ToString();
+            //    campaignItem.ActionAditionalData = current["ActionAditionalData"].ToString();
 
-                items.Add(campaignItem);
-            }
+            //    items.Add(campaignItem);
+            //}
 
-            var serializedData = JsonConvert.SerializeObject(items,
+            var serializedData = JsonConvert.SerializeObject(new object(),
                         new JsonSerializerSettings()
                         {
                             PreserveReferencesHandling = PreserveReferencesHandling.Objects,

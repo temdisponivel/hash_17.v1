@@ -12,67 +12,54 @@ namespace Hash17.MockSystem
     {
         #region Properties
 
-        private readonly Dictionary<SystemVariableType, string> _innerdiDictionary = new Dictionary<SystemVariableType, string>();
+        private readonly Dictionary<string, string> _innerdiDictionary = new Dictionary<string, string>();
+        public event Action<string> OnSystemVariableChange;
 
-        public event Action<SystemVariableType> OnSystemVariableChange;
+        public const string USERNAME = "USER_NAME";
 
         #endregion
 
         #region IDictionary
-        
-        public void Add(KeyValuePair<SystemVariableType, string> item)
+
+        public void Add(string key, string value)
         {
-            _innerdiDictionary.Add(item.Key, item.Value);
+            _innerdiDictionary.Add(key, value);
             if (OnSystemVariableChange != null)
-                OnSystemVariableChange(item.Key);
+                OnSystemVariableChange(key);
         }
 
         public void Clear()
         {
             _innerdiDictionary.Clear();
         }
-
-        public bool Contains(KeyValuePair<SystemVariableType, string> item)
-        {
-            return _innerdiDictionary.Contains(item);
-        }
         
-        public bool Remove(KeyValuePair<SystemVariableType, string> item)
-        {
-            return _innerdiDictionary.Remove(item.Key);
-        }
-
         public int Count
         {
             get { return _innerdiDictionary.Count; }
         }
-        
-        public void Add(SystemVariableType key, string value)
-        {
-            _innerdiDictionary.Add(key, value);
-        }
 
-        public bool ContainsKey(SystemVariableType key)
+        public bool ContainsKey(string key)
         {
             return _innerdiDictionary.ContainsKey(key);
         }
 
-        public bool Remove(SystemVariableType key)
+        public bool Remove(string key)
         {
             return _innerdiDictionary.Remove(key);
         }
 
-        public bool TryGetValue(SystemVariableType key, out string value)
+        public bool TryGetValue(string key, out string value)
         {
             return _innerdiDictionary.TryGetValue(key, out value);
         }
-
-        public string this[SystemVariableType key]
+        
+        public string this[string key]
         {
             get
             {
                 if (!_innerdiDictionary.ContainsKey(key))
-                    this[key] = PlayerPrefs.GetString(key.ToString(), "default");
+                    return string.Empty;
+
                 return _innerdiDictionary[key];
             }
             set
@@ -81,16 +68,6 @@ namespace Hash17.MockSystem
                 if (OnSystemVariableChange != null)
                     OnSystemVariableChange(key);
             }
-        }
-
-        public ICollection<SystemVariableType> Keys
-        {
-            get { return _innerdiDictionary.Keys; }
-        }
-
-        public ICollection<string> Values
-        {
-            get { return _innerdiDictionary.Values; }
         }
 
         #endregion

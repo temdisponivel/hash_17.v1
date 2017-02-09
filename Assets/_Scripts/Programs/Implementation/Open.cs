@@ -86,7 +86,8 @@ namespace Hash17.Programs.Implementation
                 window.OnClose += OnWindowClose;
                 _windowOpened = window;
 
-                file.Open();
+                if (file.CanBeRead)
+                    file.Open();
             }
             else
             {

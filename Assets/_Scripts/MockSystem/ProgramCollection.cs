@@ -84,7 +84,7 @@ namespace Hash17.MockSystem
         {
             base.Add(item);
             if (item.StartUnlocked)
-                Alias.Campaign.Info.UnlockPrograms.Add(item.UniqueId);
+                Alias.Campaign.Info.UnlockedPrograms.Add(item.UniqueId);
         }
 
         #endregion

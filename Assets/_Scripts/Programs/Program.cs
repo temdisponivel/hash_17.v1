@@ -25,11 +25,11 @@ namespace Hash17.Programs
         public virtual bool ManuallyFinished { get; set; }
         public bool StartUnlocked { get; set; }
 
-        public bool IsAvailable { get { return  Application.isPlaying && Alias.Campaign.Info.UnlockPrograms.Contains(UniqueId); } }
+        public bool IsAvailable { get { return  Application.isPlaying && Alias.Campaign.Info.UnlockedPrograms.Contains(UniqueId); } }
 
         public ProgramParameter Parameters { get; set; }
         public bool Running { get; private set; }
-        protected Coroutine ExecCoroutine { get; set; }
+        public Coroutine ExecCoroutine { get; set; }
 
         #endregion
 

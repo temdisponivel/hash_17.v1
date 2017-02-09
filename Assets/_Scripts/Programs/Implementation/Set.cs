@@ -47,24 +47,7 @@ namespace Hash17.Programs.Implementation
                 Alias.Term.ShowText("You need to supply a value for the variable {0}".InLineFormat(Parameters.Params[0]));
             }
 
-            if (!Enum.IsDefined(typeof(SystemVariableType), variable))
-            {
-                var systemVariables = Enum.GetValues(typeof(SystemVariableType));
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < systemVariables.Length; i++)
-                {
-                    var current = systemVariables.GetValue(i);
-                    builder.AppendLine(current.ToString());
-                }
-
-                Alias.Term.ShowText("'{0}' is not a system variable. \n".InLineFormat(variable) +
-                                    "Here is a list of [b]all[/b] system variables that you can set: \n {0}"
-                                    .InLineFormat(builder.ToString()));
-
-                yield break;
-            }
-
-            Alias.SysVariables[(SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable)] = value;
+            Alias.SysVariables[value] = value;
         }
     }
 }

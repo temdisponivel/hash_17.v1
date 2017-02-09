@@ -112,7 +112,7 @@ namespace MockSystem.Term
             get { return Alias.Campaign.Info.PlayerName; }
             set
             {
-                Alias.SysVariables[SystemVariableType.USERNAME] = value;
+                Alias.SysVariables[SystemVariables.USERNAME] = value;
                 UpdateUserNameLocation();
             }
         }
@@ -203,7 +203,7 @@ namespace MockSystem.Term
                 {
                     TreatInputText(value);
                     ClearInput();
-                    AllCommandsTyped.Insert(0, value);
+                    AllCommandsTyped.Insert(0, Input.value);
                 }
                 else if (ShowTextWhenNotTreatingInput)
                 {
@@ -307,7 +307,7 @@ namespace MockSystem.Term
 
                 if (showLocation)
                 {
-                    entry.Setup(CurrentLocationAndUserName, string.Empty, TextTable.transform);
+                    entry.Setup(CurrentLocationAndUserName.HandleSystemVariables(), string.Empty, TextTable.transform);
 
                     newText = NGUITools.AddChild(TextTable.gameObject, TextEntryPrefab);
                     newText.transform.SetAsFirstSibling();
@@ -328,7 +328,7 @@ namespace MockSystem.Term
             if (ident)
                 BeginIdentation();
 
-            entry.Setup(showLocation ? Alias.Config.CarrotChar : string.Empty, _identationBuilder + text, TextTable.transform);
+            entry.Setup(showLocation ? Alias.Config.CarrotChar : string.Empty, (_identationBuilder + text).HandleSystemVariables(), TextTable.transform);
 
             if (ident)
                 EndIdentation();
@@ -535,11 +535,11 @@ namespace MockSystem.Term
             ClearInput();
         }
 
-        public void OnSystemVariableChange(SystemVariableType variableType)
+        public void OnSystemVariableChange(string variableType)
         {
             switch (variableType)
             {
-                case SystemVariableType.USERNAME:
+                case SystemVariables.USERNAME:
                     UpdateUserNameLocation();
                     break;
             }

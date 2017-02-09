@@ -225,13 +225,11 @@ namespace Hash17.Utils
 
                 var variable = text.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                if (Enum.IsDefined(typeof(SystemVariableType), variable))
+                if (Alias.SysVariables.ContainsKey(variable))
                 {
-                    var variableType = (SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable);
-
                     string value;
-                    if (Alias.SysVariables.TryGetValue(variableType, out value))
-                        toReplace[variable] = value.ColorizeSystemVariable(variableType);
+                    if (Alias.SysVariables.TryGetValue(variable, out value))
+                        toReplace[variable] = value.ColorizeSystemVariable(variable);
                 }
             }
 
@@ -248,48 +246,11 @@ namespace Hash17.Utils
             return text;
         }
 
-        public static string HandleCampaignState(this string text)
-        {
-            if (!text.Contains(Alias.Config.CharToConsiderSystemVariable))
-                return text;
-
-            var toReplace = new Dictionary<string, string>();
-            var occurencies = text.MultipleIndexOf(Alias.Config.CharToConsiderSystemVariable, StringComparison.OrdinalIgnoreCase);
-            for (int i = 0; i < occurencies.Count - 1; i++, i++)
-            {
-                var startIndex = occurencies[i];
-                var endIndex = occurencies[i + 1];
-
-                var variable = text.Substring(startIndex + 1, endIndex - startIndex - 1);
-
-                if (Enum.IsDefined(typeof(SystemVariableType), variable))
-                {
-                    var variableType = (SystemVariableType)Enum.Parse(typeof(SystemVariableType), variable);
-
-                    string value;
-                    if (Alias.SysVariables.TryGetValue(variableType, out value))
-                        toReplace[variable] = value;
-                }
-            }
-
-            if (toReplace.Count > 0)
-            {
-                var builder = new StringBuilder(text);
-                foreach (var entry in toReplace)
-                {
-                    builder.Replace("{0}{1}{0}".InLineFormat(Alias.Config.CharToConsiderSystemVariable, entry.Key), entry.Value);
-                }
-                text = builder.ToString();
-            }
-
-            return text;
-        }
-
-        public static string ColorizeSystemVariable(this string text, SystemVariableType type)
+        public static string ColorizeSystemVariable(this string text, string type)
         {
             switch (type)
             {
-                case SystemVariableType.USERNAME:
+                case SystemVariables.USERNAME:
                     return TextBuilder.BuildText(text, Alias.Config.UserNameColor);
             }
 

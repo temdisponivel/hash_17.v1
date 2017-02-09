@@ -68,7 +68,7 @@ namespace Hash17.Programs.Implementation
 
         protected void OnFinishDecryptingCallback(File file, string passWord)
         {
-            Alias.Campaign.Info.CrackedFiles.Add(file.UniqueId);
+            file.Decrypt();
 
             if (file.IsProtected)
                 Alias.Term.ShowText("File decrypted. You can open this file now.");
