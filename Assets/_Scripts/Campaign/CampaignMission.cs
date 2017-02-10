@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using Hash17.Files;
 using Hash17.MockSystem;
 using Hash17.Utils;
+using Newtonsoft.Json;
 
 namespace Hash17.Campaign
 {
@@ -12,7 +13,7 @@ namespace Hash17.Campaign
         #region Properties
 
         public int Id;
-        public int CampaignMissionReward;
+        public List<int> CampaignMissionReward;
         public bool Completed;
         public event Action<CampaignMission> OnComplete;
 
@@ -32,6 +33,7 @@ namespace Hash17.Campaign
 
         #region Progression
 
+        [JsonIgnore]
         public float GeneralProgression
         {
             get
@@ -42,10 +44,15 @@ namespace Hash17.Campaign
             }
         }
 
+        [JsonIgnore]
         public float FilesOpenedProgression
         {
             get
             {
+                // Returns 1 to not be be relevant on the general progression
+                if (FilesToOpen.Count == 0)
+                    return 1;
+
                 var files = 0;
                 for (int i = 0; i < FilesToOpen.Count; i++)
                 {
@@ -58,10 +65,14 @@ namespace Hash17.Campaign
             }
         }
 
+        [JsonIgnore]
         public float FilesDecryptedProgression
         {
             get
             {
+                if (FilesToDecrypt.Count == 0)
+                    return 1;
+
                 var files = 0;
                 for (int i = 0; i < FilesToDecrypt.Count; i++)
                 {
@@ -74,10 +85,14 @@ namespace Hash17.Campaign
             }
         }
 
+        [JsonIgnore]
         public float DevicesConnectProgression
         {
             get
             {
+                if (DevicesToConnect.Count == 0)
+                    return 1;
+
                 var devies = 0;
                 for (int i = 0; i < DevicesToConnect.Count; i++)
                 {
@@ -90,10 +105,14 @@ namespace Hash17.Campaign
             }
         }
 
+        [JsonIgnore]
         public float DevicesDecryptedProgression
         {
             get
             {
+                if (DevicesToDecrypt.Count == 0)
+                    return 1;
+
                 var files = 0;
                 for (int i = 0; i < DevicesToDecrypt.Count; i++)
                 {
@@ -106,10 +125,14 @@ namespace Hash17.Campaign
             }
         }
 
+        [JsonIgnore]
         public float SystemVariablesProgression
         {
             get
             {
+                if (SystemVariablesToSet.Count == 0)
+                    return 1;
+
                 var variables = 0;
                 for (int i = 0; i < SystemVariablesToSet.Count; i++)
                 {
@@ -122,10 +145,14 @@ namespace Hash17.Campaign
             }
         }
 
+        [JsonIgnore]
         public float CampaignMissionProgression
         {
             get
             {
+                if (CampaignMissionToComplete.Count == 0)
+                    return 1;
+
                 var missions = 0;
                 for (int i = 0; i < CampaignMissionToComplete.Count; i++)
                 {
@@ -138,10 +165,14 @@ namespace Hash17.Campaign
             }
         }
 
+        [JsonIgnore]
         public float ProgramsProgression
         {
             get
             {
+                if (ProgramsToUnlock.Count == 0)
+                    return 1;
+
                 var programs = 0;
                 for (int i = 0; i < ProgramsToUnlock.Count; i++)
                 {

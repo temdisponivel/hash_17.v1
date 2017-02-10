@@ -62,7 +62,7 @@ namespace Hash17.Programs.Implementation
                     textToShow.Append(".");
                 }
 
-                Alias.Term.ShowTypeWriterText(textToShow.ToString(), callback: () => OnFinishDecryptingCallback(file, passWord));
+                Alias.Term.ShowTypeWriterText(textToShow.ToString(), 0.001f, callback: () => OnFinishDecryptingCallback(file, passWord));
             }
         }
 

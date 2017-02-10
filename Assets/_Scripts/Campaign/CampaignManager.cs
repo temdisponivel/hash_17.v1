@@ -104,12 +104,18 @@ namespace Hash17.Campaign
             File.OnFileDecrypted += OnFileDecrypted;
             Device.OnDecrypted += OnDeviceDecrypted;
             Alias.Devices.OnCurrentDeviceChange += OnDeviceConnected;
+
+            if (IsFirstTimeInGame)
+            {
+                CampaignMissionRewards[Alias.Config.GameStartCampaignItemReward].Execute();
+            }
         }
 
         public void LoadStuff()
         {
             LoadProgress();
-            LoadCampaignItems(Alias.DataHolder.CampaignItemsSerializedData);
+            LoadCampaignMissions(Alias.DataHolder.CampaignMissionsSerializedData);
+            LoadCampaignItemsRewards(Alias.DataHolder.CampaignMissionsRewardSerializedData);
         }
 
         public void SaveProgress()
@@ -129,13 +135,10 @@ namespace Hash17.Campaign
             {
                 var content = System.IO.File.ReadAllText(SavePath);
                 info = JsonConvert.DeserializeObject<CampaignInfo>(content);
-                info.PlayerName = Alias.Config.DefaultUserName;
             }
             info.InitializeIfNull();
             Info = info;
             Alias.SysVariables.Add(SystemVariables.USERNAME, Info.PlayerName);
-
-
         }
 
         #endregion
@@ -144,7 +147,7 @@ namespace Hash17.Campaign
 
         #region Load
 
-        public void LoadCampaignItems(TextAsset serializedData)
+        public void LoadCampaignMissions(TextAsset serializedData)
         {
             UncompletedCampaignItems = new List<CampaignMission>();
             CompletedCampaignItems = new List<CampaignMission>();
@@ -175,19 +178,42 @@ namespace Hash17.Campaign
             }
         }
 
+        public void LoadCampaignItemsRewards(TextAsset serializedData)
+        {
+            if (serializedData == null)
+            {
+                Debug.LogError("INVALIDA CAMPAIGN REWARDS DATA!");
+                return;
+            }
+
+            CampaignMissionRewards = new Dictionary<int, CampaignMissionReward>();
+
+            var content = serializedData.text;
+            var campaignMissionRewards = JsonConvert.DeserializeObject<List<CampaignMissionReward>>(content);
+
+            for (int i = 0; i < campaignMissionRewards.Count; i++)
+            {
+                CampaignMissionRewards.Add(campaignMissionRewards[i].Id, campaignMissionRewards[i]);
+            }
+        }
+
         #endregion
 
         #region Complete
 
         private void OnCampaignMissionCompleted(CampaignMission mission)
         {
-            CoroutineHelper.Instance.StartCoroutine(RunMissionRewards(mission));
+            RunMissionRewards(mission);
         }
 
-        private IEnumerator RunMissionRewards(CampaignMission mission)
+        private void RunMissionRewards(CampaignMission mission)
         {
-            var reward = CampaignMissionRewards[mission.CampaignMissionReward];
-            yield return reward.Execute();
+            for (int i = 0; i < mission.CampaignMissionReward.Count; i++)
+            {
+                var reward = CampaignMissionRewards[mission.CampaignMissionReward[i]];
+                reward.Execute();
+            }
+
             Info.CompletedCampaignMissions.Add(mission.Id);
 
             if (OnCampaignItemCompleted != null)
@@ -203,10 +229,7 @@ namespace Hash17.Campaign
         private void OnSystemVariableChanged(string variable)
         {
             if (variable == SystemVariables.USERNAME)
-            {
-                IsFirstTimeInGame = true;
                 Info.PlayerName = Alias.SysVariables[SystemVariables.USERNAME];
-            }
 
             Info.SystemVariablesSet.Add(variable);
         }

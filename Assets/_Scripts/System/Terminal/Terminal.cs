@@ -106,22 +106,12 @@ namespace MockSystem.Term
         #endregion
 
         #region User name
-
-        public string CurrentUserName
-        {
-            get { return Alias.Campaign.Info.PlayerName; }
-            set
-            {
-                Alias.SysVariables[SystemVariables.USERNAME] = value;
-                UpdateUserNameLocation();
-            }
-        }
-
+        
         public string CurrentLocationAndUserName
         {
             get
             {
-                var userName = TextBuilder.BuildText(CurrentUserName, Alias.Config.UserNameColor);
+                var userName = TextBuilder.BuildText(Alias.Campaign.Info.PlayerName, Alias.Config.UserNameColor);
                 var deviceId = TextBuilder.BuildText(DeviceCollection.CurrentDevice.Id, Alias.Config.DeviceIdColor);
                 var currentDir = TextBuilder.BuildText(DeviceCollection.FileSystem.CurrentDirectory.Path, Alias.Config.DirectoryColor);
 
@@ -195,15 +185,15 @@ namespace MockSystem.Term
             var value = Input.value.ClearInput();
 
             if (HandleSystemVariables)
-                value = value.HandleSystemVariables();
+                value = value.HandleSystemVariables(false); // colorize = false
 
             if (!string.IsNullOrEmpty(value))
             {
                 if (TreatInput)
                 {
                     TreatInputText(value);
+                    AllCommandsTyped.Insert(0, value);
                     ClearInput();
-                    AllCommandsTyped.Insert(0, Input.value);
                 }
                 else if (ShowTextWhenNotTreatingInput)
                 {

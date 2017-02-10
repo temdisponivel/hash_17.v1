@@ -36,9 +36,10 @@ public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
         if (NGUIEditorTools.DrawHeader("Campaign Items"))
         {
             NGUIEditorTools.BeginContents();
-            config.CampaignItemsSpreedSheetId = EditorGUILayout.TextField("Campaign Items Sheet Id", config.CampaignItemsSpreedSheetId);
+            config.CampaignMissionsSpreadSheetId = EditorGUILayout.TextField("Campaign Mission Sheet Id", config.CampaignMissionsSpreadSheetId);
             if (GUILayout.Button("Fetch all Campaign Items data"))
-                Hash17DataRetrieverInstance.Instance.FetchCampaignItems(config.CampaignItemsSpreedSheetId);
+                Hash17DataRetrieverInstance.Instance.FetchCampaignMission(config.CampaignMissionsSpreadSheetId);
+
             NGUIEditorTools.EndContents();
         }
 

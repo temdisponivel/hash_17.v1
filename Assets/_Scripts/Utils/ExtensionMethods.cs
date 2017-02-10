@@ -211,7 +211,7 @@ namespace Hash17.Utils
 
         #region System Variable
 
-        public static string HandleSystemVariables(this string text)
+        public static string HandleSystemVariables(this string text, bool colorize = false)
         {
             if (!text.Contains(Alias.Config.CharToConsiderSystemVariable))
                 return text;
@@ -229,7 +229,7 @@ namespace Hash17.Utils
                 {
                     string value;
                     if (Alias.SysVariables.TryGetValue(variable, out value))
-                        toReplace[variable] = value.ColorizeSystemVariable(variable);
+                        toReplace[variable] = colorize ? value.ColorizeSystemVariable(variable) : value;
                 }
             }
 

@@ -15,7 +15,7 @@ namespace Hash17.MockSystem
         private readonly Dictionary<string, string> _innerdiDictionary = new Dictionary<string, string>();
         public event Action<string> OnSystemVariableChange;
 
-        public const string USERNAME = "USER_NAME";
+        public const string USERNAME = "USERNAME";
 
         #endregion
 

@@ -9,12 +9,13 @@ namespace Hash17.Campaign
 {
     public class CampaignMissionReward
     {
+        public int Id;
         public List<int> FilesToUnlock;
         public List<int> DevicesToUnlock;
         public List<int> ProgramsToUnlock;
         public List<string> CommandsToRun;
 
-        public virtual Coroutine Execute()
+        public virtual void Execute()
         {
             for (int i = 0; i < FilesToUnlock.Count; i++)
             {
@@ -30,11 +31,11 @@ namespace Hash17.Campaign
             {
                 Alias.Campaign.Info.UnlockedPrograms.Add(ProgramsToUnlock[i]);
             }
-
-            return CoroutineHelper.Instance.StartCoroutine(RunCommands());
+            
+            RunCommands();
         }
 
-        protected virtual IEnumerator RunCommands()
+        protected virtual void RunCommands()
         {
             for (int i = 0; i < CommandsToRun.Count; i++)
             {
@@ -43,7 +44,7 @@ namespace Hash17.Campaign
                 if (Alias.Programs.GetProgramAndParameters(CommandsToRun[i], out prog, out param) ==
                     ProgramCollection.ProgramRequestResult.Ok)
                 {
-                    yield return Alias.Term.RunProgram(prog, param).ExecCoroutine;
+                    Alias.Term.RunProgram(prog, param);
                 }
             }
         } 

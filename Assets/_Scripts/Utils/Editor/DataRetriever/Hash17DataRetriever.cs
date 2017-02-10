@@ -26,8 +26,7 @@ namespace Hash17.Utils
 
         #region Campaign
 
-        public string CampaignItemsSpreedSheetId;
-        public string DefaultCampaignInfoSpreedSheetId;
+        public string CampaignMissionsSpreadSheetId;
 
         #endregion
     }

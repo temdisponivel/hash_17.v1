@@ -59,9 +59,6 @@ namespace Hash17.Game
 
             CampaignManager.OnGameStarted();
 
-            if (CampaignManager.IsFirstTimeInGame)
-                SystemVariables[SystemVariables.USERNAME] = Alias.Config.DefaultUserName;
-
             // ----------------------------------------
 
             ToEnableAfterStart.gameObject.SetActive(true);

@@ -47,7 +47,7 @@ namespace Hash17.Programs.Implementation
                 Alias.Term.ShowText("You need to supply a value for the variable {0}".InLineFormat(Parameters.Params[0]));
             }
 
-            Alias.SysVariables[value] = value;
+            Alias.SysVariables[variable] = value;
         }
     }
 }

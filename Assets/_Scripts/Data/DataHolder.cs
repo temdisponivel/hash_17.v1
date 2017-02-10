@@ -12,7 +12,8 @@ namespace Hash17.Data
         public GameConfiguration GameConfiguration;
         public TextAsset ProgramsSerializedData;
         public TextAsset DevicesSerializedData;
-        public TextAsset CampaignItemsSerializedData;
+        public TextAsset CampaignMissionsSerializedData;
+        public TextAsset CampaignMissionsRewardSerializedData;
 
         #endregion
 
@@ -25,7 +26,8 @@ namespace Hash17.Data
             GameConfiguration = Resources.LoadAll<GameConfiguration>("")[0];
             ProgramsSerializedData = Resources.Load<TextAsset>(Alias.Config.CollectionLoadPath + "ProgramCollectionData");
             DevicesSerializedData = Resources.Load<TextAsset>(Alias.Config.CollectionLoadPath + "DeviceCollectionData");
-            CampaignItemsSerializedData = Resources.Load<TextAsset>(Alias.Config.CollectionLoadPath + "CampaignItemsData");
+            CampaignMissionsSerializedData = Resources.Load<TextAsset>(Alias.Config.CollectionLoadPath + "CampaignMissionsData");
+            CampaignMissionsRewardSerializedData = Resources.Load<TextAsset>(Alias.Config.CollectionLoadPath + "CampaignMissionsRewardsData");
         }
 
         #endregion

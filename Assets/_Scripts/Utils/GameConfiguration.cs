@@ -6,15 +6,12 @@ namespace Hash17.Utils
     [CreateAssetMenu(fileName = "GameConfiguration", menuName = "Hash17/GameConfiguration")]
     public class GameConfiguration : ScriptableObject
     {
-        public string OwnedDeviceId;
-        public string VoxPopuliServer;
-
         public string CollectionsSavePath;
         public string CollectionLoadPath;
 
         public string CampaignSavePath;
 
-        public string DefaultUserName;
+        public int GameStartCampaignItemReward;
 
         #region Text
 
