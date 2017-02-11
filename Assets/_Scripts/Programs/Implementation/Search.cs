@@ -15,6 +15,9 @@ namespace Hash17.Programs.Implementation
     {
         protected override IEnumerator InnerExecute()
         {
+            if (AskedForHelp(true))
+                yield break;
+
             ProgramParameter.Param param;
 
             bool any = Parameters.TryGetParam("any", out param);

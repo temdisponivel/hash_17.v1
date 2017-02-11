@@ -99,7 +99,7 @@ namespace Hash17.Programs
             {
                 for (int i = 0; i < unknownParams.Count; i++)
                 {
-                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("Unknow parameter {0}.", unknownParams[i].Name)));
+                    Alias.Term.ShowText(TextBuilder.WarningText(string.Format("Unknow parameter '{0}'.", unknownParams[i].Name)));
                 }
                 Alias.Term.ShowText(Usage);
             }

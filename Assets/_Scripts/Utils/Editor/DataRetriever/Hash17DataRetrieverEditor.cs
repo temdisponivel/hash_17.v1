@@ -1,16 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
-using FH.DataRetrieving;
 using Hash17.Utils;
 using UnityEditor;
 
 [CustomEditor(typeof(Hash17DataRetriever))]
-public class Hash17DataRetrieverEditor : DataRetrieverBaseEditor
+public class Hash17DataRetrieverEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
-
         serializedObject.Update();
 
         var config = (Hash17DataRetriever)target;

@@ -1,5 +1,4 @@
-﻿using FH.DataRetrieving;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters;
@@ -33,11 +32,11 @@ namespace Hash17.Utils
         #region Data Retriever
 
         protected JsonData[] _spreadSheetResults;
-        protected DataRetrieverBase _dataRetriever;
+        protected Hash17DataRetriever _dataRetriever;
 
-        public DataRetrieverBase DataRetriever
+        public Hash17DataRetriever DataRetriever
         {
-            get { return _dataRetriever ?? (_dataRetriever = Resources.LoadAll<DataRetrieverBase>("")[0]); }
+            get { return _dataRetriever ?? (_dataRetriever = Resources.LoadAll<Hash17DataRetriever>("")[0]); }
         }
 
         #endregion
@@ -130,16 +129,6 @@ namespace Hash17.Utils
                         Debug.Log("File saved: " + path);
                     }
                 }
-
-                //using (Stream fileStream = File.Open(path, FileMode.Create))
-                //{
-                //    using (StreamWriter zip = new StreamWriter(fileStream))
-                //    {
-                //        zip.Write(JsonConvert.SerializeObject(entry.Value));
-                //        CreateCSharpKeysFile(cSharpPathPrefix, "Firehorse.Localization", "LocalizationKeys", entry.Value.Keys.ToArray());
-                //        Debug.Log("File saved: " + path);
-                //    }
-                //}
             }
 
             AssetDatabase.Refresh();
@@ -322,7 +311,7 @@ namespace Hash17.Utils
             prog.Description = desc;
             prog.Usage = usage;
             prog.Global = availableGame;
-            prog.AditionalData = aditionalData;
+            prog.AditionalData = !aditionalData.StartsWith("--") ? aditionalData : string.Empty;
             prog.KnownParametersAndOptions = !knownParameters.StartsWith("--")
                 ? knownParameters.Split(';')
                 : new string[0];
@@ -570,7 +559,7 @@ namespace Hash17.Utils
                     campaignItem.SystemVariablesToSet = GetStringList(current, "SystemVariablesToSet");
                     campaignItem.ProgramsToUnlock = GetIntList(current, "ProgramsToUnlock");
                     campaignItem.CampaignMissionReward = GetIntList(current, "CampaignMissionRewards");
-                    campaignItem.CampaignMissionReward = GetIntList(current, "CampaignMissionToComplete");
+                    campaignItem.CampaignMissionToComplete = GetIntList(current, "CampaignMissionToComplete");
 
                     items.Add(campaignItem);
                 }

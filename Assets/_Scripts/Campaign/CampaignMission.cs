@@ -38,9 +38,9 @@ namespace Hash17.Campaign
         {
             get
             {
-                var sum = FilesOpenedProgression + FilesDecryptedProgression + DevicesConnectProgression +
-                          DevicesDecryptedProgression + SystemVariablesProgression + ProgramsProgression;
-                return sum/6f;
+                var sum = (FilesOpenedProgression / 6f) + (FilesDecryptedProgression / 6f) + (DevicesConnectProgression / 6f) +
+                          (DevicesDecryptedProgression / 6f) + (SystemVariablesProgression / 6f) + (ProgramsProgression / 6f);
+                return sum;
             }
         }
 
