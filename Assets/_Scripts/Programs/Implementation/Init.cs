@@ -46,13 +46,16 @@ namespace Hash17.Programs.Implementation
             {
                 var message = TextBuilder.WarningText(
                             "Please, set your {0} using the '{1}' program."
-                            .InLineFormat("username".Colorize(Alias.Config.UserNameColor), "set".Colorize(Alias.Config.ProgramColor)));
+                            .InLineFormat("username".Colorize(Alias.Config.UserNameColor), 
+                            "set".Colorize(Alias.Config.ProgramColor)));
 
                 Alias.Term.ShowText(message);
 
             }
 
-            var helpMessage = "If you need any help, just type '{0}'.".InLineFormat("help".Colorize(Alias.Config.ProgramColor));
+            var helpMessage = "If you need any help, just type '{0}'. \nOr you can {1} for a term using '{1} <term>'. Eg: search alo."
+                              .InLineFormat("help".Colorize(Alias.Config.ProgramColor),
+                              "search".Colorize(Alias.Config.ProgramColor));
 
             Alias.Term.ShowText(helpMessage);
 

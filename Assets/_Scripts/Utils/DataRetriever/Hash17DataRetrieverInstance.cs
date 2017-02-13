@@ -447,11 +447,11 @@ namespace Hash17.Utils
             var startUnlocked = bool.Parse(currentDevice["StartUnlocked"].ToString());
             if (!string.IsNullOrEmpty(specialPrograms))
             {
-                var specialProgramsDef = currentDevice["SpecialPrograms"].ToString().Split(',');
+                var specialProgramsDef = currentDevice["SpecialPrograms"].ToString().Split(';');
                 for (int i = 0; i < specialProgramsDef.Length; i++)
                 {
                     var currentProg = specialProgramsDef[i];
-                    var parts = currentProg.Split(';');
+                    var parts = currentProg.Split(',');
                     var programId = (ProgramType)Enum.Parse(typeof(ProgramType), parts[0]);
                     var programUniqueId = parts[1];
                     dicSpecialProgram[programId] = int.Parse(programUniqueId);
@@ -599,7 +599,7 @@ namespace Hash17.Utils
                     campaignItem.Id = int.Parse(current["Id"].ToString());
                     campaignItem.FilesToUnlock = GetIntList(current, "FilesToUnlock");
                     campaignItem.DevicesToUnlock = GetStringHashedList(GetStringList(current, "DevicesToUnlock"));
-                    campaignItem.ProgramsToUnlock = GetStringHashedList(GetStringList(current, "ProgramsToUnlock"));
+                    campaignItem.ProgramsToUnlock = GetIntList(current, "ProgramsToUnlock");
                     campaignItem.CommandsToRun = GetStringList(current, "CommandsToRun");
 
                     itemsRewards.Add(campaignItem);

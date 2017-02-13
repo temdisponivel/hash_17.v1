@@ -25,7 +25,8 @@ namespace Hash17.Devices
         public FirewallType FirewallType;
         public Dictionary<ProgramType, int> SpecialPrograms;
         public bool StartUnlocked { get; set; }
-
+        public List<RunningSystem> RunningSystems { get; set; }
+        
         [JsonIgnore]
         public bool IsAvailable { get { return Application.isPlaying && Alias.Campaign.Info.UnlockedDevices.Contains(UniqueId); } }
 

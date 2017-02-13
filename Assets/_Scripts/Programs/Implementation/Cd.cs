@@ -6,6 +6,7 @@ using System.Text;
 using Hash17.Data;
 using Hash17.Files;
 using Hash17.MockSystem;
+using Hash17.Programs.Util;
 using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
@@ -55,42 +56,9 @@ namespace Hash17.Programs.Implementation
             }
             else if (param == null)
             {
-                const int typePad = 6;
-                const int namePad = 50;
-                const int statusPad = 10;
-                const int colorTagSize = 11;
-                const int total = typePad + namePad + statusPad - colorTagSize;
-                Alias.Term.ShowText("{0}{1}{2}".InLineFormat("TYPE".PadRight(typePad), "NAME".PadRight(namePad - colorTagSize), "STATUS".PadRight(statusPad)));
-                Alias.Term.ShowText("".PadRight(total, '-'));
-
                 var dir = fileSystem.CurrentDirectory;
-                var childs = dir.GetAvailableChilds();
-                for (int i = 0; i < childs.Count; i++)
-                {
-                    Alias.Term.ShowText("{0}{1}".InLineFormat("DIR:".PadRight(typePad), childs[i].PrettyName));
-                }
-
-                var files = dir.GetAvailableFiles();
-                for (int i = 0; i < files.Count; i++)
-                {
-                    string status;
-                    if (files[i].IsProtected)
-                    {
-                        if (files[i].CanBeRead)
-                            status = "Descrypted";
-                        else
-                            status = "Encrypted";
-                    }
-                    else
-                    {
-                        status = "Normal";
-                    }
-                    var fileState = status.PadRight(statusPad);
-                    Alias.Term.ShowText("{0}{1}{2}".InLineFormat("FILE:".PadRight(typePad), files[i].PrettyName.PadRight(namePad), fileState));
-                }
-
+                ProgramUtil.ShowFiles(dir);
                 yield return 0;
-
                 Alias.Term.RepositionText();
             }
         }

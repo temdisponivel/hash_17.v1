@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Hash17.Data;
-using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
 
@@ -157,6 +155,8 @@ namespace Hash17.Programs
             if (Running)
                 FinishExecution();
         }
+
+        public virtual void CacheAditionalData() { }
 
         #endregion
 

@@ -48,7 +48,7 @@ namespace Hash17.Programs.Implementation
                 label.AssumeNaturalSize();
 
                 _windowInstance.Setup("Timer", label, true, false, startClosed: true);
-                _windowInstance.Size = new Vector2(label.width + 20, label.height + 10);
+                _windowInstance.Size = new Vector2(label.width + 20, label.height + 50);
                 _windowInstance.SizeLocked = true;
 
                 yield return CoroutineHelper.Instance.WaitAndCallTimes((i) =>

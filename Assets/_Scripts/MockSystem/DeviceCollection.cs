@@ -28,13 +28,24 @@ namespace Hash17.MockSystem
 
         #region Helper
 
-        public bool GetDeviceByIdForced(int id, out Device device)
+        public bool GetDeviceByIdForced(int uniqueId, out Device device)
         {
-            device = _all.Find(d => d.UniqueId == id);
+            device = _all.Find(d => d.UniqueId == uniqueId);
             return device != null;
         }
 
-        public bool GetDeviceById(int id, out Device device)
+        public bool GetDeviceByIdForced(string id, out Device device)
+        {
+            device = _all.Find(d => d.Id == id);
+            return device != null;
+        }
+
+        public bool GetDeviceById(int uniqueId, out Device device)
+        {
+            return GetDeviceByIdForced(uniqueId, out device) && device.IsAvailable;
+        }
+
+        public bool GetDeviceById(string id, out Device device)
         {
             return GetDeviceByIdForced(id, out device) && device.IsAvailable;
         }

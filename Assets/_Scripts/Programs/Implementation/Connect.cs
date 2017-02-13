@@ -6,6 +6,7 @@ using System.Text;
 using Hash17.Data;
 using Hash17.Devices;
 using Hash17.MockSystem;
+using Hash17.Programs.Util;
 using MockSystem;
 using Hash17.Utils;
 using UnityEngine;
@@ -24,12 +25,7 @@ namespace Hash17.Programs.Implementation
             ProgramParameter.Param param;
             if (Parameters.ContainParam("s"))
             {
-                for (int i = 0; i < Alias.Devices.Count; i++)
-                {
-                    var deviceId = TextBuilder.BuildText(Alias.Devices[i].Id, Alias.Config.DeviceIdColor);
-                    var deviceName = Alias.Devices[i].Name;
-                    Alias.Term.ShowText(string.Format("ID: {0} | NAME: {1}", deviceId.PadRight(10), deviceName));
-                }
+                ProgramUtil.ShowDevices();
 
                 FinishExecution();
                 yield break;

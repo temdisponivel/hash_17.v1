@@ -13,5 +13,6 @@
         Open,
         Timer,
         Set,
+        Exploit,
     }
 }

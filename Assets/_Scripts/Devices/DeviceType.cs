@@ -4,5 +4,6 @@
     {
         Normal,
         Passworded,
+        CarDevice,
     }
 }

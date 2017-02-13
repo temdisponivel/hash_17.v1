@@ -33,7 +33,7 @@ namespace Hash17.Files
         {
             get
             {
-                if (Alias.Campaign.Info.DecryptedFiles.Contains(UniqueId))
+                if (CanBeRead)
                     return _content;
                 
                 return _content.Encrypt(Password);

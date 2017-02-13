@@ -8,6 +8,8 @@ public class Hash17DataRetrieverEditor : Editor
 {
     public override void OnInspectorGUI()
     {
+        base.OnInspectorGUI();
+
         serializedObject.Update();
 
         var config = (Hash17DataRetriever)target;
